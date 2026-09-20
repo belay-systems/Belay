@@ -5420,3 +5420,38 @@ a matter of reading more carefully: the defects live in the prose asserting the
 code is right, and re-reading re-derives the reasoning that produced them. Budget
 for the pass up front, and run it **before** anything irreversible lands — a
 signed artifact, a permanent identifier, a committed history.
+
+---
+
+# Pre-Public Hardening (2026-09-20, late) — appended here so no line citation moves
+
+Written by the session that ran the last scan before the owner made Belay
+public. It is at the end of the file, against this file's usual order, because
+every line above is cited by number somewhere and an insertion would move them.
+
+**What the scan asked.** Not "are the rules right" but "what enforces each rule
+if nobody reads it". Three answers were "nothing":
+
+- The files that *are* the guards (`.gitignore`, the agent instruction files,
+  `pyproject.toml`) were not owner-only in `.github/CODEOWNERS`.
+- The ruleset planned for `main` could not have worked. It required review from
+  a code owner, the owner is the only code owner of the governance paths, GitHub
+  does not let an author approve their own pull request, and every session so
+  far has pushed as the owner. `.github/rulesets/` now holds two rulesets
+  instead: one nobody can bypass (pull request, the five checks, no force-push,
+  no deletion) and one for review that an organization owner can bypass through
+  a pull request.
+- Nothing told an agent that an Issue opened by a stranger is not a task.
+
+**What the owner still has to rule**, put to them in the session and to be
+recorded in `docs/OwnerDecisions.md` in their words, not here: whether the
+second contributor is an organization Owner or a Member with write access
+(GitHub showed a pending invitation as Member, where Part 14a's recommendation
+describes both as owners); whether two passages in `docs/OwnerDecisions.md` that
+name a brokerage and a private project are published as they stand; and the
+ADR-013 amendment (Issue #1).
+
+**Not verified, and said so:** `scripts/public_settings.py --apply` has never
+run, because GitHub refuses rulesets on a private repository in a free
+organization. Its read-only mode was run against the private repository and
+reported 3 of 10 passing, which is the expected answer before the flip.

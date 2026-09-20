@@ -23,3 +23,18 @@
 /AGENTS.md                @pewpewpressco-ux
 /LICENSE                  @pewpewpressco-ux
 /.github/                 @pewpewpressco-ux
+
+# The guards themselves, added before the repository went public. A guard that
+# the person it restrains can approve removing is a convention. These decide
+# what gets published, what every contributor's agent is told to do, and what
+# code installs itself on a contributor's machine and in continuous integration.
+/.gitignore                            @pewpewpressco-ux
+/tests/test_publication_guard.py       @pewpewpressco-ux
+/tests/test_rulesets.py                @pewpewpressco-ux
+/tests/test_governance_conformance.py  @pewpewpressco-ux
+/scripts/public_settings.py            @pewpewpressco-ux
+/pyproject.toml                        @pewpewpressco-ux
+/CLAUDE.md                             @pewpewpressco-ux
+/.claude/                              @pewpewpressco-ux
+/CONTRIBUTING.md                       @pewpewpressco-ux
+/SECURITY.md                           @pewpewpressco-ux

@@ -354,12 +354,12 @@ to 3**; an agent cannot create a GitHub organization.
 (`docs/OwnerDecisions.md` Part 11d, re-confirmed in the build brief). Do it
 only after step 4 above reports clean and CI is green on Belay.
 
-Immediately afterwards, on `main`: require a pull request; require the five
-checks by name — `governance conformance`, `suite (py3.11)`, `suite (py3.12)`,
-`suite (py3.13)`, `dashboard builds`; require review from Code Owners; block
-force-pushes and deletion; secret scanning and push protection on; private
-vulnerability reporting on; Issues on; Actions set to require approval for
-first-time contributors (Part 13c).
+Immediately afterwards, tell a session the flip is done. It runs `python
+scripts/public_settings.py --apply`, which sets everything this entry used to
+list by hand (the two rulesets in `.github/rulesets/`, secret scanning, push
+protection, private vulnerability reporting, the Actions limits, Part 13c) and
+then reads each one back as PASS or FAIL. **`--apply` could not be tried while
+Belay was private, so its first run is its test: read the table, not the "ok".**
 
 ### Close Atlas down as a workplace — ADDED 2026-09-20
 
