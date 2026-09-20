@@ -5445,7 +5445,7 @@ if nobody reads it". For these the answer was "nothing":
 
 **What `main: review` does not do, found by the independent pass.** Its bypass
 is "any organization owner, through a pull request". `docs/OperatorChecklist.md`
-tells the owner to invite the second contributor as an organization Owner. If
+until Part 15b told the owner to invite the second contributor as an organization Owner. If
 that is done, both people who can merge can bypass it, and **the code-owner
 requirement binds nobody**; `.github/CODEOWNERS` then only decides whose review
 GitHub asks for. It binds the second contributor only if they are a Member with
@@ -5453,18 +5453,15 @@ write access. GitHub also counts a code owner only if they have write access,
 and on 2026-09-20 `gh api repos/belay-systems/Belay/collaborators` listed the
 owner alone. `main: checks` is unaffected either way: it has no bypass.
 
-**What the owner still has to rule**, put to them in the session and to be
-recorded in `docs/OwnerDecisions.md` in their words, not here:
+**What was put to the owner, and ruled the same session** — `docs/OwnerDecisions.md`
+Part 15 has the owner's words: the second contributor is a Member with write
+access, not an organization Owner, so `main: review` does bind them (15b);
+passages naming a brokerage and a private project are redacted, and the
+repository was rebuilt rather than force-pushed so that the redaction is real
+(15a); Belay gets its own folder on the owner's machine (15c); the machine's
+default commit address is a GitHub no-reply address (15d).
 
-- Whether the second contributor is an organization Owner or a Member with
-  write access. GitHub showed a pending invitation as Member, where Part 14a's
-  recommendation describes both as owners. The paragraph above is what turns on
-  it. Part 13c names "review from Code Owners" as part of what meets the owner's
-  condition that nothing changes `main` without review, so this is that
-  condition's question too.
-- Whether two passages in `docs/OwnerDecisions.md` that name a brokerage and a
-  private project are published as they stand.
-- The ADR-013 amendment (Issue #1).
+**Still owed by the owner:** the ADR-013 amendment (Issue #1).
 
 **Not verified, and said so:** `scripts/public_settings.py --apply` has never
 run, because GitHub refuses rulesets on a private repository in a free

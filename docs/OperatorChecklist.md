@@ -338,8 +338,8 @@ to 3**; an agent cannot create a GitHub organization.
    organization; you will find out at creation.
 2. **Invite the second contributor**, `Eternalaether5` (canonical login
    `eternalaether5`), as an
-   organization **Owner** — that is what Part 14a's selection means by both
-   owners being owners in GitHub's eyes.
+   organization **Member**, and give them Write access to Belay once they
+   accept. Ruled in Part 15b, which overrules the "Owner" this entry once said.
 3. **Create the repository** `Belay` inside it, **PRIVATE**, with no README, no
    `.gitignore` and no licence. The snapshot supplies all three, and any file
    GitHub adds at creation would break the single-commit requirement.
@@ -368,9 +368,9 @@ After Belay is live and public:
 - Atlas's `README.md` gains one line saying development moved. The owner may
   mark that repository **archived** (read-only) on GitHub. **It stays private
   either way** — Part 12b makes that permanent.
-- On the owner's machine, rename the old folder and clone Belay into the path
-  the old one had, so tools that key their settings to a folder path keep
-  working.
+- On the owner's machine, Belay is cloned into its own `Belay` folder (Part
+  15c, overruling 14d). The old folder stays where it is: it holds the only
+  copy of the fetched market data, which git ignores.
 - **The scheduled review routine moves to Belay** (Part 14c), by editing the
   existing routine in place. **Never retire and replace it** — the standing
   note on how is the last entry in the Done section. A session can make this
