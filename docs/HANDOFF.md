@@ -2439,7 +2439,7 @@ ref rather than the working tree. The account half: `cc80866` recorded that the
 cloud routine's Step 1 runs the script and obeys its exit code instead of listing
 a directory, and corrected the "no session can fix it" sentence — the correction,
 and why the evidence for the original claim was bad, is at
-`docs/OperatorChecklist.md:474-488`. Executed on this commit:
+`docs/OperatorChecklist.md:495-509`. Executed on this commit:
 
 ```
 $ python scripts/review_due.py
@@ -4591,7 +4591,7 @@ because it requires writing files into `docs/proposals/`; the line that causes
 it was re-read instead.
 
 **The briefs on this branch are not orphaned in fact.**
-`docs/OperatorChecklist.md:24` and `:26` name both of them. The test passes for
+`docs/OperatorChecklist.md:45` and `:26` name both of them. The test passes for
 the right reason today; it would also pass for the wrong one, and its own
 docstring records that it caught a real orphan on its first run. (Verified current on this branch; both line numbers will shift by roughly 21 lines when PR #10 merges.)
 

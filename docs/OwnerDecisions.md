@@ -2091,7 +2091,7 @@ The routine is updated in place and never retired and replaced.
 
 **The repository contradicts itself about why recreating the routine is
 dangerous, and neither claim has been verified.**
-`docs/OperatorChecklist.md:490` says a rebuilt routine **can** come back
+`docs/OperatorChecklist.md:511` says a rebuilt routine **can** come back
 *without* connector access. `docs/proposals/fresh-public-repository-brief.md:35-36` says it
 attaches *every* connector on the account, once including one able to place
 orders. The two sit badly together, and at least one is wrong. Both point at

@@ -3617,3 +3617,1198 @@ is that *no* artifact of any type has ever been committed. Rules 4 to 8 are
 specific to fetch records, since that is the only producer in the repository with
 a caller. A metric artifact, a review record and a strategy will each raise the
 question of who calls `save()` and when, and nothing here answers it.
+## ADR-015: A Strategy's Stage Is Carried, Not Asserted — And A Stage Move Without Evidence Is Not A Review
+
+Status:
+**PROPOSED — ratification is blocked on a prior owner ruling. Not implemented in any part.**
+
+Date:
+2026-09-19
+
+---
+
+> **What blocks ratification.** On 2026-09-19 the owner was asked what this ADR
+> should do about promotions into capital stages given that no document defines a
+> minimum evidence quality per rung, and selected **"Research a bar first"**: a
+> separate research task is to propose a minimum evidence grade for each rung, and
+> the owner rules on that proposal **before** ADR-015 is ratified. Rule 4 below
+> carries a marked, empty slot for that table and says exactly how it will consume
+> it. **No grade is invented here.**
+>
+> **That proposal now exists: `docs/proposals/evidence-bar-per-rung.md`, on this
+> branch.** It offers four options for the floor, and carries **two recommendations
+> that differ** — the author's and an independent reviewer's — each with its own
+> reasoning and cost, with no winner declared. It ends with seven questions only the
+> owner can answer, ordered to be asked one at a time. **Ratification of this ADR is
+> blocked on the owner's ruling on them.**
+>
+> **It has now had one independent pass**, which found 17 defects, 4 of them
+> blocking; the proposal was revised on 2026-09-19 and lists them in its own
+> appendix. **One of those blockers reached this ADR**, and rule 4's table is where
+> it landed: the table is keyed by destination alone, four destinations are both a
+> climb and a demotion destination, and a floor read off the destination would have
+> gated emergency demotions. Rule 4 now carries a direction clause. The table is
+> still empty.
+
+> **The owner has selected shape, six times. The owner has ratified no text.**
+>
+> 2026-09-19, first set:
+> 1. For F-007 — **"Carry proof + check storage."** The strategy carries a link to
+>    the signed review that authorized each rung, **and** the repository refuses to
+>    save or load a rung unless the previous rung is actually stored.
+> 2. **"Rule them together."** One ADR covers F-007 and F-014.
+>
+> 2026-09-19, second set, after the second independent pass:
+> 3. **"Yes, check on load."** Reading a strategy also confirms that the previous
+>    version and the last rung's review are really stored. Two extra reads, bounded.
+>    → rule 3c.
+> 4. **"Research a bar first."** Above. → rule 4's slot, and this Status block.
+> 5. **"Evidence for everything."** Every stage move, up or down, needs an evidence
+>    record and not only a written reason. → rule 4, which is no longer
+>    `Promote`-only.
+> 6. **"Yes, longest history wins."** A new version's ladder must extend or equal
+>    the longest stored ladder under that identifier; a mistaken save is corrected
+>    by appending a correcting rung with its own review, never by going back.
+>    → rule 3e, which replaces the first revision's "forks are left legal".
+>
+> Every rule below is this draft's reading of those six selections. The wording,
+> the field names, the component boundaries and every open item are the drafter's.
+> No owner prose is quoted, because none was given.
+
+> **Revision history, kept because it is the honest measure of how much attacking
+> this needed.**
+>
+> - **First draft (2717e76).** Reviewed independently: every citation and every
+>   measurement correct; **three blocking defects in the rule text.** Rule 3 never
+>   tied `strategy_stage` to the ladder, so one honest first rung bought a
+>   dishonest Production; a rung named a review without its version, so the first
+>   ADR-005 revision of any review would have made every citing strategy
+>   unreadable; and one review could buy two rungs.
+> - **Second draft (13d188d).** Reviewed independently again: **two more blocking
+>   defects, both demonstrated by execution.** `get()` did not resolve anything, so
+>   a single hand-written re-signed YAML with a seven-rung ladder naming reviews
+>   that do not exist was returned as `PRODUCTION`; and the Revision branch let a
+>   version built on an older ancestor silently undo a demotion, or un-retire a
+>   retired strategy. Five further weaknesses, including that scoping the
+>   repository's validation by `artifact.type` let the *forger* choose the scope.
+> - **This draft.** All fixed below, each named where it was fixed.
+>
+> **Two independent passes, five blocking defects, none found by the author.** That
+> is the pattern this repository has recorded for four consecutive sessions, and it
+> is the reason the Required Follow-Up asks for a third pass rather than treating
+> this one as settled.
+
+> **Nothing here is ratified, and no code was written.** The only file this branch
+> changes is `docs/DECISIONS.md`.
+
+---
+
+## Context
+
+**Two findings, one hole.** Both are live against `main` at `cc80866` and both were
+re-executed for this draft rather than taken from their reports.
+
+**F-007 — a strategy can be signed into existence at Production.**
+`docs/HANDOFF.md:3365`, ruled for fix by the owner 2026-08-14
+(`docs/OwnerDecisions.md:935`, guarantee at `:952`). `ArtifactFactory.create()`
+refuses to mint a STRATEGY past `IDEA` (`framework/artifacts/factory.py:61-71`) and
+`ArtifactIntegrity.sign()` (`framework/artifacts/integrity.py:71-80`) is a public
+classmethod that will hash anything handed to it. Re-run for this draft:
+
+```
+F-007 verify_hash : True
+F-007 validates   : True
+F-007 reloaded    : StrategyLifecycle.PRODUCTION
+```
+
+Three further paths reach the same place and were opened:
+`ArtifactSerializer.load()`, which returns `Artifact(**values)` at
+`framework/artifacts/serializer.py:134`; a hand-edit followed by a re-sign; and
+`dataclasses.replace()` followed by a sign. Three paths are closed: the factory
+guard above, a hand-edit *without* a re-hash
+(`framework/artifacts/repository.py:179-190`), and `validate_transition`
+(`framework/artifacts/validator.py:114-131`) — which guards *movement* and is never
+consulted about *birth*.
+
+**F-014 — a promotion can be recorded with no evidence whatsoever.** The durable
+number for the finding that `reports/review/2026-08-21-review.md:125` heads
+"F-007"; that report's correction block is authoritative and its headings are not.
+`review_artifact()` takes `stage_at_review` as a declared parameter and takes no
+evidence at all (`framework/artifacts/review.py:70-84`); it checks justification
+only (`:131-136`); it passes no evidence to the factory (`:167-174`). Re-run — a
+`PROMOTE` from `Promotion Review` to `Micro Capital` justified `"Looks good."`:
+
+```
+F-014 evidence    : () level: None
+F-014 validates   : True
+```
+
+`constitution/Paper_First_Capital_Doctrine.md:45-47` — "Promotion requires
+evidence. Never confidence alone" — is enforced nowhere in `framework/`.
+
+**Why they are one ruling.** A REVIEW artifact becomes the currency that buys a
+rung. If that currency can be minted in one call with no evidence, the ladder is
+decoration. Ruling F-007 without F-014 would move the hole rather than close it.
+
+### The version test for "birth" is rejected on executed evidence
+
+The 2026-08-14 proposal named *version `1.0.0` with no `parent_hash`* as the test
+for creation rather than advancement. `docs/OwnerDecisions.md:976-981` declined to
+rule it and told the next reader to attack it. Attacked three ways:
+`version="2.0.0", parent_hash="0"*64` on a STRATEGY at `PRODUCTION` validates
+`True`; `git grep -n "parent_hash=" -- framework/ scripts/` returns no matches, so
+no production code sets the field; and no document in `constitution/`, `Knowledge/`
+or `strategies/` names it.
+
+The finding survives intact, as `docs/OwnerDecisions.md:980` said it would — only
+the shape changes. **The shape is a ladder, not a version number.** `parent_hash`
+returns in rule 3a in a different role: not a test for birth, but the link saying
+*which* stored version a new version supersedes. That is the job
+`framework/artifacts/integrity.py:25-27` already assigns it — "it binds an artifact
+to the version it superseded, and an unprotected link can be repointed" — and the
+reason it is inside the signature at `framework/artifacts/integrity.py:63`.
+
+### The precedent this copies is one file over
+
+`framework/artifacts/validator.py:226-238` re-derives `evidence_level` and refuses
+a mismatch, for the reason its own comment gives: without it, an artifact built by
+calling `Artifact()` directly could claim Level A while carrying nothing but
+hypotheses, "and that claim is what a promotion gate reads". `strategy_stage` is
+the same kind of claim read by the same kind of gate, and `_validate_lifecycle`
+(`framework/artifacts/validator.py:145-169`) checks only that it *is* a
+`StrategyLifecycle` — never *which*, and never *how it got there*.
+
+### What the governing documents require, read in full for this draft
+
+- **`constitution/Paper_First_Capital_Doctrine.md:5-7`** — "Every strategy begins
+  with zero capital. No exceptions." Unconditional, and the constraint this ADR may
+  not conclude around.
+- **`constitution/Paper_First_Capital_Doctrine.md:45-47`** — "Promotion requires
+  evidence. Never confidence alone."
+- **`constitution/Immutable_Laws.md:23-25`** (Law III) — "No strategy is entitled
+  to capital. Capital must be earned."
+- **`constitution/Immutable_Laws.md:39`** (Law V) — "No department may bypass
+  validation."
+- **`constitution/Evidence_Standards.md:7-35`** — the four evidence classes,
+  implemented as `EvidenceLevel` at `framework/artifacts/enums.py:4-13` and ranked
+  at `framework/artifacts/enums.py:21-26`.
+- **`constitution/Evidence_Standards.md:45`** — "Every conclusion must reference
+  supporting evidence." **This is the sentence owner selection 5 applies.**
+- **`constitution/Promotion_Pipeline.md:71-83`** — the seven promotion criteria,
+  ruled canonical by ADR-006 rule 1.
+- **`strategies/Lifecycle.md:39`**, **`:41`** — "Strategies may move backward."
+  "Strategies never skip stages."
+- **`strategies/Registry.md:43`** — "Every strategy exists in exactly one lifecycle
+  stage."
+- **`workflows/Monthly/StrategyPromotion.md:43`** — "Every decision requires written
+  justification." **Cited at `:43` knowingly:** nine tracked locations cite `:37`,
+  where the word is `Demote`. F-020 of `reports/review/2026-09-04-review.md:155`,
+  not this branch's to fix.
+
+**What none of them say, checked rather than assumed: no document maps a lifecycle
+stage to a required evidence class.** That gap is what owner selection 4 sends to
+research, and it is why rule 4 carries a slot instead of a number.
+
+---
+
+## Decision
+
+### Rule 1 — A post-`IDEA` STRATEGY artifact carries its ladder, in signed content
+
+Under the `content` key `ladder`, oldest rung first. **The key appears exactly
+once.** `content` is a tuple of pairs and nothing forbids a duplicate key;
+`dict(artifact.content)` silently keeps the last — verified,
+`dict((("ladder","A"),("ladder","B")))` is `{'ladder': 'B'}` — so two `ladder` keys
+would give a reader one history and a checker another.
+
+**A rung is exactly five strings**, in this order:
+
+`(from_stage, to_stage, review_id, review_version, review_integrity_hash)`
+
+- `from_stage`, `to_stage` — a `StrategyLifecycle` **value**, one of the nine
+  strings at `framework/artifacts/enums.py:85-93` (`"Idea"`, `"Paper Trading"`, …).
+  Not member names, not free text. Values because that is what
+  `ArtifactIntegrity.canonical_payload` already stores for `strategy_stage`
+  (`framework/artifacts/integrity.py:33-35`) and what the serializer reconstructs
+  members from (`framework/artifacts/serializer.py:43-49`).
+- `review_id` — valid under `framework/identifiers.py`, `REV` prefix.
+- `review_version` — a semantic version, as `is_semantic_version` defines it
+  (`framework/artifacts/primitives.py`). **Without it, rule 3 would resolve a review
+  through `get(id)`, which answers with `latest()`
+  (`framework/artifacts/repository.py:168-169`)**, so the first ADR-005 revision of
+  any review would make every strategy citing it unreadable.
+- `review_integrity_hash` — that review *version's* `integrity_hash`, 64 lowercase
+  hex. The hash and not merely the id, because a name can be repointed.
+
+**In `content` rather than a new `Artifact` field.** ADR-009 rule 8's reasoning:
+`Artifact` fields are inside the integrity hash, so every field added is permanent.
+`content` is inside the hash too (`framework/artifacts/integrity.py:55`).
+
+**The artifact also carries a `Validated By` relationship** whose targets are the
+ladder's `review_id`s, **in ladder order**, and **the key `Validated By` appears at
+most once in `relationships`**. `relationships` is a tuple of pairs like `content`
+(`framework/artifacts/artifact.py:63`), so the same duplicate-key hole exists there
+and is closed the same way. `Validated By` already exists
+(`framework/artifacts/relationships.py:35`); no twelfth type is invented, which is
+the constraint `Knowledge/Relationships.md` and the validator's vocabulary check
+(`framework/artifacts/validator.py:171-190`) impose.
+
+**The edge is required and it is compared — rule 2 step 8.** It is kept rather than
+dropped because `relationships` is what a graph traversal reads and `content` is
+not. It is a coarser projection by design: it names the review, the ladder names
+the exact version.
+
+### Rule 2 — `ArtifactValidator` re-derives the stage from the ladder
+
+For `ArtifactType.STRATEGY`, in `_validate_lifecycle`, in this order. **Every step
+is checkable from the artifact alone and performs no I/O.**
+
+1. `content` carries the key `ladder` **at most once**.
+2. **`strategy_stage is IDEA` if and only if the ladder is absent or empty.** Both
+   directions.
+3. Every rung is a sequence of **exactly five** elements, **each of them a string**.
+   `from_stage` and `to_stage` each equal one of the nine values at
+   `framework/artifacts/enums.py:85-93`; `review_id` valid under
+   `framework/identifiers.py`; `review_version` a semantic version;
+   `review_integrity_hash` 64 lowercase hex characters.
+4. Rung 0's `from_stage` is `"Idea"`.
+   `constitution/Paper_First_Capital_Doctrine.md:5-7` is the whole of this line.
+5. **Chaining, between rungs.** For every `i > 0`, rung `i`'s `from_stage` equals
+   rung `i-1`'s `to_stage`.
+6. **Legality, within each rung.** For **each rung individually**,
+   `validate_transition(from_stage, to_stage)` passes
+   (`framework/artifacts/validator.py:114-131`). Asked rather than re-decided, on
+   the ground `framework/artifacts/review.py:277-282` already gives.
+7. The **last** rung's `to_stage` equals `strategy_stage`. **This is the
+   re-derivation**, the same factory-computes / validator-verifies split already
+   used for the integrity hash and for `evidence_level`
+   (`framework/artifacts/validator.py:226-238`). The last rung and not the highest:
+   see rule 3d.
+8. `relationships` carries `Validated By` at most once, and its targets, as a
+   sequence, equal the ladder's `review_id`s in ladder order.
+
+A bare `Artifact(..., strategy_stage=PRODUCTION)` carries no ladder and is refused
+at step 2.
+
+**What the validator alone cannot check.** It receives one artifact and no
+repository. **It cannot resolve an identifier.** A ladder of seven well-formed rungs
+naming seven reviews that were never written passes every step above. Rules 3b and
+3c are where the record is checked.
+
+### Rule 3 — The repository runs rule 2, and checks what rule 2 cannot
+
+**3.0 — the repository validates, and the scope is not the forger's to choose.**
+
+`ArtifactValidator` is imported nowhere in `framework/artifacts/repository.py`; it
+appears only in docstring prose, at `:140` and at `:156-160`, where `get()` argues
+it is "not a second gate reimplementing the first" and that `ArtifactValidator`
+"still owns identifiers, relationships, evidence grades and lifecycle rules, and
+callers that need those still run it." **`framework/artifacts/repository.py:156-160`
+is amended: the repository is a caller that needs those rules.**
+
+`save()` and `get()` run `ArtifactValidator().validate()` for any artifact that is
+**of type `STRATEGY`, or of type `REVIEW`, or carries a `strategy_stage` that is not
+`None`** — whatever its declared type.
+
+**The third clause is the fix for a defect found by execution.** Scoping on
+`artifact.type` alone lets the forger opt out by mis-declaring the type. Run for
+this draft against `main`: an artifact declared `ArtifactType.REPORT` and carrying
+`strategy_stage=StrategyLifecycle.PRODUCTION` saved through `ArtifactRepository` and
+came back from `get()` still carrying `PRODUCTION`. `ArtifactValidator` would have
+refused it — `framework/artifacts/validator.py:165-169` forbids a `strategy_stage`
+on a non-STRATEGY — but under a type-scoped rule the validator is never called. The
+capital claim is the trigger, not the label on it.
+
+**`type` is immutable across the versions of one identifier.** `save()` refuses an
+artifact whose `type` differs from that of any stored version of the same
+identifier. Run for this draft: today `STRAT-9200` version `1.0.0` can be a
+`STRATEGY` and version `2.0.0` a `REPORT`, and both save and read back. Without
+this rule an identifier could shed its type at a later version and step out of every
+check above. **This rule binds every artifact type, not only the three in scope
+above**, because the hole it closes is the ability to leave the scope.
+
+**Scoped rather than universal, and the cost is stated.** Validating every artifact
+on every read would change the behaviour of `artifacts/RPT-0001/1.0.0.yaml` and the
+fetch-record round trip ADR-014 settled. **An unevidenced REPORT with no capital
+claim still saves and still reads back.** That is the status quo, not an
+improvement.
+
+**Cost of the amendment itself:** `validate()` raises rather than returning False,
+so `save()` and `get()` acquire a failure mode they did not have, on the path a
+promotion gate sits on.
+
+**3a — the predecessor: named by `parent_hash`, found by a scan that cannot be
+poisoned**
+
+For an artifact in scope, `parent_hash` is the `integrity_hash` of the stored
+version this one supersedes. **`P` is the stored version of the same identifier
+whose `integrity_hash` equals `artifact.parent_hash`, and `P.type` must be
+`ArtifactType.STRATEGY`.**
+
+- **Ladder empty, nothing stored under this identifier** — a birth at `IDEA`:
+  `parent_hash` must be `None`.
+- **Ladder empty, a version already stored** — an `IDEA`-stage revision, which
+  ADR-005 permits as readily as any other: `parent_hash` must be set and must name a
+  stored version that is itself at `IDEA` with an empty ladder.
+- **Ladder non-empty**: `parent_hash` must be set and exactly one stored version
+  must carry that `integrity_hash`.
+
+**How the scan works, because leaving it undefined bricks identifiers.** The scan
+reads each `{root}/{id}/*.yaml` through `ArtifactSerializer.load()` and compares the
+**stored** `integrity_hash` field. **It does not call `get()` on siblings and it
+raises on none of them.** A sibling that will not parse, or whose hash does not
+verify, is skipped and reported, not raised on. This matters because under rule 3.0
+`get()` *raises* on an invalid artifact, so a scan built on `get()` would let one bad
+file in the directory make every future save of that identifier impossible — and
+storage is append-only, so the bad file could never be removed and the identifier
+(permanent and never reused, `Knowledge/Identifiers.md`) would be dead forever.
+**Only the one version the scan selects is then fetched through `get()`**, which is
+where it is verified and validated.
+
+**Why `parent_hash` and not "the highest stored semantic version below this one".**
+The field exists for this and says so (`framework/artifacts/integrity.py:25-27`,
+inside the signature at `:63`). Inferring from version order is a guess where an
+explicit link exists, and `framework/artifacts/repository.py:86-113` records that
+reading version order to answer a capital question is the mistake `latest()` was
+written to stop. **This requires `parent_hash` to be written by production code for
+the first time** — a narrow widening of a field the schema and the signature already
+carry, and **not** the rejected birth test, which asked whether the field was
+*absent* rather than what it points at.
+
+**3b — what `save()` requires beyond rule 3.0**
+
+Let `L` be the new artifact's ladder and `r = L[-1]` its last rung. **Conditions 1
+to 5 below govern a non-empty `L`.** Where `L` is empty the artifact is at `IDEA`,
+rule 3a governs it alone, and the only branch of condition 3 that is defined is
+Revision — `L[-1]` does not exist, so Append and condition 5 do not apply. A birth
+has no predecessor; an `IDEA`-stage revision has one and reaches it through rule
+3a. *(Stated because an earlier revision left the empty-ladder case to inference,
+and walking the honest histories against the text is what surfaced it.)*
+
+1. `P` resolves per rule 3a, and is fetched through `get(artifact.id, P_version)` —
+   so `P` is integrity-verified, rule-2-derived and rule-3c-checked on the way in.
+2. **`P` is at the frontier** — rule 3e.
+3. **Exactly one of these two holds:**
+   - **Append.** `P`'s ladder equals `L[:-1]` exactly, **and** `P.strategy_stage ==
+     r.from_stage`.
+   - **Revision.** `P`'s ladder equals `L` exactly, **and** `artifact.strategy_stage
+     == P.strategy_stage`.
+
+   *(Named **Append** and not "Climb" deliberately: it covers demotion and
+   retirement rungs identically, so nobody reads "climb" and skips condition 5 for a
+   move that goes downward.)*
+4. No `(review_id, review_version)` pair appears in more than one rung of `L`.
+5. In the **Append** case, the review resolves. `get(r.review_id, r.review_version)`
+   must return `R` with:
+   - `R.type is ArtifactType.REVIEW`;
+   - `R.integrity_hash == r.review_integrity_hash`;
+   - `review_fields(R)["subject_id"] == artifact.id`;
+   - `review_fields(R)["stage_at_review"] == r.from_stage` and
+     `["resulting_stage"] == r.to_stage`;
+   - `review_fields(R)["subject_version"] == P_version` **and**
+     `["subject_integrity_hash"] == P.integrity_hash`;
+   - `review_fields(R)["subject_ladder_length"] == len(L) - 1`.
+
+**Condition 4 and the last two bullets of condition 5 stop one review buying two
+rungs.** `STRATEGY_TRANSITIONS` (`framework/artifacts/validator.py:94-100`) admits
+`Production → Paper Trading` and the forward moves admit a climb back, so a ladder
+can legally hold two rungs with an identical stage pair.
+
+**The Revision branch exists because ADR-005 requires it**: a confidence revision
+produces a new version, so a STRATEGY must gain a version without gaining a rung.
+The two branches are exclusive and exhaustive — **a new version either exactly
+reproduces the ladder of the version it supersedes, or appends exactly one rung to
+it.** A shorter ladder, a rewritten rung, a stage change with no new rung, and a new
+rung with the stage left behind are all refused, and each has a named test below.
+
+**3c — what `get()` does: one level, non-recursive, and why the previous draft's
+claim was false**
+
+Owner selection 3. For an in-scope artifact, `get()` performs the integrity check it
+already performs, runs rule 2, and then **two bounded extra reads and no more**:
+
+- **The predecessor exists and is a legal one.** For a STRATEGY with a non-empty
+  ladder: the version named by `parent_hash` is stored under this identifier, is
+  `ArtifactType.STRATEGY`, is integrity-verified, passes rule 2, and satisfies rule
+  3b condition 3 — Append or Revision — against this artifact.
+- **The last rung's review exists and says what the rung claims.** `(review_id,
+  review_version)` is stored, is integrity-verified, is typed `REVIEW`, carries
+  `integrity_hash == review_integrity_hash`, **and satisfies every sub-check of rule
+  3b condition 5.** Re-running those sub-checks rather than only matching the hash
+  is deliberate: matching the hash proves the file is the one named, and the
+  sub-checks prove the named file is *about this rung*.
+
+**Both reads use an internal one-level read — load, integrity-verify, rule 2 — and
+call `get()` on nothing.** If they called `get()`, reading a strategy at
+`PRODUCTION` would walk seven predecessors and seven reviews and each review would
+want its subject. `framework/artifacts/repository.py:129-166` argues for a bounded
+read path and says it is "not a second gate reimplementing the first"; two reads is
+bounded, a traversal is not.
+
+**The second draft said `save()` having checked every link "guarantees that every
+rung in a stored ladder went through `save()`". That sentence was false and is
+withdrawn.** It was disproved by execution: one hand-written, re-signed YAML at
+`<root>/STRAT-0001/8.0.0.yaml` — stage `Production`, a seven-rung ladder naming
+`REV-9001` to `REV-9007`, `parent_hash` of `"f"*64`, a matching `Validated By` edge
+— was returned by `get()` as `PRODUCTION` with all eight rule-2 steps passing and
+**zero reviews on disk**. Nothing a write-time check does constrains a file that
+never went through the write path. That is what owner selection 3 fixes, and it is
+what this rule now does.
+
+**An `IDEA`-stage revision's parent link is checked by `save()` (rule 3a) and is not
+re-checked on read**, because no rung and therefore no capital claim depends on it.
+The two reads above are spent where a stage is being asserted.
+
+**What `get()` still does not catch, stated exactly.** It checks one level: the
+immediate predecessor and the *last* rung's review. It does **not** check rungs `0`
+to `n-2`, their reviews, or the predecessor's own predecessor. A strategy whose
+seventh-from-last review was deleted still reads back. That is the chain sweep's job
+— rule 3f.
+
+**3d — backward moves, and they are not an exception**
+
+Read from `STRATEGY_TRANSITIONS` (`framework/artifacts/validator.py:57-102`) rather
+than guessed: backward moves of any distance down to a `PAPER_TRADING` floor, plus
+`RETIRED` from anywhere; ADR-004 ruled those ten demotions. **A demotion is a rung
+like any other.** It appends `("Production", "Paper Trading", "REV-00NN", "1.0.0",
+<hash>)`; ADR-004 rule 4's written justification is already enforced at
+`framework/artifacts/review.py:131-136`; and under owner selection 5 it now also
+carries evidence — rule 4. **The ladder is a history, not a path**: it never shrinks,
+and a demoted strategy's ladder is *longer* than a never-demoted one's, which is why
+rule 2 step 7 reads the last rung rather than the highest. A strategy at `RETIRED`
+has a final rung and no legal successor, because `STRATEGY_TRANSITIONS[RETIRED]` is
+empty. `strategies/Lifecycle.md:39` and `:41` are satisfied by delegating rather than
+re-deciding.
+
+**3e — longest history wins; there are no forks, and a mistake is corrected forward**
+
+Owner selection 6. **This replaces the first revision's "forks are left legal",
+which the second pass showed was not merely untidy but exploitable.**
+
+**The frontier.** Among the *counted* stored versions of an identifier (defined
+below), let `Lmax` be the longest ladder. **A version is at the frontier when its
+ladder equals `Lmax`.** Rule 3b condition 2 requires `P` to be at the frontier, and
+with rule 3b condition 3 that gives exactly:
+
+- **Append:** `L[:-1] == Lmax`, so `len(L) == len(Lmax) + 1` and `Lmax` is a proper
+  prefix of `L`.
+- **Revision:** `L == Lmax`.
+
+Therefore **`Lmax` must be a prefix of `L`, and `len(L) - len(Lmax)` must be 0 or
+1.** Read off the consequences rather than left to inference:
+
+- A ladder **shorter** than `Lmax` is refused **even when it is an honest prefix of
+  it**. History does not get shorter.
+- A ladder of **equal length but different content** is refused: equal length with
+  different content means `Lmax` is not a prefix.
+- A ladder **longer by two or more** is refused.
+- **Revising the latest version stays legal**, which it must — ADR-005 mandates that
+  a confidence change produces a new version. The Revision branch is exactly that
+  case.
+- **Revising an older version is now refused.** Its ladder is a strict prefix of
+  `Lmax`, so it is not at the frontier. **This is a real loss and it is stated
+  rather than buried:** a mistake recorded three versions ago cannot be corrected in
+  place. Owner selection 6 is the ruling that it should not be — **a mistaken save
+  is corrected by appending a correcting rung with its own review, never by going
+  back** — and that is consistent with what this repository already does everywhere
+  else with superseded prose: annotate forward, never rewrite
+  (`strategies/Lifecycle.md:51-59` is the pattern).
+- **The B2 forgery dies here.** Honest `4.0.0` at `Production`, honest demotion
+  `5.0.0` to `Paper Trading` (so `len(Lmax) = n+1`), then `6.0.0` with
+  `parent_hash = hash(4.0.0)` and `4.0.0`'s ladder: `P` is `4.0.0`, whose ladder has
+  length `n ≠ len(Lmax)`, so `P` is not at the frontier and the save is refused.
+  Under the second draft the Revision branch held, `latest()` returned `Production`,
+  and no review was involved. **The same move un-retired a `RETIRED` strategy**,
+  which rule 3d forbids in prose and nothing enforced.
+- **And one review can no longer be cited for the same rung in two forks**, because
+  there are no forks. That closes it without a further rule.
+
+**Several versions may share `Lmax`, and that is not a fork.** Successive same-stage
+revisions of the frontier all carry the identical ladder, so all are at the frontier
+and any of them may be built on. They are not competing histories — the history is
+the same object in each — and the first Append made from any of them advances `Lmax`,
+after which every other frontier sibling stops being at the frontier and no second
+Append can be made. `latest()` continues to pick one, as it does today. **A fork
+requires two *different* ladders of the frontier length, and the prefix rule refuses
+the second of those outright.**
+
+**Which stored versions count.** A version counts toward `Lmax` only if it parses,
+its integrity hash verifies, it is `ArtifactType.STRATEGY`, it passes rule 2, **and
+it passes rule 3c's one-level check**. **The last clause is what stops a forged file
+dropped into the directory from owning the identifier for free:** a long ladder
+naming reviews that do not exist fails rule 3c and is not counted, so it neither
+becomes `Lmax` nor blocks honest saves. As in rule 3a, a version that fails any of
+these is **skipped and reported, never raised on**.
+
+**The residual denial of service, admitted rather than argued away.** A forger who
+*also* writes the predecessor file and the review file that rule 3c checks can
+produce a counted ladder longer than the honest one. Storage is append-only, so it
+can never be removed; `Knowledge/Identifiers.md` makes identifiers permanent and
+never reused, so the identifier cannot be abandoned and replaced. **The honest
+history would then have to continue by appending to the forgery.** This is the price
+of "longest history wins", it is real, and the only defences against it are the ones
+outside this ADR: write access to the repository, git review of a tracked directory,
+and rule 3f's sweep. Named here so it is a decision rather than a discovery.
+
+**3f — the chain sweep**
+
+A repository-wide check: for every stored STRATEGY version, resolve **every** rung's
+review and **every** predecessor back to `IDEA`, and report anything unresolvable,
+any counted ladder that is not a prefix of `Lmax`, and any identifier with more than
+one `Lmax`. This is the only thing that catches what rule 3c's one level does not.
+It is the shape ADR-014 rule 7 already rules for orphaned store versions and
+`tests/data/test_store.py:238-267` already implements for them, on the convention
+`tests/data/test_store.py:206-227` states: ask the system, not the prose. **It is
+Required Follow-Up, not a `get()` behaviour**, because its cost is proportional to
+the whole store.
+
+### Rule 4 — A stage move without evidence is not a review (F-014)
+
+Owner selection 5. **This is no longer `Promote`-only.** `ReviewOutcome` has four
+members (`framework/artifacts/enums.py:135-138`): `Promote`,
+`Remain Current Stage`, `Demote`, `Retire`.
+
+**Evidence is required for `Promote`, `Demote` and `Retire`** — the three that move
+a strategy between stages. `constitution/Evidence_Standards.md:45` — "Every
+conclusion must reference supporting evidence" — is the sentence that reaches the
+two the doctrine does not name, and owner selection 5 applies it.
+
+**`Remain Current Stage` is left optional, and that is the drafter's judgement, not
+the owner's selection.** The selection named three outcomes and said "every stage
+move"; `Remain` is by ADR-008 the *absence* of movement
+(`framework/artifacts/review.py:242-248`). Two things pull the other way and the
+owner should see both: `Remain` is also the state-side name for *rejecting* a
+promotion (ADR-008 rule 4), so requiring evidence would put a bar on saying no; and
+a `Remain` that holds a strategy at Limited Capital is a decision to keep capital
+deployed, which `constitution/Evidence_Standards.md:45` arguably reaches. **Flagged as an open
+item rather than settled.**
+
+**Where each obligation lives.**
+
+- **(a) `review_artifact()` gains `evidence`, defaulting to empty**, and passes it
+  to the factory — the one thing `framework/artifacts/review.py:167-174` does not
+  do. Defaulted rather than required so that `Remain` is not forced to pass `()`
+  explicitly.
+- **(b) `review_artifact()` refuses at construction** when `outcome` is `Promote`,
+  `Demote` or `Retire` and the evidence tuple is empty, or any record's `verify()`
+  is False. At construction, on the reason
+  `framework/artifacts/review.py:102-106` already gives: an unjustified decision
+  "is not an artifact with a defect — it is not a decision".
+- **(c) `ArtifactValidator` gains its first REVIEW-specific path**, applying the same
+  checks by reading `outcome` out of `content`. It has none today. Needed because a
+  construction-time check does not survive `ArtifactSerializer.load()`, which builds
+  `Artifact(**values)` directly (`framework/artifacts/serializer.py:134`) — **that
+  gap is F-007 itself**, and repeating it for reviews would be digging the same hole
+  next door.
+- **(d) `save()` and `get()` run (c)** under rule 3.0. No separate storage condition.
+- **(e) `save()` reconciles the declared subject fields** — rule 5. That needs the
+  store and the validator has none.
+
+**`evidence_level` is re-derived**, which ADR-005 rule 5 already requires and
+`framework/artifacts/validator.py:226-238` already does. No new taxonomy:
+`Artifact.evidence` exists (`framework/artifacts/artifact.py:37`), is inside the
+signature (`framework/artifacts/integrity.py:43`), and carries
+`constitution/Evidence_Standards.md`'s four classes through `EvidenceLevel`
+(`framework/artifacts/enums.py:4-13`).
+
+**Confidence is not evidence.** A populated `resulting_confidence` or a
+`confidence_adjustment` of `Increase` does not satisfy this rule —
+`constitution/Paper_First_Capital_Doctrine.md:45-47`, "Never confidence alone", the
+only sentence in the constitution naming something that explicitly does *not* count.
+
+**What owner selection 5 costs, stated because the owner was told it and chose it
+anyway.** A demotion can no longer be recorded on the strength of a written reason
+alone. In an emergency — a live breach, a strategy that must come off capital now —
+the reviewer must first construct an `EvidenceRecord`, which requires a source, a
+methodology, a level, a confidence and a provenance
+(`framework/artifacts/evidence.py:20-30`). **The mitigation is that the evidence for
+a demotion is usually already in hand: the record of the observed breach itself** —
+the drawdown measurement, the failed check, the deviation report — is exactly a
+Level A or B record, and attaching it is recording what was already seen rather than
+producing something new. It is still a step between noticing and acting, and on a
+day when that matters it will be felt.
+
+#### The minimum evidence grade per rung — the slot owner selection 4 reserved
+
+**This table is deliberately empty. Nothing may fill it except an owner ruling.**
+`docs/proposals/evidence-bar-per-rung.md` proposes what could fill it — four
+options, the author's recommendation, an independent reviewer's *different*
+recommendation, and the counter-argument against each — and **this ADR deliberately
+copies none of it here, because it is unruled.**
+
+| Rung reached (`to_stage`) | Minimum `EvidenceLevel` — **upward moves only** |
+|---|---|
+| Research | *to be ruled* |
+| Validation | *to be ruled* |
+| Paper Trading | *to be ruled* |
+| Promotion Review | *to be ruled* |
+| Micro Capital | *to be ruled* |
+| Limited Capital | *to be ruled* |
+| Production | *to be ruled* |
+| Retired | *to be ruled* |
+
+**How rule 4 will consume it, so the shape of the check is settled now even though
+the numbers are not.** A ninth step joins rule 4: for a review whose outcome moves a
+strategy **upward**, the artifact's `evidence_level` — which is already the strongest
+grade present, derived by `strongest_evidence_level`
+(`framework/artifacts/enums.py:29-43`) and re-derived by the validator — must be **at
+least** the minimum ruled for the rung's `to_stage`, compared through
+`EVIDENCE_STRENGTH` (`framework/artifacts/enums.py:21-26`) and never through the
+members' declaration order. The comparison is a table lookup and a `>=`; nothing else
+in this ADR changes when the table is filled.
+
+**The floor binds upward moves only, and the direction is computed, not inferred from
+the table.** The table is keyed by destination alone, and four destinations are
+*both* a climb destination and a demotion destination — `Paper Trading`, `Promotion
+Review`, `Micro Capital` and `Limited Capital` each appear on the right-hand side of
+both a forward and a backward entry in `STRATEGY_TRANSITIONS`
+(`framework/artifacts/validator.py:57-102`). A floor read off `to_stage` alone would
+therefore put the `Validation → Paper Trading` bar onto `Production → Paper Trading`
+as well, which is a grade gate on an emergency demotion — exactly what ADR-004 rule 4
+(`docs/DECISIONS.md:396-400`) forbids and what rule 4's own cost paragraph above says
+must not be added to.
+
+So the ninth step runs **only when the rung is upward**, determined as follows and in
+this order:
+
+1. **Retirement is classified first.** If `to_stage` is `"Retired"`, the move is a
+   retirement, it is never upward, and the ninth step does not run. `RETIRED` is
+   declared last in `StrategyLifecycle` and is therefore *positionally* above
+   `PRODUCTION` while being no rung at all — the trap the comment at
+   `framework/artifacts/enums.py:96-109` exists to warn about, and the reason
+   `STRATEGY_LADDER` drops it. Reading a retirement as the deepest promotion in the
+   system would demand the strongest evidence on the fastest capital-preservation act
+   Belay has.
+2. **Otherwise compare `STRATEGY_LADDER` positions**
+   (`framework/artifacts/enums.py:107-109`), never
+   `list(StrategyLifecycle)` positions. The move is **upward** when
+   `STRATEGY_LADDER.index(to_stage) > STRATEGY_LADDER.index(from_stage)`, and the
+   ninth step runs. It is downward or level otherwise, and the ninth step does not.
+   **No conversion is needed between a rung's strings and the ladder's members:**
+   `StrategyLifecycle` is a `str` enum (`framework/artifacts/enums.py:69`), so
+   `tuple.index` matches a value against a member. Verified for this amendment —
+   `STRATEGY_LADDER.index("Paper Trading")` is `3`, `.index("Production")` is `7`,
+   and `"Retired" in STRATEGY_LADDER` is `False`, which is clause 1's safety net
+   rather than a substitute for it: relying on the membership test alone would make
+   a retirement raise `ValueError` instead of being classified.
+
+The `Retired` row is kept in the table so the owner rules it explicitly rather than by
+omission; by clause 1 the only value it can carry is *no floor*.
+
+Rule 4's base obligation is unaffected by direction: a `Demote` or a `Retire` still
+carries at least one verifying evidence record, as owner selection 5 requires. What
+the direction clause removes is a *grade* requirement on the way down, never the
+record.
+
+**Three places where that proposal and this ADR must be reconciled at ruling time**,
+named now so none is discovered during implementation:
+
+- **Downward moves.** The proposal's author and its independent reviewer both
+  recommend **no grade floor** on demotion and retirement — one evidence record
+  describing the observed condition that triggered the move, graded at whatever level
+  that observation was made at. **That is consistent with the owner's "Evidence for
+  everything" selection and with rule 4 as written here:** rule 4 binds `Promote`,
+  `Demote` and `Retire` to carry evidence and sets no grade for any of them, and the
+  direction clause above keeps the table off them, so a no-floor downward rule adds
+  nothing this ADR refuses. If the owner rules a floor downward instead, rule 4's
+  direction clause and the proposal's section 5 both change.
+- **`Remain Current Stage`.** Left evidence-optional above as the drafter's
+  judgement, flagged as an open item. The proposal now puts it to the owner as a
+  question of its own, and its two recommendations differ on the answer — so this is
+  a third place the ruling reaches, and the open item above is where it lands.
+- **Where the bar is ruled.** The proposal's last question asks whether the bar is
+  ruled *inside* ADR-015 or as a separate **ADR-016** — one ratification, against a
+  bar that could later be amended without re-opening the ladder rules. **This ADR
+  does not answer that**, and it is not the drafter's to answer: either way the table
+  above is the interface, and either way it is filled by a ruling and not by a
+  session.
+
+**Until it is filled, rule 4 requires evidence to be present and unedited, and
+nothing about its grade** — so **a single Level D record,
+`constitution/Evidence_Standards.md:31-35`, "Hypothesis. Research only.", satisfies
+it for a promotion into real capital.** That is precisely why owner selection 4
+blocks ratification on the research task rather than letting this ADR guess.
+
+#### What rule 4 buys, and what it does not
+
+**`EvidenceRecord.verify()` proves the record has not been edited since it was
+created. It proves nothing about whether the evidence is true, adequate or
+relevant.** It recomputes the record's own hash over its own fields
+(`framework/artifacts/evidence.py:62-84`) — self-consistency, not an external check.
+Verified for this draft: a record whose `source` is `"I made this up"`, whose
+`methodology` is the empty string and whose `confidence` is `0.99` returns
+`verify() -> True`.
+
+**Together with the empty table above: rule 4 buys non-emptiness and
+tamper-evidence. It does not buy quality.** That is the honest ceiling, and closing
+the gap is what the blocked ruling is for.
+
+### Rule 5 — The REVIEW `content` shape, settled now
+
+`framework/artifacts/review.py:56-67` records ten keys today.
+`artifacts/RPT-0001/1.0.0.yaml` is the only artifact ever committed — verified with
+`git log --all --diff-filter=A --name-only -- artifacts/` — so no REVIEW exists and
+its signed content is still free to change. After the first is saved, every change
+is a migration of permanent append-only records, which `Knowledge/Versioning.md:25`
+forbids rewriting. **ADR-014 rule 6 (`docs/DECISIONS.md:3375-3393`) made exactly
+this argument about the fetch record and is cited as an analogy only; it rules
+nothing about REVIEW content.**
+
+**Three keys are added, and rule 3b condition 5 reads all three** — none is
+decorative:
+
+- **`subject_integrity_hash`** — the `integrity_hash` of the exact subject version
+  reviewed. `subject_id` and `subject_version` name a *file*; the hash names its
+  *contents*.
+- **`subject_ladder_length`** — how many rungs the subject carried when reviewed.
+  It pins a review to a *position*, which is what stops one review buying two rungs
+  after a demotion and re-climb.
+- **`evidence_summary`** — one line naming what the evidence records are, for a
+  person reading the YAML. Prose; nothing computes on it. Same status ADR-009 rule 8
+  gave the six template sections.
+
+**Who writes them.** `review_artifact()`
+(`framework/artifacts/review.py:70-84`) gains three parameters of those names, and
+the module constant `FIELDS` (`framework/artifacts/review.py:56-67`) grows from ten
+entries to thirteen. `review_fields()` reads them back through that same constant,
+which is what the constant exists for — its own comment says it is named there so
+that writer and reader "cannot drift apart". `subject_integrity_hash` and
+`subject_ladder_length` are required; `evidence_summary` defaults to empty.
+
+**Not added: the evidence itself.** It belongs on `Artifact.evidence`, which exists,
+is signed, and has a derived grade. Copying it into `content` would be the
+duplicated abstraction `AGENTS.md:113` forbids.
+
+**`stage_at_review` stays declared, and is reconciled at the storage boundary.**
+
+*Declared*, because `review_artifact()` is a pure constructor that takes no
+repository, and ADR-009 made the record a statement of what the reviewer had in
+front of them. A field substituted from disk would stop being that, and would make a
+review of a stale artifact indistinguishable from a review of a current one — the
+distinction `framework/artifacts/review.py:88-91` says `subject_version` exists to
+draw.
+
+*Reconciled*, because a declaration nobody tests is what F-014 is. On `save()` of a
+REVIEW the repository resolves `subject_id` at `subject_version` and requires the
+stored artifact's `integrity_hash` to equal `subject_integrity_hash`, its
+`strategy_stage` to equal `stage_at_review`, and its ladder length to equal
+`subject_ladder_length`.
+
+**When the subject does not exist, `save()` refuses** with a message naming the
+missing `subject_id` and `subject_version`, and says that a review of an artifact
+that is not stored records a decision about nothing. It does **not** return `None`
+or save the review unreconciled: a silent fallback indistinguishable from a real
+answer is the failure `review_fields()` already refuses at
+`framework/artifacts/review.py:188-199`.
+
+**Ordering is forced and there is no cycle.** A review is saved *before* the
+strategy version whose rung cites it, because rule 3b condition 5 resolves it; and
+the review's own subject is the *predecessor*, which already exists.
+
+**A REVIEW whose subject is not a STRATEGY remains unconstructible, and that is
+unchanged and intended.** `review_artifact()` already requires `stage_at_review` and
+`resulting_stage` to be `StrategyLifecycle` members
+(`framework/artifacts/review.py:70-84`), so a review of a REPORT cannot be built on
+`main` today. ADR-009 built this record for strategy reviews and this ADR does not
+widen it. Recorded here rather than discovered later; if Belay ever needs to review a
+non-strategy artifact, that is a new ruling and not a bug in this one.
+
+### Rule 6 — `ArtifactSerializer` restores tuples all the way down, and no further
+
+`_PAIR_FIELDS` re-tupling at `framework/artifacts/serializer.py:116-118` is exactly
+two levels deep. Measured rather than argued: a ladder carried as a nested tuple in
+`content` round-trips through `dump()`/`load()` with `verify_hash() -> True` —
+`canonical_digest` JSON-encodes and JSON does not distinguish a tuple from a list —
+and **comes back as nested lists**. Signatures are unaffected; immutability is not,
+and `Artifact` is frozen precisely so a signed payload cannot be edited afterwards,
+which `framework/artifacts/serializer.py:53-57` states in those words.
+
+**The recursion is bounded by type, and the bound is the rule.** It converts `list`
+to `tuple` and recurses into the elements of a `list`. **Every other type is
+returned unchanged and is not descended into** — `str`, `bytes`, `int`, `float`,
+`bool`, `None`, and `dict` (whose keys and values are left exactly as loaded).
+Strings are named explicitly because a naive "recurse into anything iterable" walks
+a string forever. `dict` is left alone because nothing here puts one in `content`,
+and widening the conversion would change the fetch-record round trip ADR-014
+settled.
+
+### Rule 7 — `ArtifactFactory` keeps its own guard
+
+`docs/OwnerDecisions.md:982` left this a preference. It is ruled: keep it. It fails
+earlier and says more, and rule 2 does not make it redundant — the factory refuses
+at *issue* and the validator at *read*, and F-007 is precisely the finding that a
+check at one of those is not a check at the other.
+
+---
+
+## Tests this implies
+
+Behaviours, not code. **Every negative test asserts the specific refusal, never a
+bare exception type** — a test asserting `pytest.raises(ValueError)` passes on a
+misspelled keyword, and this repository has shipped that shape twice. Where a test
+below could pass for a wrong reason, the wrong reason is named.
+
+**The honest histories — the tests that stop the fix being a wall.**
+`docs/proposals/F-007-session-brief.md:130-133` names the first as the one most
+likely to be forgotten.
+
+1. A strategy climbs `Idea` to `Production` one rung at a time, each rung bought by a
+   stored review carrying evidence, and every version round-trips through
+   `ArtifactRepository` with its stage and integrity intact.
+2. A strategy at `Idea` with no ladder and `parent_hash` of `None` saves and reads
+   back.
+3. A second version at `Idea` with an empty ladder saves when `parent_hash` names the
+   stored `Idea` version; and is refused, naming `parent_hash`, when it is `None`
+   while a version is already stored.
+4. A strategy is demoted from `Production` to `Paper Trading` **with an evidenced
+   `Demote` review** and climbs back; the ladder grows through the demotion, holds
+   two rungs with the same stage pair, and each is bought by a different review.
+5. A same-stage content revision of the **frontier** version — ADR-005's confidence
+   change — saves with the ladder and stage unchanged and no review required.
+6. A review is revised to a second version after a strategy has cited its first; the
+   strategy still resolves through `get()`, because the rung names `review_version`.
+   Asserts the loaded stage, not merely that no exception was raised.
+7. An emergency demotion recorded from a single evidence record describing the
+   observed breach saves, reads back, and its `evidence_level` is the record's grade.
+
+**The forgeries — each refused, and the refusal named.**
+
+8. `Artifact(type=STRATEGY, strategy_stage=PRODUCTION)` + `sign()` is refused for
+   carrying no ladder while not at `Idea`. *(F-007's reproduction.)*
+9. The same through `ArtifactSerializer.load()`, refused identically.
+10. The same re-signed after a hand-edit, refused identically.
+11. The same via `dataclasses.replace()` + `sign()`, refused identically.
+12. An honest `Idea` version plus an honest `Idea → Research` review, then a version
+    claiming `strategy_stage = "Production"` with that one rung, refused **naming the
+    mismatch between the stage and the last rung's `to_stage`**. *(Blocker 1.)*
+13. **A hand-written re-signed YAML with a seven-rung ladder naming reviews that are
+    not on disk is refused by `get()`, naming the missing `(review_id,
+    review_version)`** — and separately, with the review present but the predecessor
+    absent, refused naming the missing `parent_hash` version. *(Blocker B1; two
+    tests. Each must assert the message, because a test that only asserts "not
+    `PRODUCTION`" would pass on an unrelated `AttributeError`.)*
+14. A version whose `parent_hash` names an older, non-frontier ancestor is refused
+    **naming the frontier**, in three forms: undoing a demotion, un-retiring a
+    `RETIRED` strategy, and an ordinary revision of a superseded version. *(Blocker
+    B2, owner selection 6.)*
+15. A ladder of the same length as `Lmax` but differing in any rung is refused naming
+    the prefix rule; so is a ladder shorter than `Lmax` that is an honest prefix of
+    it; so is one longer by two.
+16. An artifact declared `REPORT` but carrying `strategy_stage=PRODUCTION` is refused
+    by both `save()` and `get()`, naming the stage on a non-STRATEGY. *(The executed
+    scope-evasion.)*
+17. A second version of one identifier declaring a different `type` is refused by
+    `save()`, naming both types.
+18. A rung naming a review whose stored version differs from the one named is refused
+    naming the version; and test 6's positive case is its pair. *(Blocker 2.)*
+19. A ladder in which one `(review_id, review_version)` appears in two rungs is
+    refused naming the repeated pair. *(Blocker 3.)*
+20. A rung whose review's `subject_ladder_length` is not `len(L) - 1` is refused
+    **naming both numbers**; and one whose `subject_integrity_hash` names a version
+    other than the predecessor used is refused naming both hashes. *(Blocker 3.)*
+21. A `Promote`, a `Demote` and a `Retire` review with empty evidence are each
+    refused at construction, by the validator, and by `save()` — nine tests, because
+    they are three outcomes across three components. *(F-014, owner selection 5.)*
+22. A `Remain Current Stage` review with empty evidence **saves**, which pins the
+    drafter's judgement call so that changing it later is a deliberate act.
+23. A review carrying a record whose hash has been forged is refused naming the
+    record's source.
+
+**The direction clause — written now, run when the table is filled.** Both are
+written against a `to_stage` whose ruled floor is above `D`; until the table is
+ruled, both are `xfail` against the empty table, in the shape the conformance suite
+already uses for a gap being watched. `Micro Capital` is the worked example because
+it is the first stage committing real money.
+
+23a. **A demotion into a stage whose upward floor is `C` passes carrying only a Level
+    D observed-condition record.** `Limited Capital → Micro Capital` — a legal
+    backward move (`framework/artifacts/validator.py:81-87`) — with a single Level D
+    record recording a reasoned structural argument saves and reads back, and the
+    stored `evidence_level` is `D`. **Asserts the refusal does not happen**, and its
+    docstring must name ADR-004 rule 4 (`docs/DECISIONS.md:396-400`) as what it
+    protects, so that a future change to the ninth step cannot silently put a floor
+    on an emergency demotion.
+23b. **A promotion into that same stage carrying only a Level D record is refused,
+    naming both the ruled minimum and the record's grade.** `Promotion Review → Micro
+    Capital` — the rung that releases real money — with the identical record. The two
+    tests differ only in `from_stage`, which is the whole point: the table is keyed by
+    destination and the direction clause is what separates them.
+
+**The structural rules.**
+
+24. A ladder not beginning at `"Idea"` is refused naming rung 0's `from_stage`.
+25. A ladder with a gap — rung `i`'s `from_stage` unequal to rung `i-1`'s `to_stage`
+    — is refused naming both rungs.
+26. A ladder containing a rung that skips a stage is refused, **and the refusal comes
+    from `validate_transition`**, asserted by matching its message.
+27. A strategy at `Idea` with a non-empty ladder is refused; a post-`Idea` strategy
+    with an empty ladder is refused. Both directions of step 2.
+28. Rung shape, one test each, every refusal naming the offending element: four
+    elements; six elements; **an element that is not a string** (an integer, and a
+    nested list); a stage that is a member *name* rather than a value; a malformed
+    `review_id`; a non-semantic `review_version`; a `review_integrity_hash` of the
+    wrong length; one in upper case.
+29. A `Validated By` edge whose targets differ from the ladder's `review_id`s, or are
+    in a different order, is refused; and `relationships` carrying `Validated By`
+    twice is refused.
+30. `content` carrying the key `ladder` twice is refused.
+31. A non-empty ladder with `parent_hash` of `None`, and a `parent_hash` matching no
+    stored version, are each refused by `save()` **naming `parent_hash`** — not
+    merely raising, because a missing predecessor could otherwise surface as a
+    `None` dereference.
+32. **A directory containing one unparseable sibling and one corrupt sibling still
+    permits an honest save**, and the refusal-free path is asserted by the save
+    succeeding. *(Rule 3a's scan, and the brick-the-identifier failure it exists to
+    prevent.)*
+33. **A forged long-ladder file dropped into the directory, naming reviews that do
+    not exist, does not become `Lmax` and does not block an honest save.** *(Rule
+    3e's counting rule.)*
+34. A REVIEW whose subject is not stored is refused by `save()` naming the
+    `subject_id` and `subject_version`; one whose subject's `integrity_hash`,
+    `strategy_stage` or ladder length disagrees with the declared value is refused
+    naming the field that disagreed. *(Rule 5's reconcile — four tests, none of which
+    existed in the previous draft.)*
+35. `save()` and `get()` refuse an invalid STRATEGY and an invalid REVIEW, and still
+    accept a REPORT with no capital claim that would not otherwise validate. *(Rule
+    3.0, including its stated asymmetry.)*
+36. **`get()` opens exactly two extra artifacts and no more** — asserted by reading a
+    strategy at `Production` from a repository holding only it, its predecessor and
+    its last rung's review, with every earlier version and review absent, and
+    observing that it succeeds. **This test asserts the limitation, not a guarantee,
+    and its docstring must say so, naming rule 3f as what covers the rest.** *(The
+    inverse of the previous draft's test 25, which asserted that `get()` resolved
+    nothing.)*
+37. A nested list inside `content` comes back as a nested tuple, and a string inside
+    `content` comes back as the same string rather than a tuple of characters.
+38. `ArtifactFactory.create()` still refuses a post-`Idea` STRATEGY at birth.
+
+---
+
+## Consequences
+
+Positive:
+
+- F-007 closes at the point where the claim is *read* as well as where it is
+  *issued*, which is the guarantee `docs/OwnerDecisions.md:958` names
+- F-014 closes, and `constitution/Paper_First_Capital_Doctrine.md:45-47` acquires an
+  implementation for the first time in the project's life
+- under owner selection 5, `constitution/Evidence_Standards.md:45` becomes true of
+  every stage move rather than only of promotions
+- the REVIEW record stops being a statement *about* a strategy and becomes a thing
+  the strategy must *produce* to move
+- the signed content of a REVIEW is settled in the last window where that is free
+- `parent_hash` stops being a field nothing writes
+- an identifier can no longer shed its type at a later version
+
+Negative:
+
+- **`tests/artifacts/test_serializer_round_trip.py:90-116` must change.** The only
+  place in the repository constructing a post-`IDEA` STRATEGY — a grep for
+  `strategy_stage=StrategyLifecycle.` above `IDEA` over `tests/`, `framework/` and
+  `scripts/` returns exactly one line, `:110`. It jumps `IDEA` to `LIMITED_CAPITAL`
+  in one `dataclasses.replace`, skipping three rungs and naming no review. **Its
+  subject — that an earned stage survives the round trip — is not weakened; the
+  fixture gets longer and more honest.**
+- `tests/artifacts/test_review_decision.py` gains evidence at every `Promote`,
+  `Demote` and `Retire` construction, and `review_artifact()`'s signature grows by
+  four parameters
+- **building a strategy for a test stops being a one-liner.** Reaching
+  `MICRO_CAPITAL` legitimately takes five strategy versions and five evidenced
+  reviews. A shared climbing fixture is not optional
+- **an emergency demotion now needs an evidence record first.** Owner selection 5,
+  with the cost and the mitigation stated in rule 4
+- **a mistake three versions back can no longer be revised in place.** Owner
+  selection 6; correction is forward-only
+- **`get()` is no longer one integrity check.** Two extra artifact reads on every
+  in-scope read, and it can now refuse a file it used to return
+- `save()` and `get()` acquire a validation failure mode on the path a promotion gate
+  sits on
+- committed artifacts per rung, permanent and tracked under ADR-014 rule 2, with no
+  retention policy — the ground on which ADR-013 and ADR-014 both declined to rule one
+- rules 3 and 5 are checks at a boundary nothing crosses today. Nothing in Belay calls
+  `save()` for a STRATEGY or a REVIEW, so a green suite proves the checks work and
+  proves nothing about the system using them — ADR-014's position on the day it was
+  ratified
+
+### Residual risk, stated rather than buried
+
+**What the cheapest forgery costs, counted rather than asserted.**
+
+- **Against `main` today: one file.** A hand-written, re-signed YAML at
+  `<root>/STRAT-0001/8.0.0.yaml` claiming `PRODUCTION`. Executed.
+- **Against the second draft of this ADR: still one file.** The same YAML with a
+  seven-rung ladder naming `REV-9001`…`REV-9007`, a `parent_hash` of `"f"*64` and a
+  matching `Validated By` edge. `get()` returned `PRODUCTION` with zero reviews on
+  disk. Executed. That is what owner selection 3 was asked about.
+- **Against this draft: three files.** `get()` checks one level, so the forger must
+  also write the predecessor version — whose ladder is `L[:-1]` and which must pass
+  rule 2 — and the *last* rung's review, which must be typed `REVIEW`, carry the named
+  integrity hash, and satisfy every sub-check of rule 3b condition 5. The earlier six
+  rungs' reviews and the predecessor's own ancestors need not exist.
+- **To forge a history that also survives rule 3f's sweep: fifteen files** for a
+  strategy at `PRODUCTION` — eight strategy versions and seven reviews, each
+  evidenced, each internally consistent, each resolving.
+
+**So `get()` raises the floor from one file to three, and only the sweep raises it to
+fifteen.** Stating the three honestly is the point: the previous draft claimed a
+guarantee it did not have.
+
+**And none of this stops an insider.** `ArtifactIntegrity.sign()`
+(`framework/artifacts/integrity.py:71-80`) is a **checksum, not a signature**: SHA256
+over the artifact's own contents, no key, so anyone who can call it can produce a
+valid hash for any content. Nothing in `framework/` authenticates an author.
+`review_artifact()` refuses an empty reviewer string
+(`framework/artifacts/review.py:123-124`) and checks the name against no roster —
+ADR-009 rule 10, because no document names reviewer roles. ADR-014 rule 3 records the
+same class of limit in the same voice: the artifact root "is enforced by nothing but
+the choice of root", and a caller passing the default by mistake writes a permanent
+record "because it is a valid signed artifact". **What this ADR buys is cost and
+visibility, not impossibility.**
+
+**Three further residuals**, each named at its rule and gathered here: the
+denial-of-service that "longest history wins" admits (rule 3e); what one-level
+checking does not see (rule 3c); and `_validate_evidence`
+(`framework/artifacts/validator.py:221-224`), which checks that an evidence hash is
+present and never that it is right — rule 4 closes that for REVIEW artifacts only,
+and it stays open for every other type and is registered as a finding nowhere.
+
+---
+
+## Rejected Alternatives
+
+**A — the version chain: "birth is version `1.0.0` with no `parent_hash`".** Rejected
+on executed evidence, in the Context. This rejects the *birth test*; rule 3a adopts
+`parent_hash` for the different job `framework/artifacts/integrity.py:25-27` already
+assigns it.
+
+**B — refuse every post-`IDEA` STRATEGY at the validator, full stop.** Closes F-007
+and is a wall. `docs/proposals/F-007-session-brief.md:130-133` names legitimate
+climbing as the test most likely to be forgotten.
+
+**C alone — carry the proof, add no storage gate.** Rejected by owner selection 1, and
+on the merits: rule 2 checks only internal consistency.
+
+**D alone — gate storage, carry no proof.** Rejected by owner selection 1, and on the
+merits: after a demotion a strategy occupies the same stage twice, so stage alone does
+not identify a rung.
+
+**Adding one condition to `save()` instead of running the validator.** Rejected — rule
+3.0. It closes one forgery and leaves the class open.
+
+**Scoping the repository's validation by `artifact.type` alone.** Rejected on executed
+evidence — rule 3.0. It lets the forger choose the scope.
+
+**Making `get()` resolve nothing.** This was the second draft's rule and it was
+disproved by execution — rule 3c. Rejected by owner selection 3.
+
+**Making `get()` resolve recursively to `IDEA`.** Rejected — unbounded I/O on a read,
+against `framework/artifacts/repository.py:129-166`. The middle position, one bounded
+level, is what owner selection 3 chose, and what it leaves uncovered is stated rather
+than hidden.
+
+**Defining the predecessor as the highest stored semantic version below this one.**
+Rejected — rule 3a. A guess where an explicit, signature-covered link exists.
+
+**Building rule 3a's predecessor scan on `get()`.** Rejected — rule 3a. Under rule
+3.0 `get()` raises, so one bad sibling would make every future save of that identifier
+impossible, permanently, in append-only storage.
+
+**Leaving forks legal, as the first revision did.** Rejected by owner selection 6, and
+on the merits: the second pass turned the fork into an executed forgery that undid a
+demotion and un-retired a retired strategy.
+
+**Requiring `evidence` as a mandatory parameter of `review_artifact()`.** Rejected — it
+would force `Remain` to pass `()` explicitly. Optional parameter, refusal scoped to the
+three moving outcomes.
+
+**Ruling a minimum evidence class per rung in this ADR.** Rejected by owner selection
+4, which sends it to research first. The slot is marked and the consumption rule is
+written; the numbers are not this document's to invent.
+
+**A twelfth relationship type, e.g. `Promoted By`.** Rejected.
+`framework/artifacts/relationships.py:1-12` records that `Knowledge/Relationships.md`
+"is implemented, not extended", and `Validated By`
+(`framework/artifacts/relationships.py:35`) already means what is needed.
+
+**Dropping the `Validated By` edge as redundant with the ladder.** Rejected — rule 1. A
+graph traversal reads relationships, not content. Made checkable instead.
+
+**A new `Artifact` field, `ladder`.** Rejected on ADR-009 rule 8's reasoning: fields are
+permanent and inside the hash, and `content` is inside the hash too.
+
+**Reading `stage_at_review` from the stored subject instead of declaring it.** Rejected
+in favour of declare-and-reconcile — rule 5.
+
+---
+
+## Required Follow-Up (ADR-015)
+
+- **the per-rung minimum evidence grade must be ruled first.** Owner selection 4.
+  **Ratification of this ADR is blocked on it.** The research is done and is on this
+  branch as `docs/proposals/evidence-bar-per-rung.md`; it has had **one** independent
+  pass (17 defects, 4 blocking, all applied), and what is owed now is the owner's
+  ruling on its seven questions. **A second independent pass on the proposal is still
+  worth having** — every ADR in this file that had a second reader lost claims to it,
+  and the first pass on this proposal found a blocker that reached rule 4's table
+- **ratify or amend**, after that ruling
+- **a third independent pass, BEFORE implementation.** Two passes have now found five
+  blocking defects in drafts whose citations and measurements were each time correct —
+  which is the standing lesson that verifying an ADR's *facts* is not attacking its
+  *rules*. ADR-014's Status block records what happened when the ordering was reversed:
+  19 defect-grade errors across 93 claims, eight in committed code
+- **implement rules 6, 5, 4, 1, 2, 3 in that order**, tests written first and run red
+  against unchanged code. **Rule 5 before any REVIEW artifact is committed**, or it
+  becomes a migration of append-only records
+- **rule 3f's chain sweep**, in the shape ADR-014 rule 7 and
+  `tests/data/test_store.py:238-267` use. It is what rule 3c's one level deliberately
+  does not do, and the residual-risk count above depends on it existing
+- **a shared test fixture that climbs the ladder**, landed with rule 2 and not after it
+- **`docs/HANDOFF.md` and `CHANGELOG.md` on ratification**, and not before
+- **`.claude/skills/belay-review/SKILL.md:66` says "the 13 ADRs"** and was already wrong
+  by one before this landed. F-025 of `reports/review/2026-09-04-review.md:404`.
+  Deliberately not fixed on this branch
+- **this ADR cites `workflows/Monthly/StrategyPromotion.md:43` knowingly**, where nine
+  tracked locations — including `framework/artifacts/review.py:134`, inside a runtime
+  error message — cite `:37`, which is the word `Demote`. F-020 of
+  `reports/review/2026-09-04-review.md:155`, not this branch's to fix
+
+### Still open, deliberately
+
+**The minimum evidence grade per rung.** Owner selection 4. The slot is in rule 4 and
+it blocks ratification. Until it is filled, a single Level D hypothesis satisfies rule
+4 for a promotion into real capital. **The research the owner asked for is
+`docs/proposals/evidence-bar-per-rung.md`**, which offers four options and carries two
+recommendations that differ — its author's "producible-grade floor", derived from the
+grade each stage is defined to produce and which would close the capital rungs until a
+paper-trading engine exists, and an independent reviewer's "hypothesis floor", which
+closes only the Level D purchase of a real-money rung. **Neither is declared the
+winner and this ADR does not pick one. Whether the bar is ruled inside this ADR or as
+ADR-016 is one of the proposal's seven open questions and is not answered here.**
+
+**Whether `Remain Current Stage` requires evidence.** Owner selection 5 named the three
+moving outcomes. `Remain` records no movement (`framework/artifacts/review.py:242-248`)
+but is also the state-side name for rejecting a promotion (ADR-008 rule 4), and a
+`Remain` that holds a strategy at Limited Capital is a decision to keep capital
+deployed. **Left optional as the drafter's judgement, pinned by test 22 so that
+changing it is deliberate** — and now put to the owner as question 3 of
+`docs/proposals/evidence-bar-per-rung.md`, where the two recommendations differ. If
+the owner splits it as the reviewer proposes, test 22 splits with it.
+
+**What happens to a strategy whose authorizing review is later found to be wrong.**
+Owner selection 6 settles the *direction* — correction is forward, by appending a
+correcting rung with its own review — and does not settle what that rung looks like
+when the fault is in a review rather than in the strategy. `Superseded By`
+(`framework/artifacts/relationships.py:39`) exists and nothing here rules its use.
+
+**The denial of service that "longest history wins" admits.** Rule 3e. A forger who
+writes three consistent files can own an identifier permanently, because nothing can
+be deleted and identifiers are never reused. No mitigation inside this ADR; the
+defences are access control, git review and rule 3f.
+
+**Who may sign, and whether Belay needs a real signature rather than a checksum.** The
+largest question this ADR touches and much wider than F-007 — it reaches every artifact
+type and every ADR in this file that says "signed".
+
+**Whether artifacts other than STRATEGY and REVIEW need anything.** The evidence-hash
+gap and the validation asymmetry named in rule 3.0 are both general, and nothing here
+answers them.

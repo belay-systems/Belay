@@ -17,6 +17,27 @@ date. Never delete a done item; this file is a record as well as a queue.
 
 ## Open
 
+### Rule on the evidence bar per rung — ADR-015 cannot be ratified until you do
+
+**Added 2026-09-19.** `AGENTS.md` step 14: this is a decision that is the owner's by
+constitutional right, and no session may make it. Asked what ADR-015 should do about
+promotions into capital stages given that no Belay document states how good the
+evidence must be, you selected **"Research a bar first"**. That research is now on
+`adr/015-stage-is-carried` as `docs/proposals/evidence-bar-per-rung.md`.
+
+Read it and answer its section 10 — seven questions, the first being which of three
+candidate bars to adopt. **ADR-015's Status block records that its ratification is
+blocked on this ruling**, and rule 4 of that ADR carries an empty table, one row per
+rung, that only your ruling may fill.
+
+**Two cautions before you rule.** The proposal has had **no independent verification
+pass** — every ADR in this repository that has had a real second reader lost claims to
+it, and ADR-015 itself lost five blocking defects across two passes. And its
+recommended candidate would, by its own admission, close the capital rungs entirely
+until a paper-trading engine exists.
+
+---
+
 ### Start the next session — one sentence, no prompt to keep
 
 **Added 2026-08-27.** The next session's work is written down in the repository
