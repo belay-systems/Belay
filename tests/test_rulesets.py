@@ -59,7 +59,19 @@ def test_every_ruleset_is_active_and_targets_the_default_branch():
     for path in RULESETS:
         ruleset = _load(path)
         assert ruleset["enforcement"] == "active", path.name
-        assert ruleset["conditions"]["ref_name"]["include"] == ["~DEFAULT_BRANCH"], path.name
+        assert ruleset["target"] == "branch", path.name
+        assert ruleset["conditions"] == {
+            "ref_name": {"include": ["~DEFAULT_BRANCH"], "exclude": []}
+        }, path.name
+
+
+def test_required_checks_must_come_from_github_actions():
+    """15368 is the GitHub Actions app. Without it, any app able to post a
+    status named `suite (py3.11)` satisfies the rule."""
+    checks = _rules(_load(REPO / ".github" / "rulesets" / "main-checks.json"))[
+        "required_status_checks"
+    ]["required_status_checks"]
+    assert {c.get("integration_id") for c in checks} == {15368}
 
 
 def test_the_checks_ruleset_can_be_bypassed_by_nobody():
@@ -74,3 +86,13 @@ def test_the_review_ruleset_requires_a_code_owner():
     params = _rules(_load(REPO / ".github" / "rulesets" / "main-review.json"))["pull_request"]
     assert params["require_code_owner_review"] is True
     assert params["required_approving_review_count"] >= 1
+
+
+def test_the_review_ruleset_has_exactly_one_way_round_it():
+    """Both neighbours are worse. An empty list deadlocks every pull request
+    the sole code owner writes. "always" in place of "pull_request" lets an
+    organization owner push to `main` with no pull request at all."""
+    ruleset = _load(REPO / ".github" / "rulesets" / "main-review.json")
+    assert [(a["actor_type"], a["bypass_mode"]) for a in ruleset["bypass_actors"]] == [
+        ("OrganizationAdmin", "pull_request")
+    ]

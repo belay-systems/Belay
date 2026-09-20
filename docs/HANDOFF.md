@@ -5430,7 +5430,7 @@ public. It is at the end of the file, against this file's usual order, because
 every line above is cited by number somewhere and an insertion would move them.
 
 **What the scan asked.** Not "are the rules right" but "what enforces each rule
-if nobody reads it". Three answers were "nothing":
+if nobody reads it". For these the answer was "nothing":
 
 - The files that *are* the guards (`.gitignore`, the agent instruction files,
   `pyproject.toml`) were not owner-only in `.github/CODEOWNERS`.
@@ -5443,15 +5443,40 @@ if nobody reads it". Three answers were "nothing":
   a pull request.
 - Nothing told an agent that an Issue opened by a stranger is not a task.
 
+**What `main: review` does not do, found by the independent pass.** Its bypass
+is "any organization owner, through a pull request". `docs/OperatorChecklist.md`
+tells the owner to invite the second contributor as an organization Owner. If
+that is done, both people who can merge can bypass it, and **the code-owner
+requirement binds nobody**; `.github/CODEOWNERS` then only decides whose review
+GitHub asks for. It binds the second contributor only if they are a Member with
+write access. GitHub also counts a code owner only if they have write access,
+and on 2026-09-20 `gh api repos/belay-systems/Belay/collaborators` listed the
+owner alone. `main: checks` is unaffected either way: it has no bypass.
+
 **What the owner still has to rule**, put to them in the session and to be
-recorded in `docs/OwnerDecisions.md` in their words, not here: whether the
-second contributor is an organization Owner or a Member with write access
-(GitHub showed a pending invitation as Member, where Part 14a's recommendation
-describes both as owners); whether two passages in `docs/OwnerDecisions.md` that
-name a brokerage and a private project are published as they stand; and the
-ADR-013 amendment (Issue #1).
+recorded in `docs/OwnerDecisions.md` in their words, not here:
+
+- Whether the second contributor is an organization Owner or a Member with
+  write access. GitHub showed a pending invitation as Member, where Part 14a's
+  recommendation describes both as owners. The paragraph above is what turns on
+  it. Part 13c names "review from Code Owners" as part of what meets the owner's
+  condition that nothing changes `main` without review, so this is that
+  condition's question too.
+- Whether two passages in `docs/OwnerDecisions.md` that name a brokerage and a
+  private project are published as they stand.
+- The ADR-013 amendment (Issue #1).
 
 **Not verified, and said so:** `scripts/public_settings.py --apply` has never
 run, because GitHub refuses rulesets on a private repository in a free
-organization. Its read-only mode was run against the private repository and
-reported 3 of 10 passing, which is the expected answer before the flip.
+organization. Two things the design rests on are inferred from GitHub's
+documentation rather than stated in it: that a bypass applies only to the
+ruleset granting it, and that an author cannot approve their own pull request.
+
+**The by-hand fallback, if the script fails.** Settings, Rules, Rulesets, New
+branch ruleset, target the default branch: require a pull request; require the
+status checks `governance conformance`, `suite (py3.11)`, `suite (py3.12)`,
+`suite (py3.13)`, `dashboard builds`; block force pushes; restrict deletions; no
+bypass list. Then Settings, Code security: secret scanning, push protection and
+private vulnerability reporting on. Then Settings, Actions, General: allow only
+actions created by GitHub; require approval for first-time contributors;
+workflow permissions read-only.

@@ -355,11 +355,11 @@ to 3**; an agent cannot create a GitHub organization.
 only after step 4 above reports clean and CI is green on Belay.
 
 Immediately afterwards, tell a session the flip is done. It runs `python
-scripts/public_settings.py --apply`, which sets everything this entry used to
-list by hand (the two rulesets in `.github/rulesets/`, secret scanning, push
-protection, private vulnerability reporting, the Actions limits, Part 13c) and
-then reads each one back as PASS or FAIL. **`--apply` could not be tried while
-Belay was private, so its first run is its test: read the table, not the "ok".**
+scripts/public_settings.py --apply` (rulesets from `.github/rulesets/`, secret
+scanning, push protection, vulnerability reporting, Issues on, wiki off, the
+Actions limits, Part 13c) and reads each back as PASS or FAIL. **`--apply` has
+never run, so its first run is its test: read the table, not the "ok".** The
+by-hand fallback is the last section of `docs/HANDOFF.md`.
 
 ### Close Atlas down as a workplace — ADDED 2026-09-20
 

@@ -74,13 +74,22 @@ def _shape(ruleset: dict) -> dict:
         params = dict(rule.get("parameters") or {})
         if "required_status_checks" in params:
             params["required_status_checks"] = sorted(
-                c["context"] for c in params["required_status_checks"]
+                (c["context"], c.get("integration_id"))
+                for c in params["required_status_checks"]
             )
         rules[rule["type"]] = {k: v for k, v in params.items() if k in _COMPARED}
     bypass = sorted(
         (a.get("actor_type"), a.get("bypass_mode")) for a in ruleset.get("bypass_actors") or []
     )
-    return {"enforcement": ruleset.get("enforcement"), "rules": rules, "bypass": bypass}
+    ref = (ruleset.get("conditions") or {}).get("ref_name") or {}
+    return {
+        "enforcement": ruleset.get("enforcement"),
+        "target": ruleset.get("target"),
+        "include": ref.get("include"),
+        "exclude": ref.get("exclude"),
+        "rules": rules,
+        "bypass": bypass,
+    }
 
 
 _COMPARED = {
@@ -102,7 +111,7 @@ def check_visibility(repo: str) -> tuple[str, str]:
 
 
 def check_rulesets(repo: str) -> list[tuple[str, str, str]]:
-    code, listed = api(f"repos/{repo}/rulesets")
+    code, listed = api(f"repos/{repo}/rulesets?includes_parents=false")
     if code != 0 or not isinstance(listed, list):
         return [("rulesets", UNKNOWN, f"could not list rulesets: {listed}")]
     by_name = {r["name"]: r["id"] for r in listed}
@@ -115,6 +124,10 @@ def check_rulesets(repo: str) -> list[tuple[str, str, str]]:
         code, live = api(f"repos/{repo}/rulesets/{by_name[want['name']]}")
         if code != 0 or not isinstance(live, dict):
             rows.append((label, UNKNOWN, f"could not read it: {live}"))
+        elif "bypass_actors" not in live:
+            # GitHub omits the field for a caller who cannot edit the ruleset,
+            # and an omitted list must not compare equal to an empty one.
+            rows.append((label, UNKNOWN, "GitHub did not return bypass_actors; run this as an organization owner"))
         elif _shape(live) != _shape(want):
             rows.append((label, FAIL, f"differs from the tracked file: live {_shape(live)}"))
         else:
@@ -161,7 +174,18 @@ def check_actions(repo: str) -> list[tuple[str, str, str]]:
     if code != 0 or not isinstance(data, dict):
         rows.append(("only GitHub's own actions may run", UNKNOWN, f"could not read it: {data}"))
     else:
-        rows.append(("only GitHub's own actions may run", PASS if data.get("allowed_actions") == "selected" else FAIL, f"allowed_actions is {data.get('allowed_actions')}"))
+        ok, detail = data.get("allowed_actions") == "selected", f"allowed_actions is {data.get('allowed_actions')}"
+        if ok:
+            code, chosen = api(f"repos/{repo}/actions/permissions/selected-actions")
+            ok = (
+                code == 0
+                and isinstance(chosen, dict)
+                and chosen.get("github_owned_allowed") is True
+                and chosen.get("verified_allowed") is False
+                and not chosen.get("patterns_allowed")
+            )
+            detail = json.dumps(chosen) if isinstance(chosen, dict) else str(chosen)
+        rows.append(("only GitHub's own actions may run", PASS if ok else FAIL, detail))
     code, data = api(f"repos/{repo}/actions/permissions/fork-pr-contributor-approval")
     if code != 0 or not isinstance(data, dict):
         rows.append(("fork pull requests wait for approval", UNKNOWN, "could not read it; check Settings, Actions, General by hand"))
@@ -189,7 +213,7 @@ def apply(repo: str) -> None:
     if status != PASS:
         sys.exit(f"Refusing to apply: {detail}. The owner makes the repository public first; this script never does.")
 
-    code, listed = api(f"repos/{repo}/rulesets")
+    code, listed = api(f"repos/{repo}/rulesets?includes_parents=false")
     existing = {r["name"]: r["id"] for r in listed} if code == 0 and isinstance(listed, list) else {}
     steps: list[tuple[str, str, str, dict | None]] = []
     for want in wanted_rulesets():
@@ -204,7 +228,7 @@ def apply(repo: str) -> None:
                 "secret_scanning_push_protection": {"status": "enabled"},
             }
         }),
-        ("wiki off", "PATCH", f"repos/{repo}", {"has_wiki": False}),
+        ("wiki off, Issues on", "PATCH", f"repos/{repo}", {"has_wiki": False, "has_issues": True}),
         ("private vulnerability reporting", "PUT", f"repos/{repo}/private-vulnerability-reporting", None),
         ("dependency alerts", "PUT", f"repos/{repo}/vulnerability-alerts", None),
         ("workflow token read-only", "PUT", f"repos/{repo}/actions/permissions/workflow", {

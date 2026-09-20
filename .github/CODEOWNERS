@@ -3,6 +3,8 @@
 # relying on anyone remembering it.
 #
 # Both owners review ordinary work, so neither is a bottleneck on the other.
+# GitHub counts a code owner only if they have write access to the repository.
+# Until the second contributor has it, the catch-all names one eligible person.
 # Nobody can approve their own pull request, so this still means a second pair
 # of eyes on ordinary work. On the owner-only paths below there is no second
 # code owner, so an owner-authored change there has no eligible reviewer.
@@ -32,7 +34,12 @@
 /tests/test_publication_guard.py       @pewpewpressco-ux
 /tests/test_rulesets.py                @pewpewpressco-ux
 /tests/test_governance_conformance.py  @pewpewpressco-ux
+/tests/data/test_store.py              @pewpewpressco-ux
+/tests/data/test_dolt_clone.py         @pewpewpressco-ux
+/tests/artifacts/test_repository.py    @pewpewpressco-ux
 /scripts/public_settings.py            @pewpewpressco-ux
+/scripts/status.py                     @pewpewpressco-ux
+/docs/ENGINEERING_AGENT.md             @pewpewpressco-ux
 /pyproject.toml                        @pewpewpressco-ux
 /CLAUDE.md                             @pewpewpressco-ux
 /.claude/                              @pewpewpressco-ux

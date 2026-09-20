@@ -12,6 +12,11 @@ deciding that a new kind of file may be published.
 
 Nothing here reads file contents for secrets. GitHub's push protection does
 that, and a pattern list kept here would be a weaker copy of it.
+
+**What this does not catch**, found by an independent pass and left open because
+no shape test can close it: data small enough to sit under the size limit in a
+file of an allowed kind, and data pasted into a markdown file. Those are caught
+by review or not at all, which is why `AGENTS.md` states the rule in words too.
 """
 
 from __future__ import annotations
@@ -25,16 +30,46 @@ REPO = Path(__file__).resolve().parents[1]
 # databases, archives, notebooks and spreadsheets are absent on purpose.
 ALLOWED_SUFFIXES = frozenset({".md", ".py", ".yml", ".yaml", ".toml", ".json", ".cmd"})
 
-# Tracked files with no suffix, or whose whole name is the suffix.
-ALLOWED_NAMES = frozenset({"LICENSE", "CODEOWNERS", ".gitignore"})
+# Tracked files with no suffix, or whose whole name is the suffix. Whole paths,
+# so that a `LICENSE` somewhere else in the tree is not waved through.
+ALLOWED_PATHS = frozenset({"LICENSE", ".github/CODEOWNERS", ".gitignore"})
 
 # Directories that hold fetched or cloned vendor data on a working machine.
 FORBIDDEN_ROOTS = ("data/",)
 
-# Bytes. The one exemption is the session record, which is long because nothing
-# in it is ever deleted.
+# Bytes. Markdown gets more room because this project's records are never
+# pruned, and the longest of them is already past the smaller limit. Everything
+# else is code or configuration, and a quarter of a megabyte of either is
+# usually data.
 SIZE_LIMIT = 256 * 1024
-SIZE_EXEMPT = frozenset({"docs/HANDOFF.md"})
+MARKDOWN_SIZE_LIMIT = 1024 * 1024
+
+# Only ordinary files. A symbolic link or a submodule entry can carry an allowed
+# name and point at anything.
+ORDINARY_MODES = frozenset({"100644", "100755"})
+
+# The guards, which `.github/CODEOWNERS` must keep as the owner's alone. An
+# empty CODEOWNERS file fails nothing else in the suite.
+OWNER = "@pewpewpressco-ux"
+OWNER_ONLY = (
+    "/.github/",
+    "/.gitignore",
+    "/AGENTS.md",
+    "/CLAUDE.md",
+    "/.claude/",
+    "/pyproject.toml",
+    "/LICENSE",
+    "/constitution/",
+    "/docs/OwnerDecisions.md",
+    "/docs/DECISIONS.md",
+    "/scripts/public_settings.py",
+    "/scripts/status.py",
+    "/tests/test_publication_guard.py",
+    "/tests/test_rulesets.py",
+    "/tests/test_governance_conformance.py",
+    "/tests/data/test_store.py",
+    "/tests/data/test_dolt_clone.py",
+)
 
 
 def _tracked() -> list[str]:
@@ -63,7 +98,7 @@ def test_every_tracked_file_is_of_a_kind_the_owner_has_allowed():
         p
         for p in _tracked()
         if PurePosixPath(p).suffix.lower() not in ALLOWED_SUFFIXES
-        and PurePosixPath(p).name not in ALLOWED_NAMES
+        and p not in ALLOWED_PATHS
     ]
     assert not found, (
         f"tracked files of a kind not yet allowed: {found}. If this kind of "
@@ -72,15 +107,37 @@ def test_every_tracked_file_is_of_a_kind_the_owner_has_allowed():
     )
 
 
+def test_every_tracked_entry_is_an_ordinary_file():
+    out = subprocess.run(
+        ["git", "ls-files", "-s", "-z"], cwd=REPO, capture_output=True, check=True
+    ).stdout.decode("utf-8")
+    found = [e for e in out.split("\0") if e and e.split(" ", 1)[0] not in ORDINARY_MODES]
+    assert not found, f"tracked symbolic links or submodules: {found}"
+
+
 def test_no_tracked_file_is_large_enough_to_be_a_dataset():
+    def limit(path: str) -> int:
+        return MARKDOWN_SIZE_LIMIT if path.lower().endswith(".md") else SIZE_LIMIT
+
     found = [
         (p, (REPO / p).stat().st_size)
         for p in _tracked()
-        if p not in SIZE_EXEMPT
-        and (REPO / p).is_file()
-        and (REPO / p).stat().st_size > SIZE_LIMIT
+        if (REPO / p).is_file() and (REPO / p).stat().st_size > limit(p)
     ]
     assert not found, (
-        f"tracked files over {SIZE_LIMIT} bytes: {found}. A file this large is "
-        "usually data. If it is not, the owner adds it to SIZE_EXEMPT."
+        f"tracked files over their size limit: {found}. A file this large is "
+        "usually data. If it is not, raising the limit is the owner's decision."
     )
+
+
+def test_the_guards_are_the_owners_alone_in_codeowners():
+    """CODEOWNERS is last-match-wins, so each guard must have its own line
+    naming the owner and nobody else."""
+    lines = [
+        line.split()
+        for line in (REPO / ".github" / "CODEOWNERS").read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.startswith("#")
+    ]
+    last = {parts[0]: parts[1:] for parts in lines}
+    wrong = {path: last.get(path) for path in OWNER_ONLY if last.get(path) != [OWNER]}
+    assert not wrong, f"not owner-only in .github/CODEOWNERS: {wrong}"
