@@ -1,0 +1,303 @@
+# PROPOSAL — What "Enough Data" Means: A Definition Of Sample Adequacy For F-004
+
+**Status: PROPOSAL awaiting owner ruling. Dated 2026-09-19, revised 2026-09-19 after an independent pass (15 defects, 5 blockers). Nothing here is doctrine and no code changes with it.** Every figure is **NUMBER NOT RULED**. The appendix records what changed and why, per Immutable Law VII (`constitution/Immutable_Laws.md:49-51`, "Institutional knowledge shall never be intentionally discarded").
+
+Requested by the owner's F-004 ruling of 2026-09-19, recorded here as selections and nothing more:
+
+> **F-004 → "b now"** — define adequacy against something independent of the observed effect.
+> **Shape → "aligned"** with the recommendation: **adequacy = a minimum number of observations AND a minimum time span, both required, neither depending on the observed effect.**
+> **Regime coverage → deferred**, because Belay cannot measure regimes yet, and recorded as an open gap.
+> **The numbers** are to be proposed by research with real citations, attacked by an independent reviewer, and ruled by the owner next session, together with the evidence bar.
+
+Later the same day the owner made further selections in chat, **now recorded at `docs/OwnerDecisions.md:1464` (Part 10f) and `:1487` (Part 10g)** [*repointed by the committer of `records/2026-09-19-rulings`, 2026-09-19 — the text below still describes these as chat selections because that is what they were when this document was first drafted; the record referenced no longer needs to be "pending"*]: **(i)** F-006's narrow fix is **authorised** — every coverage statement carries its observation count beside the span — to be built at step 4 of the Part 9a blocker order; **(ii)** a trading-calendar **proposal** is to be written first, no code and no library chosen; **(iii)** once a calendar exists, an **unexplained gap fails closed** — the fetch is refused, not stored with a warning — while a gap explained by the calendar or by a recorded reason such as a halt is allowed and disclosed. Section 10's question 4 is rewritten around (iii).
+
+**This document has now had one independent adversarial pass and has NOT been re-verified since revision.** The reviewer confirmed every repository citation, the formula transcription, and all four claimed contradictions, and found 5 blockers and 10 lesser defects; all 15 were checked against source by this author and all 15 were applied. Read section 8 as a proposal to be attacked again.
+
+**Citation caveat, updated by the committer.** All `docs/HANDOFF.md` and `docs/OwnerDecisions.md` line numbers below were valid at `origin/main` **3080848** when first drafted. **Re-verified and repointed by content, 2026-09-19 (evening), by the committer of `records/2026-09-19-rulings`, against that branch** — the register commit anticipated above has since landed (PR #9 as `2f44c19`, PR #11 as `3080848` onto `main`), and `docs/HANDOFF.md` and `docs/OwnerDecisions.md` moved further still on this branch and in this pull request. Every citation below reflects `records/2026-09-19-rulings` as of this pull request, not `origin/main` at the date above.
+
+**The regime deferral is verified, not assumed.** `framework/services/regime.py:1-10` is a ten-line placeholder whose `run()` prints `"Analyzing market regime..."`; `docs/ROADMAP.md:75-81` states `Regime robustness` is blocked on regime classification and on returns segmented by regime.
+
+---
+
+## Why this exists, in plain words
+
+`sample_adequate` is a true/false flag on every statistical review Belay produces. It is meant to answer a question the p-value cannot: **"is there enough data here to conclude anything at all?"** — because "we tested it and found nothing" and "we could not test it" are different answers, and only one of them means the strategy failed.
+
+Today the flag is computed from the same arithmetic as `significant`, so it can never disagree with it. It answers no second question. This proposes what the second question should be.
+
+---
+
+## 1. What the code does today, and why the flag is empty
+
+`minimum_observations_for_significance` searches for the smallest `n` at which **the observed effect** would clear the critical value: `clears(n)` is `effect * sqrt(n) >= t_critical_value(alpha, n - 1)` (`framework/metrics/statistics.py:228-229`). That predicate **is** the significance test and is monotone in `n`, so `n >= needed` is the same proposition as `p < alpha`, and `sample_adequate` (`:303`) is `significant` (`:301`) written twice. `docs/HANDOFF.md:3563-3567` records 60 random trials producing 0 mismatches.
+
+The test that should have caught it asserts the opposite: `tests/metrics/test_significance.py:226-239` asserts only the one-way implication and concedes the mechanism in its own docstring; `docs/HANDOFF.md:1141-1143` repeats the concession as though it were a design choice.
+
+ADR-012 rule 8 is the rule being defeated (`docs/DECISIONS.md:2231-2238`): "**A sample below that number has not failed the test — it has not taken it**, and reporting those two states identically is the failure this rule exists to prevent." The ADR's own Still-Open section already names the hole (`docs/DECISIONS.md:2382-2386`): "**What minimum sample Belay requires.** ... No document says how many Belay *demands* before a strategy may be promoted."
+
+---
+
+## 2. What "observations" and "span" mean for Belay's data
+
+**An observation is one element of the return series the test is run on**, not one row of market data. Belay's unit is a `DailyBar` (`framework/data/contract.py:73-89`) inside a `DailyBarSeries` whose bars are validated strictly increasing (`:107-112`). A daily strategy's observations are daily returns; a monthly strategy's are monthly. **A count floor stated in bars is therefore not frequency-neutral** — section 6 treats that as a defect of the simplest candidate rather than hiding it.
+
+**A span is `period()`, first bar to last bar** (`framework/data/contract.py:114-127`). That is F-006 (`docs/HANDOFF.md:3590-3619`): two bars three years apart disclose three years.
+
+**For a dense daily series, a count floor and a span floor are one constraint, not two.** 756 observations *is* three years at 252 trading days a year. The count only bites independently at non-daily frequency, or on a series with holes. That is not an argument against stating both — it is the reason the pair alone does not do the work people assume it does.
+
+**Interaction with F-006.** F-006's narrow fix — record observation count beside span, now **authorised** (`docs/OwnerDecisions.md:1464`, Part 10f) and confirmed by `docs/OwnerDecisions.md:926-932` as not blocked on a trading calendar — makes the two numbers *visible together*. This proposal makes them *jointly binding*. Complementary: F-006 stops a disclosure lying about coverage; this stops a review calling a thin record adequate.
+
+**The pair does not close the sparse case.** 760 observations spread over 20 years satisfies "756 observations AND 3 years" while covering **10.4%** of the calendar days in its own window (760 / (20 × 365.25); on a trading-day basis, 15.1%). A dense daily series sits at 252/365.25 = **0.690** on the calendar-day measure. Whether a third condition should catch this is **the owner's reserved question**, not research's — see section 10, question 4, which is rewritten around the owner's "fails closed" selection.
+
+---
+
+## 3. What Belay's documents say about how much data — and where they stop
+
+They demand evidence and never quantify it.
+
+- `constitution/Promotion_Pipeline.md:27` — maturity Level 2, `Validated`, **is** "Passed statistical review." `:75-81` lists the seven promotion criteria, first `Statistical performance`.
+- `constitution/Capital_Authority.md:11-14` — "Capital shall be determined using: ... `Statistical edge`." The conclusion sizes positions.
+- `constitution/Immutable_Laws.md:29-33` — Law IV, "Past performance is evidence. It is never proof."
+- `Validation/Backtesting.md:13-31` — nine minimum metrics, of which `Trade Count` (`:27`) is the only count of anything; `:35-43` requires a documented `Sample Period`; `:47-49`, "Outputs become evidence. Not guarantees."
+- `Validation/Workflow.md:15` — `Statistical Review` is its own step. `Validation/Critic.md:23` — "Could randomness explain the result?"; `:17` — "What market regimes break this?", the deferred half of this ruling.
+- `Validation/CapitalReview.md:13-25` — promotion considers `Evidence quality` first and `Paper performance` last. Neither is given a length.
+- `strategies/PromotionCriteria.md:7` heads its categories with `Statistical Performance`; `:29` refers promotion thresholds to the Investment Committee; `:46-50` records the 0-100 Promotion Score as **suspended, not adopted**, for want of weights and a threshold.
+
+**Nothing states a minimum count, span, or track-record length.** The only in-repo figure of that shape is operational: `docs/HANDOFF.md:171` records three years of AAPL as 754 daily bars.
+
+**Two precedents govern how a number may enter here.** ADR-012 rule 3 (`docs/DECISIONS.md:2190-2194`) refuses to default alpha because no Belay document states one. ADR-012 **rule 2** (`docs/DECISIONS.md:2184-2188`) refuses to default the null: `null_return` "is a required argument with no default. Testing against zero is the conventional choice and it is still a choice." **Both bind this proposal** — see the treatment of the reference Sharpe `c` in section 5.
+
+---
+
+## 4. Outside literature, retrieved this session
+
+Belay's documents outrank these. Offered for their formulas and as evidence the field takes these quantities seriously — never as authority.
+
+1. **Harvey, Liu and Zhu, ". . . and the Cross-Section of Expected Returns", NBER Working Paper 20592, October 2014** — https://www.nber.org/papers/w20592 — abstract: "The estimation of our model suggests that a newly discovered factor needs to clear a much higher hurdle, with a t-ratio greater than 3.0," and "We argue that most claimed research findings in financial economics are likely false." **Relevance: the hurdle, not the sample.** A t-hurdle of 3.0 rather than 1.96 multiplies every sample requirement by (3.0/1.96)² ≈ 2.343.
+2. **Bailey and López de Prado, "The Sharpe Ratio Efficient Frontier", Journal of Risk 15(2), 2012** — Minimum Track Record Length. Formula as rendered by Portfolio Optimizer, https://portfoliooptimizer.io/blog/the-probabilistic-sharpe-ratio-bias-adjustment-confidence-intervals-hypothesis-testing-and-minimum-track-record-length/ : `MinTRL(c) = (1 − κ·SR + (γ−1)·SR²/4) · (z₁₋α / (SR − c))²`, κ skewness, γ kurtosis, SR the Sharpe ratio, c the reference threshold, z the normal critical value; its worked example needs 184 monthly observations against 136 available. The R reference, https://rdrr.io/cran/PerformanceAnalytics/man/MinTrackRecord.html , states the question as "How long should a track record be in order to have a p-level statistical confidence that its Sharpe ratio is above a given threshold?", cites the same paper, and documents its `refSR` argument as needing to be "in the same periodicity as the returns (non-annualized)" — which is why section 5 writes the conversion down. **Relevance: this is the sample-size formula, and its only strategy-specific inputs are a Sharpe ratio and a reference — both of which can be declared rather than observed.**
+3. **NBER, US Business Cycle Expansions and Contractions** — https://www.nber.org/research/data/us-business-cycle-expansions-and-contractions — average contraction 10.3 months and average expansion 64.2 months over 1945-2020 (17.0 and 41.4 over 1854-2020), and the full table of peak and trough dates. **Relevance: the span argument — and, recomputed, the refutation of the obvious version of it.** See section 5.
+4. **Against the n ≥ 30 convention** — Yangzhuoran Fin Yang, "30 isn't a reliable cutoff for a 'large' sample", https://yangzhuoranyang.com/posts/n30/ — "It could be 30, it could be 3000", arguing 30 describes when the t-distribution resembles the normal, not a Central Limit Theorem guarantee. **Relevance: the cheap answer — "require n ≥ 30" — has no defensible grounding.**
+
+**What none of them authorizes.** Each needs an input Belay does not hold or has not declared: a trial count, a target Sharpe, a reference, a regime classifier.
+
+---
+
+## 5. The arithmetic, stated so it can be checked
+
+### 5a. The span: an average is not a containment, and the first draft confused them
+
+**The first draft of this document claimed three years "reliably contains more than one average post-war contraction." That is false and is withdrawn.** An average duration of 10.3 months says nothing about how often a window of a given length overlaps one.
+
+Recomputed this session from NBER's post-1945 peak/trough dates, over every rolling window in Nov 1945 – Apr 2020 (894 months):
+
+| Window | Windows | Containing ≥1 recession month | Share |
+|---|---|---|---|
+| 1 year | 883 | 245 | **27.7%** |
+| 3 years | 859 | 475 | **55.3%** |
+| 5 years | 835 | 611 | **73.2%** |
+| 6.17 years (74 months) | 821 | 667 | **81.2%** |
+| 10 years | 775 | 765 | **98.7%** |
+
+**The longest recession-free stretch is 128 months — July 2009 through February 2020**, which is ten and a half years containing no contraction month at all. So **no span short of eleven years guarantees regime variety**, and a span floor is a *probabilistic* guard, not a structural one.
+
+**Consequence: the span floor is a JUDGEMENT CALL, not a derivation.** It is the owner's to make, on the percentages above. This document recommends one and labels it as judgement.
+
+### 5b. The count: the conversion, and the reference that may not be defaulted
+
+MinTRL takes a **per-period** Sharpe, not an annual one. The conversion, written down because `framework/metrics/statistics.py:84-95` exists precisely to stop a silent factor-of-252 error:
+
+> `SR_period = SR_annual / sqrt(periods_per_year)` — ÷√252 for daily, ÷√12 for monthly. `c` converts the same way.
+
+**`c` may not be silently zero.** ADR-012 rule 2 (`docs/DECISIONS.md:2184-2188`) makes `null_return` a required argument with no default, on the reasoning that "a strategy that beats zero but not the risk-free rate has no edge worth capital." Setting `c = 0` inside an adequacy rule re-introduces exactly the default that rule forbids. **Proposed: `c` is the caller's own `null_return`, converted to a per-period Sharpe by the same division — one value, two uses, so the significance test and the adequacy floor cannot disagree about what "no edge" means.** The tables below print `c = 0` only because that is the null the illustration uses, and it is labelled, not assumed.
+
+### 5c. The table, at c = 0, κ = 0, γ = 3, ceilings applied
+
+| Declared target Sharpe (annual) | z = 1.645 | z = 1.96 (two-sided 5%) | t = 3.0 (Harvey-Liu-Zhu) |
+|---|---|---|---|
+| 0.50 | 2,730 bars / 10.83 yr | 3,875 / **15.38 yr** | 9,077 / 36.02 yr |
+| 0.75 | 1,214 / 4.82 yr | 1,723 / **6.84 yr** | 4,037 / 16.02 yr |
+| 1.00 | 684 / 2.71 yr | 971 / **3.85 yr** | 2,273 / 9.02 yr |
+| 1.50 | 305 / 1.21 yr | 433 / **1.72 yr** | 1,013 / 4.02 yr |
+| 2.00 | 172 / 0.68 yr | 244 / **0.97 yr** | 572 / 2.27 yr |
+
+**The requirement is quadratic in the target**: halving the ambition quadruples the data. **Non-normality barely matters at daily frequency**: at target 1.0 and z = 1.96, moving from (κ=0, γ=3) to (κ=−0.5, γ=6) takes 971 bars to 1,004 — +3.44%, because the per-day Sharpe is tiny. At monthly frequency it matters far more.
+
+### 5d. The finding that decides question 2: for daily series the MinTRL floor is mostly inert
+
+Against a 756-observation flat floor, the declared target at which MinTRL falls below it:
+
+| Hurdle | Crossover declared target |
+|---|---|
+| z = 1.645 | **0.951** |
+| z = 1.96 | **1.133** |
+| t = 3.0 | **1.737** |
+
+**Any declared target above the crossover makes the MinTRL count smaller than the flat count, so for a daily series Candidate 2 collapses into Candidate 1.** It bites only at low frequency. Monthly, at z = 1.96: target 1.0 → **49 observations ≈ 4.08 years**; target 0.75 → 84 ≈ 7.00 years; target 0.5 → **187 ≈ 15.58 years**. This is the whole practical content of the choice, and question 2 is unanswerable without it.
+
+### 5e. What the formula is actually computing, said precisely
+
+Substituting a **declared** target for the observed Sharpe turns MinTRL into an *a-priori power calculation*: **"if the realised Sharpe, skewness and kurtosis land exactly on the declared values, how many observations would distinguish them from `c` at 1−α?"** That is independent of the observed effect — which is what the ruling demands — but `N` is a function of a **chosen** target. It is not "derived" in the sense of being read off a document; it is derived *conditional on a choice*. Every reading of the tables above carries that conditional.
+
+### 5f. Cost in calendar time
+
+A three-year daily backtest series is ~754 bars and, per `docs/HANDOFF.md:171`, fetching one took 4.4 seconds. A three-year **paper** track record takes three years. **Any bar set here is nearly free on the backtest side of the ladder and expensive on the paper side** — the two are different quantities, and section 7 stops conflating them.
+
+---
+
+## 6. Four candidate definitions
+
+All four leave `minimum_observations_for_significance` in place as a reported number and replace only the boolean.
+
+### Candidate 1 — Flat floor
+
+`sample_adequate = (observations >= N_MIN) and (span >= S_MIN)`, both constants fixed for all strategies. Proposed: **N_MIN = 756 observations, S_MIN = 3 calendar years. NUMBERS NOT RULED, and the span is a judgement call (5a).** For a dense daily series these are the same constraint stated twice (756 = 3 × 252); the count exists to bite at other frequencies and on sparse series.
+
+- **Protects against:** the short-sample false positive, which is the whole of rule 8.
+- **Costs:** three years of history — seconds for a backtest, three wall-clock years for paper. Buys a 55.3% chance the window contains a recession month.
+- **Fails:** not frequency-neutral. A monthly strategy would need 756 monthly returns (63 years), or a waiver, and a waiver is a hole. It ignores how hard the claimed edge is to detect.
+- **Gamed by:** running at the highest frequency that satisfies the count. Resample a monthly signal to daily and the count arrives 63 times sooner — though the span floor still binds.
+
+### Candidate 2 — Declared-target floor
+
+`N_MIN = ceil(MinTRL(declared target, alpha, declared skew, declared kurtosis, c = the caller's null))` at the series' own frequency; `S_MIN` fixed at **3 calendar years. NUMBERS NOT RULED.** The target is **pre-declared**, recorded before the test and inside the artifact's integrity hash.
+
+- **Protects against:** everything Candidate 1 does, plus the frequency hole — MinTRL converts the target to the series' own periodicity, so a monthly strategy gets a monthly answer (target 1.0 → 49 observations).
+- **Costs:** one new required input per strategy, and a modest ambition makes the bar enormous (monthly target 0.5 → 15.6 years).
+- **Fails, and this is decisive:** **for daily series it is largely inert.** Above a declared target of 1.133 (z = 1.96) the MinTRL count sits below 756 and the flat floor governs anyway (5d). The extra machinery buys almost nothing at Belay's actual data frequency.
+- **Gamed by:** declaring a high target to shrink the count. The first draft claimed the mitigation was that the strategy "must then be judged against 2.0" — **that mitigation does not exist anywhere in Belay, no test asserts it, and the integrity hash proves only that the declaration was not edited.** The claim is withdrawn.
+
+### Candidate 2H — Declared target as a *raise only* (the reviewer's variant)
+
+Candidate 2 with one added rule: **`N_MIN = max(flat_count, ceil(MinTRL(...)))`.** A declared target may only **raise** the requirement, never lower it below the flat count.
+
+- **Protects against:** the gaming route in Candidate 2, structurally rather than by promise. Declaring a high target buys nothing.
+- **Costs:** the same as Candidate 1 for daily series, plus one declared input; it is strictly stricter than both 1 and 2.
+- **Fails:** it still rests on a chosen target for the low-frequency case, and it makes a cautious declaration expensive while making an ambitious one free of consequence. It is a floor, not an incentive.
+
+### Candidate 3 — Cycle floor (most conservative)
+
+Candidate 2H with `S_MIN` = **74 months ≈ 6.17 years (NUMBER NOT RULED)**.
+
+- **Protects against:** a record measured entirely inside one expansion — the commonest way a strategy looks good and is not. Raises containment from 55.3% to **81.2%**.
+- **Costs:** closes paper promotion for six years; in practice a decision not to promote on paper evidence this decade.
+- **Fails:** 81.2% is not coverage. The July 2009 – February 2020 stretch is 128 recession-free months, so even 6.17 years can be entirely inside one expansion.
+- **Gamed by:** choosing a start date. Nothing in Belay pins the window.
+
+### Candidate 4 — Drop the boolean (excluded by the ruling, recorded)
+
+The other half of F-004's option set (`docs/HANDOFF.md:3571-3573`): report `minimum_observations` and the span, and let a human judge. The owner selected "b now", so this is not live. Recorded because it is the cheapest correct answer and a reviewer attacking this document should weigh it: a flag nobody can define well is worse than two honest numbers.
+
+### Does a pre-declared target satisfy the ruling? — flagged, not decided
+
+The ruling is that adequacy must not depend on **the observed effect**. Candidates 2 and 2H depend on a **declared** effect — fixed before the data and unmoved when the data moves, so `sample_adequate` can no longer be a restatement of `significant`. Mechanically the ruling is satisfied, and the test in section 9 proves it by construction. **But a stricter reading is available**: the owner may have meant "adequacy must not depend on anything the strategy's author controls", under which only Candidate 1 or 3 qualifies. That is owner question 2.
+
+---
+
+## 7. Two different quantities, and how they interlock with the evidence bar
+
+**Backtest sample adequacy and a paper-trading track record are not the same question.** Adequacy on a historical series costs a fetch — seconds (`docs/HANDOFF.md:171`). Adequacy on a paper track record costs wall-clock years, because the observations do not exist until time passes. A number that is trivial for the first is a multi-year gate on the second.
+
+docs/proposals/evidence-bar-per-rung.md (on PR #10's branch; not a resolvable path here), revised at `8e3edb2` on `origin/adr/015-stage-is-carried`, asks the paper-trading version as its question 4 ("How much paper trading is enough?"), records that **no Belay document gives a number**, and states that **its independent reviewer recommends referring the number to the Investment Committee**, on the existing precedent of `strategies/PromotionCriteria.md:29` ("Promotion thresholds are determined by the Investment Committee"). That recommendation exists and the owner should see it.
+
+Two coherent arrangements, presented neutrally as question 7:
+
+- **One ruling serves both.** This document's definition is the quantity; the evidence bar cites it per rung rather than naming a second number. Buys one answer to "how much data is enough" and no drift.
+- **Rule them separately.** Backtest adequacy is ruled here; the paper-trading length goes to the Investment Committee. Buys a right-sized answer for each, at the cost of two places where "enough" is defined.
+
+---
+
+## 8. Recommendation, with the uncertainty it deserves — and the dissent
+
+**This author recommends Candidate 2H** — the flat floor as a hard minimum, with a pre-declared target able only to raise it — **with a three-year span floor labelled a judgement call.** The reviewer's hard-floor variant is adopted because it removes the one gaming route whose mitigation this document could not substantiate.
+
+**Stated with the uncertainty it deserves.** The count floor is *conditional on a chosen target* (5e), not derived from a document. The span floor is a judgement on the percentages in 5a: three years buys a 55.3% chance of containing a recession month, and no achievable span buys certainty. And for daily series — Belay's only data today — 2H and Candidate 1 are the same rule (5d), so the declared target is machinery for a frequency Belay cannot yet trade.
+
+**Where this author and the independent reviewer differ, both are shown rather than resolved:**
+
+| Question | This author | Independent reviewer |
+|---|---|---|
+| Q1 span | 3 years, labelled judgement | **Agrees** — 3 years, but only if the owner is shown 55.3 / 73.2 / 81.2% and chooses on them |
+| Q2 declared target | Allow it (2H), raise-only | **Agrees, conditionally** — allow only with the hard floor; without it the gaming route is open |
+| Q3 flat count | 756 | **Agrees** — provided the owner is told 756 is the span floor restated for daily data, not a second guard |
+| Q4 density floor | Useful as a stopgap | **Agrees only after** the owner is told this rules a question they reserved (`docs/OwnerDecisions.md:914-916`) |
+| Q5 hurdle | Keep caller-supplied alpha | **Agrees** |
+| Q6 venue | Amend ADR-012 rule 8 | **Agrees** |
+| Q7 one ruling or two | One ruling serves both | **Differs — rule separately.** Backtest adequacy and paper length are different quantities, and the evidence-bar reviewer already recommended the Investment Committee route for the paper number |
+
+**The open gap this ruling records rather than closes: regime coverage.** `Validation/Critic.md:17` asks what regimes break a strategy; `constitution/Promotion_Pipeline.md:78` makes `Regime robustness` a promotion criterion; `constitution/Capital_Authority.md:15` makes `Regime compatibility` a capital input. Belay can measure none of it (`framework/services/regime.py:1-10`, `docs/ROADMAP.md:75-81`). **5a is the quantified case for the deferral**: a span floor is a weak probabilistic proxy for regime coverage, and the 128-month recession-free stretch is the proof. Record it so the definition is reopened when regime classification exists, rather than assumed complete.
+
+---
+
+## 9. Implementation sketch for a later session (not code)
+
+**`framework/metrics/statistics.py`.** `sample_adequate` (`:303`) stops being derived from `needed` and becomes `observations >= count_floor and span >= span_floor`, both floors supplied by the ruling and never derived from `returns`. `significance()` gains the span as a `SamplePeriod` (`framework/metrics/reporting.py:42-44`, ADR-013 rule 7 — two dates, already the type `Disclosure` demands at `framework/metrics/reporting.py:148-155`) rather than a day count, because the caller already holds one from `DailyBarSeries.period()`. If Candidate 2H is ruled, the declared target, skew, kurtosis and the per-period `c` are arguments with **no defaults**, per ADR-012 rules 2 and 3. `SignificanceResult` (`framework/metrics/statistics.py:84-95`) gains the floors applied and the span measured: a floor that is not reported cannot be checked.
+
+**F-027 in the same change, not after it.** `significance()` catches the refusal from `minimum_observations_for_significance` and substitutes `_MAX_OBSERVATIONS` (`framework/metrics/statistics.py:284-289`, constant at `:71`) — the exact number the refusal at `:231-236` exists to avoid emitting. That substitution exists **only** to keep `sample_adequate` computable at `:303`. Once adequacy no longer depends on `needed`, it has no purpose and can be deleted: `minimum_observations` becomes `int | None` with the reason carried beside it, the unruled fix proposed at `docs/HANDOFF.md:4467-4469` (the problem statement is at `:4230-4266`). Doing it here avoids signing an artifact whose `parameters` (`:375-376`) carry a fabricated 1,000,000 — `framework/metrics/reporting.py:219-232` places those inside the integrity hash and `Knowledge/Versioning.md:25` ("No version is overwritten") means the first wrong one cannot be corrected. `significance_artifact` has no non-test caller today, so nothing has been signed yet.
+
+**The Disclosure block needs no new field.** `SamplePeriod` carries the span; `metric_artifact`'s `observations` argument carries the count (`framework/metrics/reporting.py:168-179`). What changes is that both floors and the measured span join `parameters`, so "this sample was adequate" sits inside the signature next to the rule that produced it.
+
+**ADR-012: amendment, not a new ADR** (question 6). Rule 8 is the rule being repaired. The amendment states the two-part definition, the ruled numbers, the treatment of `c` under rule 2, and the deferred regime gap with 5a's percentages.
+
+**The tests that would prove the boolean is now independent.**
+
+1. **The load-bearing one.** The mutation that must turn it red is restoring `sample_adequate = len(returns) >= minimum_observations_for_significance(...)`. So the test needs a series whose count is **below its own `needed`** while clearing the ruled floors — which must report `adequate is True` — **and** the converse, a series whose count exceeds its own `needed` while failing a floor, reporting `adequate is False`. A test that only holds count and span fixed while varying the effect is insufficient: it can pass under the old formula.
+2. **All four outcomes exist.** One case each for (significant, adequate), (significant, not adequate), (not significant, adequate), (not significant, not adequate). Two are unreachable today; naming all four states that rule 8's distinction is real.
+3. **Each floor binds alone.** A series clearing the count and failing the span, and one clearing the span and failing the count, both report `False` — otherwise "AND" has been implemented as "OR".
+4. **F-027's three states are distinguishable.** A series whose mean sits exactly on the null (`[0.01, -0.01, 0.02, -0.02]`, per `docs/HANDOFF.md:4438-4451`) must not report `minimum_observations = 1000000`.
+5. **F-017 while the file is open.** `docs/HANDOFF.md:4181-4188` records that removing the `abs()` at `framework/metrics/statistics.py:221` passes the entire suite. One below-null series through `significance()` closes it. Different finding, different commit — but the session should know it is there.
+
+---
+
+## 10. The questions only the owner can answer, in order
+
+Ask one at a time. Each says what the thing is and why Belay needs it before asking.
+
+**Question 1 — the span floor.** A "span" is the stretch of calendar time a track record covers, first observation to last. Belay needs one because a record measured entirely inside a calm market has not been tested by anything. **The honest numbers, recomputed from NBER's post-war recession dates**: of every possible window in 1945-2020, the share containing at least one recession month is **27.7% at 1 year, 55.3% at 3 years, 73.2% at 5 years, 81.2% at 6.2 years, 98.7% at 10 years** — and the longest recession-free stretch on record is 128 months (July 2009 – February 2020), so **no realistic span guarantees a downturn**. The cost, for a daily strategy: on historical data, any of these is seconds of fetching; on a paper track record, the span *is* the wait — 3 years, 5 years, 6.2 years of real time before anything can be called adequate. Options: **(a) 3 years**; **(b) 5 years**; **(c) 6.2 years**; **(d) no span floor**. *Both recommend (a) — as a judgement call, not a derivation: it is the shortest window with better-than-even odds of containing a downturn, and each longer option buys ~18 percentage points for years of delay.*
+
+**Question 2 — may the count floor depend on a number the strategy declares about itself?** A "target Sharpe ratio" is a strategy's stated ambition — roughly, how much return per unit of risk it claims. Let it be declared in advance and the required sample size follows from a published formula that adapts correctly to daily versus monthly strategies. It is not the *observed* result, so it does not re-create F-004 — but it is a number the author picks. **The fact that decides this: for daily data it barely matters.** Any declared target above ~1.13 makes the formula's count *smaller* than the flat 756, so the flat floor governs anyway; the formula only bites at monthly frequency (target 1.0 → 49 observations ≈ 4.1 years; target 0.5 → 187 ≈ 15.6 years). Options: **(a) yes, and it may only RAISE the requirement, never lower it below the flat count**; **(b) yes, unrestricted** — then declaring a high target shrinks the bar, and Belay has nothing that later holds the strategy to its declaration; **(c) no, one fixed count for everything.** *Both recommend (a).*
+
+**Question 3 — the flat count itself.** Options: **(a) 756 observations**; **(b) 1,260**; **(c) refer it to the Investment Committee**, as `strategies/PromotionCriteria.md:29` already refers promotion thresholds. *Both recommend (a) — with the caveat that for a dense daily series 756 is the three-year span restated (3 × 252), not a second independent guard. It bites only at other frequencies or on a series with holes.*
+
+**Question 4 — a sparse record: does anything still need to catch it, now that gaps will fail closed?** A record can satisfy both floors and still be full of holes: 760 observations spread over 20 years passes "756 AND 3 years" while covering about 10% of the calendar days in its own window. **You have already ruled the stronger fix** (`docs/OwnerDecisions.md:1487`, Part 10g): once a trading calendar exists, an **unexplained gap fails closed** — the fetch is refused rather than stored with a warning. **If that holds, a sparse series cannot reach a statistical review at all, and a density floor is redundant at the metrics layer.** It would still decide one thing that (iii) does not: what happens to a series whose gaps are *all explained* — a long halt, a delisting, a market that genuinely did not trade — which fails closed nowhere and can still be too thin to conclude from. Options: **(a) no density floor — the data layer is the right place, and the calendar ruling covers it**; **(b) a density floor as a stopgap until the calendar exists, expiring when it does**; **(c) a permanent density floor, to catch the all-explained-but-still-thin case.** *This author leans (b); the reviewer's position is that this is your reserved question — `docs/OwnerDecisions.md:914-916` explicitly left "what a detected gap then does" unruled — and research should not answer it for you.*
+
+**Question 5 — how strict is the hurdle inside the formula?** The conventional critical value is 1.96. Harvey, Liu and Zhu argue a newly discovered factor needs a t-ratio above 3.0 because so many are tried; using 3.0 multiplies every sample requirement by about 2.34. Options: **(a) keep alpha as the caller already supplies it** — ADR-012 rule 3 already refuses to default it; **(b) fix a stricter hurdle for adequacy specifically.** *Both recommend (a) — a second threshold in the same module is a second place to disagree.* **Related and not optional:** the formula also needs a reference point `c` — "better than what?" — and ADR-012 **rule 2** forbids defaulting that to zero. Proposed: `c` is the null the caller already supplies, converted to the same per-period units. Confirm, or name a different reference.
+
+**Question 6 — where does this live?** Options: **(a) amend ADR-012 rule 8**, keeping one decision about one module; **(b) a new ADR-016**, so the numbers can be revised later without reopening the significance test. *Both recommend (a).*
+
+**Question 7 — one ruling, or two?** There are two different questions wearing the same words. **Backtest adequacy** asks how much *history* a statistical review needs — it costs seconds to fetch. **Paper-trading length** asks how long Belay must run a strategy on live prices with fake money — it costs that much real time, because the data does not exist until it passes. Options: **(a) one ruling — this definition is the quantity, and the evidence bar cites it per rung**; **(b) two — rule backtest adequacy here, and send the paper-trading length to the Investment Committee**, which is where `strategies/PromotionCriteria.md:29` already sends promotion thresholds. **The two reviews differ.** *This author recommends (a), so Belay has one answer to "how much data is enough" rather than two that can drift apart. The independent reviewer recommends (b), because the quantities differ by orders of magnitude in cost and because the evidence-bar proposal's own independent reviewer already recommended the Investment Committee route for the paper number.* **Note the interaction with question 1:** under (a), whatever span you set at question 1 also governs the paper track record — so choosing 3 years there means **no strategy reaches real capital for three years**.
+
+---
+
+## Appendix A — what could not be checked
+
+- **The owner's rulings were not in the repository when this document was first drafted.** `docs/OwnerDecisions.md:988` (Part 8) and `:1099-1102` (Part 9a) both carry a dated 2026-09-19 (evening) correction, and Part 10 (10e-g, `:1411`-`:1515`) is now the record: F-004 is ruled as to shape, its numbers are not; F-006's narrow fix is authorised and its wide question is ruled as a calendar-first proposal with gaps failing closed. **This document still authorizes no work** — it proposes the numbers; it does not rule them.
+- **Nothing in Belay was executed.** No code was run and no test was run. The F-027 behaviour is read from `framework/metrics/statistics.py:284-289` and from `docs/HANDOFF.md:4438-4451`, which records having re-executed it.
+- **MinBTL was sought and not retrieved.** Bailey, Borwein, López de Prado and Zhu's minimum-backtest-length formula bears on the evidence bar's trial-count question; both PDFs reachable this session were image-only and SSRN returned 403. **No MinBTL claim is made anywhere above.**
+- **The MinTRL leading-constant caveat is now closed, except for the primary paper.** Both retrieved sources give the leading term as `1 − κ·SR + (γ−1)·SR²/4`; under κ=0 and γ=3 that equals `1 + SR²/2`, so the "1 +" rendering seen elsewhere is the same expression, and the effect on section 5c is zero. **Only the Journal of Risk paper itself remains unread.**
+- **ADR-012's citation to `docs/ROADMAP.md:72` has rotted.** `docs/DECISIONS.md:2142-2144` cites line 72 as "a sentence ... observing that Belay computes none of this"; line 72 today reads "gained `framework/metrics/statistics.py` (ADR-012)." Noted, not fixed — it belongs in the register.
+- **The working tree was not clean when this document was drafted.** Every citation was originally read via `git show origin/main:<path>` at `3080848`, never from the working copy. [**Committer's note, 2026-09-19 (evening).** The register commits have since landed (PR #9 as `2f44c19`, PR #11 as `3080848` onto `main`) and this branch carries further changes on top; every citation above was re-read against `records/2026-09-19-rulings` and repointed by content where it had moved.]
+
+---
+
+## Appendix B — what changed in this revision, and why (Law VII)
+
+All 15 reviewer defects were re-verified against source by this author; **all 15 were confirmed and applied, none rejected.** One correction to the reviewer, noted rather than silently absorbed: the longest recession-free stretch is **July 2009 – February 2020**, not "Jun 2009 – Jan 2020"; the count of 128 months is right and the endpoints were off by one month each.
+
+| # | Defect | What changed |
+|---|---|---|
+| 1 | **BLOCKER** — span derivation false | Claim withdrawn in 5a and replaced by the recomputed containment table (55.3 / 73.2 / 81.2%) and the 128-month stretch; the span floor is relabelled a judgement call throughout; question 1 now shows the percentages and the cost side |
+| 2 | **BLOCKER** — `c = 0` silently defaulted against ADR-012 rule 2 | 5b makes `c` the caller's own null converted to per-period units, with rule 2 cited at `docs/DECISIONS.md:2184-2188`; added to question 5 and to the §9 signature |
+| 3 | **BLOCKER** — Candidate 2's gaming line wrong, crossover missing | 5d added: crossovers 0.951 / 1.133 / 1.737, the collapse into Candidate 1 for daily series, and the monthly figures; Candidate 2's "fails" bullet rewritten around it |
+| 4 | **BLOCKER** — unbuilt anti-gaming mitigation | The "judged against 2.0" claim is withdrawn in Candidate 2; **Candidate 2H** added (declared target may only raise `N_MIN`) and adopted in the recommendation; question 2 gains it as option (a) |
+| 5 | **BLOCKER** — Q4 ruled a reserved question | Question 4 rewritten around the owner's fails-closed selection, framed as their reserved question with `docs/OwnerDecisions.md:914-916` cited, and now asks whether a density floor is redundant, a stopgap, or permanent |
+| 6 | 6 table cells floored not ceiled | Whole table recomputed with ceilings (2,730 / 684 / 305 / 3,875 / 971 / 433) and the non-normality figure moved to 971 → 1,004 |
+| 7 | "derived rather than chosen" overclaimed | 5e added, naming it an a-priori power calculation conditional on a chosen target; the recommendation repeats the conditional |
+| 8 | ÷√252 conversion unstated | Written out in 5b, with the `refSR` non-annualised quote added to §4 |
+| 9 | Leading-constant caveat closeable | Appendix A caveat replaced with the algebraic identity; only the primary paper remains unread |
+| 10 | §7/Q7 conflated two quantities | §7 rewritten to separate backtest adequacy from paper length and to surface the evidence-bar reviewer's Investment Committee recommendation (`8e3edb2`, its question 4); question 7 now presents both neutrally |
+| 11 | Q1×Q7 interaction buried | Stated at the end of question 7 |
+| 12 | F-027 fix cited at the wrong lines | Corrected to `docs/HANDOFF.md:4467-4469`, with the problem statement at `:4230-4266` |
+| 13 | Density denominators inconsistent | §2 now uses the calendar-day basis (10.4%) and shows the trading-day figure (15.1%) beside it |
+| 14 | §9 test 1 insufficient | Test 1 rewritten around the mutation it must catch, requiring a below-`needed` case and its converse |
+| 15 | 756 and 3 years are one constraint for daily | Stated in §2, in Candidate 1, and in question 3 |
+| — | Dissent not recorded | §8 gains a side-by-side table of both recommendations, attributed, including the Q7 disagreement |

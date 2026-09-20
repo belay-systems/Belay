@@ -1,0 +1,25 @@
+# Every change is reviewed before it merges. With "require review from Code
+# Owners" switched on in the ruleset for main, GitHub enforces this rather than
+# relying on anyone remembering it.
+#
+# Both owners review ordinary work, so neither is a bottleneck on the other.
+# Nobody can approve their own pull request, so this still means a second pair
+# of eyes on ordinary work. On the owner-only paths below there is no second
+# code owner, so an owner-authored change there has no eligible reviewer.
+*                         @pewpewpressco-ux @eternalaether5
+
+# The governance records are the owner's alone. docs/OwnerDecisions.md Part 11a
+# grants the second contributor no authority over them. Most of these paths are
+# in AGENTS.md under "What only the owner may change"; AGENTS.md reserves only
+# ADR *statuses* in docs/DECISIONS.md, and does not name AGENTS.md or .github/
+# at all, so those three are this file being stricter, not quoting it.
+/constitution/            @pewpewpressco-ux
+/departments/             @pewpewpressco-ux
+/workflows/               @pewpewpressco-ux
+/Knowledge/               @pewpewpressco-ux
+/strategies/              @pewpewpressco-ux
+/docs/OwnerDecisions.md   @pewpewpressco-ux
+/docs/DECISIONS.md        @pewpewpressco-ux
+/AGENTS.md                @pewpewpressco-ux
+/LICENSE                  @pewpewpressco-ux
+/.github/                 @pewpewpressco-ux

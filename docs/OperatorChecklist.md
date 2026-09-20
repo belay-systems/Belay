@@ -1,0 +1,492 @@
+# Operator Checklist
+
+**Actions only the repository owner can take.** Everything here is outside what a
+session can do for itself: a GitHub setting, an account permission, a piece of
+software installed on a machine, a decision that is the owner's by constitutional
+right.
+
+`AGENTS.md` step 14 makes keeping this current a required part of every session
+close. A session that discovers an owner-only action and records it only in a
+chat transcript has lost it — that is the same failure as work living on an
+unmerged branch, which has now cost this repository twice.
+
+**Format.** Newest block first. Tick a line by moving it to `## Done`, with the
+date. Never delete a done item; this file is a record as well as a queue.
+
+---
+
+## Open
+
+### Start the next session — one sentence, no prompt to keep
+
+**Added 2026-08-27.** The next session's work is written down in the repository
+rather than held in a chat transcript, following the pattern
+`docs/proposals/F-007-session-brief.md` established. Open a fresh session and say:
+
+> You are Belay. Read `docs/proposals/register-rebuild-session-brief.md` and work it.
+
+That brief carries the phases, the stop gates, and the one fact a fresh session
+cannot derive cheaply: which finding numbers belong to which review, after the
+2026-08-14 and 2026-08-21 reviews collided over F-007..F-013.
+
+**Do this after the merges above.** The brief refuses to start until
+`reports/review/2026-08-14-review.md`, `docs/OwnerDecisions.md` Part 8,
+`reports/review/2026-08-21-review.md` and `.github/workflows/conformance.yml` are
+all on `main`.
+
+**After that, the opener is just "You are Belay. Follow `AGENTS.md`."** Phase 2 of
+the brief points `docs/HANDOFF.md`'s "Highest Priority Next Task" at itself, and
+`AGENTS.md` steps 13 and 14 make every session hand off to the next by rule —
+now held up by `tests/test_session_handoff.py` rather than by memory.
+
+---
+
+### Branch protection on `main` — blocks nothing, and nothing is gated until it is set
+
+**Added 2026-08-27**, when `.github/workflows/conformance.yml` landed. CI now
+*reports*; it does not yet *block*. Until this ruleset exists, a red suite can
+still reach `main`.
+
+**Still unset, reconfirmed 2026-09-19, and there is new information: the
+picker above may not be reachable at all on this plan.** `gh api
+repos/pewpewpressco-ux/Atlas/rulesets`, the endpoint the archive's settings page
+used, returned `403`: `"Upgrade to GitHub Pro or make this repository public to
+enable this feature."` This was not checked when the item was added on
+2026-08-27. Whether the web UI's ruleset picker is gated by the same plan
+restriction as the API is not established from here — that needs the owner to
+actually open `settings/rules` and look — so this is recorded as a new fact
+rather than as a rewrite of the steps below, which are kept unless the owner
+finds they do not apply. **Nothing gates the canonical source today, and three
+pull requests are about to merge into it** — #9, then #11 retargeted to
+`main`, and eventually #10 once ADR-015 is ratified — which is what raises
+this item's urgency rather than what it asks the owner to do.
+
+**Do this only after PRs #5, #1, #2 and #3 are merged.** Those three review
+branches were created before CI existed, so they carry no checks. Turning
+protection on first blocks all of them and each would need its branch updated to
+get unstuck. Protect last.
+
+1. `https://github.com/belay-systems/Belay/settings/rules`
+2. **New ruleset** → **New branch ruleset**
+3. **Ruleset Name**: `main`
+4. **Enforcement status**: `Disabled` → **`Active`**
+5. **Target branches** → **Add target** → **Include default branch**
+6. Under **Rules**, tick:
+   - Require a pull request before merging
+   - Require status checks to pass
+   - Block force pushes
+7. Under *Require status checks to pass* → **Add checks** → add all five:
+   `governance conformance`, `suite (py3.11)`, `suite (py3.12)`,
+   `suite (py3.13)`, `dashboard builds`
+8. Tick **Require branches to be up to date before merging**
+9. **Create**
+
+**If the check names do not appear in the picker**, the workflow has not run on
+`main` yet. Merging PR #5 triggers that run — watch the **Actions** tab, wait for
+it to finish, then reopen the picker.
+
+**Verification, so this is not self-certified:** open any new pull request. It
+must read "Merging is blocked" until all five checks report green. If it does
+not, the ruleset is not active on the default branch.
+
+**Record it when done.** This changes who may write to the canonical source, which
+makes it an owner ruling rather than a setting — it belongs in
+`docs/OwnerDecisions.md` as its own Part, on the same footing as the other
+rulings there.
+
+---
+
+### Merge order — PR #12, then the records pull request
+
+**Added 2026-09-19 (evening), superseding the merge-order item now in
+`## Done` below rather than editing it.** In order: merge PR #12
+(`fix/review-skill-numbering`) to `main`; retarget the records pull request
+(`records/2026-09-19-rulings`) from `fix/review-skill-numbering` to `main` and
+merge it. **PR #10 stays a draft** until ADR-015 is ratified, unaffected by
+either merge. `docs/OwnerDecisions.md:1385` (Part 10d) and `:1589` (Part 10j —
+why this is an owner action rather than something the session did itself:
+an unattended merge of PR #12 was refused by Claude Code's own permission
+control).
+
+---
+
+### Before making the repository public — six decisions, none blocking technically, all the owner's
+
+**Added 2026-09-19 (evening).** `docs/OwnerDecisions.md:1516` (Part 10h)
+records a read-only history scan run before the repository goes public: no
+secrets found, no MUST-FIX item. These six remain, each the owner's call:
+
+1. **The owner's own email address is the author on every commit to date**
+   (291 at scan time). GitHub's commit-email-privacy setting protects *future*
+   commits only; hiding the ones already made means rewriting history, which is
+   a separate and riskier decision than this checklist should make for the
+   owner.
+2. **A Windows username appears in file paths in tracked documents.**
+   Verified this session by `git grep`, and the count does not match what was
+   reported at scan time: **5 places**, not 6 — `docs/HANDOFF.md`,
+   `docs/OwnerDecisions.md`, and three files under `reports/review/`. (The
+   username is not written here; this item exists so the owner can find and
+   judge them, not so a session repeats them.)
+3. **One cloud-routine trigger id and one cloud session id appear in tracked
+   docs.** The trigger id is in this file, in the "review cadence gate" entry
+   under `## Done`; the cloud session id is in `docs/HANDOFF.md`'s "Evening
+   addendum" and "Completed This Session" sections. Both are identifiers, not
+   credentials, and neither is reproduced again here.
+4. **`LICENSE` is MIT with no name on the copyright line** (verified: it
+   reads "Copyright (c) 2026" and nothing else). MIT permits anyone to reuse
+   the whole framework, including commercially. Decide before going public
+   whether that is intended, and put a name on the line if so.
+5. **`.github/workflows/conformance.yml` is safe to run from an outside
+   contributor's pull request, verified rather than assumed**: it triggers on
+   `pull_request` (`:23-26`), not `pull_request_target`, and declares
+   `permissions: contents: read` (`:29-30`) — no secrets are used and none
+   could be exfiltrated through it. Once public, anyone can open a pull
+   request and cause it to run; turn on "require approval for outside
+   contributors' workflows" in repository settings regardless, as a second
+   layer.
+6. **Everything tracked becomes readable**, including six review reports
+   under `reports/review/` that name every open defect this repository has
+   found in itself. That is a feature of Law VII, not a bug, but it is a
+   different kind of exposure than a secret and worth the owner seeing plainly
+   stated once before deciding.
+
+---
+
+### Immediately after going public — a ruleset on `main`
+
+**Added 2026-09-19 (evening), to run right after the visibility change, not
+before (branch protection could not be configured while the plan restriction
+recorded below applied).**
+
+1. Require a pull request before merging.
+2. Require the five conformance checks by name: `governance conformance`,
+   `suite (py3.11)`, `suite (py3.12)`, `suite (py3.13)`, `dashboard builds`.
+3. Block force-pushes; restrict branch deletion.
+4. Enable secret scanning and push protection.
+5. Enable commit-email privacy (protects future commits only — see decision 1
+   above for the ones already made).
+6. Disable Issues if unused.
+
+---
+
+### Rulings owed
+
+**Added 2026-09-19, updated in place the same evening rather than rewritten —
+`docs/OwnerDecisions.md` Part 10 (10e-g) partially answered the first item
+below.** What is still waiting on the owner, not on a session:
+
+- **F-004 is ruled as to shape; its numbers are not. F-006's narrow fix is
+  authorised; its wide question is ruled as "calendar proposal first", and the
+  calendar itself is still owed.** `docs/HANDOFF.md:3559` (F-004) and
+  `docs/HANDOFF.md:3590` (F-006) carry dated 2026-09-19 (evening) corrections
+  in place; `docs/OwnerDecisions.md:988` (Part 8, as corrected) and Part 10e-g
+  (`:1411`-`:1515`) are the authorities. **No code opens for F-004's numbers or
+  F-006's wide question until they are ruled.**
+- **Two research proposals, seven questions each, await the owner — ask one
+  at a time, with a recommendation and the reasons, the format the owner
+  asked for.** The evidence-bar proposal (section 10, evidence-bar-per-rung.md
+  under `docs/proposals/` **on PR #10's branch only** — not a resolvable path
+  on this branch, so named without backticks) and
+  `docs/proposals/sample-adequacy-definition.md` (section 10, this branch).
+  Both have had exactly one independent adversarial pass (17 defects/4
+  blockers, and 15/5, respectively) and neither has had a second.
+- **F-014's fix is unruled beyond Part 9e's shape selections.** F-014 is
+  `docs/HANDOFF.md:4017`. `docs/OwnerDecisions.md:1215` (Part 9e) selects a
+  *shape* for ADR-015, which covers F-014 together with F-007, and says
+  plainly that this is not a ruling adopting it.
+- **Whether an explicit owner instruction may override the review gate's SKIP
+  verdict is unruled.** See "Owner glance items" below, item (d).
+- **ADR-015 itself is unratified**, and ratification is blocked on the
+  evidence-bar ruling above — see PR #10's own Open item on that branch,
+  which this item does not duplicate: that ruling arrives with PR #10.
+
+---
+
+### Owner glance items — small, but the owner's call rather than a session's
+
+**Added 2026-09-19.** Four things worth a look rather than a decision-blocking
+ruling — (d) was added later the same day, with the review-skill numbering fix:
+
+- **(a) A correction may be mapped onto the wrong finding.** The 2026-08-21
+  report's correction block maps its F-010 onto the 2026-08-14 review's
+  F-008, though only the trailing clause of the two actually overlaps. The
+  register copies the correction faithfully rather than re-deriving it. If
+  the owner disagrees with the mapping, the remedy is a **new durable
+  number**, never a renumbering — renumbering is exactly the mechanism that
+  cost seven claimed numbers on 2026-08-21.
+- **(b) The twelve priorities on F-019..F-030 are this registration's own
+  derivation, not the reports' own grading.** Neither
+  `reports/review/2026-09-04-review.md` nor
+  `reports/review/2026-09-11-review.md` states a priority for any finding —
+  only a severity. The owner may re-grade any of the twelve; nothing here is
+  a ruling that the mapping is right.
+- **(c) ADR-015 leaves "Remain at current stage" reviews evidence-optional**,
+  on the draft's author's own judgement rather than on an owner instruction —
+  the owner's "Evidence for everything" selection (`docs/OwnerDecisions.md`
+  Part 9e-v) named promotions, demotions and retirements as needing evidence,
+  and did not name "remain" reviews either way. Worth a glance before
+  ratification, not a blocker recorded as one.
+- **(d) On SKIP the review skill now says do not run at all — should the owner
+  be able to override that?** Added 2026-09-19, with the numbering fix.
+  `.claude/skills/belay-review/SKILL.md:42-79` tells a reviewer that a SKIP
+  from `python scripts/review_due.py` means the review does not run and no
+  finding number is allocated. That is right for the scheduled routine and for
+  anyone running it unattended, and `scripts/review_due.py:5` already exits 1
+  to say so. But it leaves **no override path for an off-cadence review the
+  owner explicitly asks for in a separate turn**, which is a different question
+  from cadence discipline and is **unruled**. A session did not decide it
+  either way; the instruction as written is the conservative reading. If the
+  owner wants an override, the shape worth ruling is the one this skill already
+  uses for fixes: an explicit instruction in a separate turn, recorded, with
+  the number still coming from the gate.
+
+---
+
+### Do not run a manual `/belay-review` yet — the numbering hazard is still in the skill
+
+**Added 2026-09-19.** `.claude/skills/belay-review/SKILL.md:250-252` still
+instructs a reviewer to "number them continuously across reviews — if the
+last report ended at F-014, this one starts at F-015" — numbering from the
+previous report's *headings*, which is the exact collision mechanism that
+cost seven already-claimed numbers on 2026-08-21. The **scheduled** cloud
+routine is protected from this because its prompt takes the number from
+`scripts/review_due.py` rather than from the skill's own instruction; a
+manually-run `/belay-review` is not. Editing the skill is a proposal for the
+owner to approve, not a session's call to make unilaterally, because it
+changes how every future review numbers its findings.
+
+**Updated in place 2026-09-19 — the owner approved that edit in chat, and it
+is written.** The selection was two choices and nothing wider: correct the
+skill's finding-numbering instruction, and take F-025's hardcoded counts in the
+same file. **The approval itself is not yet on file in `docs/OwnerDecisions.md`
+— a records pull request follows this one.** Until that lands, the record of
+the authority is this block, the closing entry in `docs/HANDOFF.md` and the
+`CHANGELOG.md` entry, and nothing in the register where the other Parts are. The instruction the paragraph above quotes is gone;
+`.claude/skills/belay-review/SKILL.md:279-299` now says the first finding takes
+the number `python scripts/review_due.py` prints and that the number is never
+derived from where a previous report's headings ended, and
+`tests/test_session_handoff.py:287-445` holds both halves of that.
+
+**This item stays Open because the fix is on a branch.** It is on
+`fix/review-skill-numbering`, as a draft pull request. Until that merges, a
+`/belay-review` run from a checkout of `main` still reads the old instruction,
+so the caution above still applies there. **Move this block to `## Done`, dated,
+when the pull request merges** — that is the owner action this item is now
+asking for, in place of the original one.
+
+---
+
+### Opening Belay to a second contributor — the owner's own steps
+
+**Added 2026-09-19 (night).** `docs/OwnerDecisions.md` Part 11 records the
+rulings behind these. Placed last under `## Open` so that no existing line
+citation into the sections above it moves.
+
+1. **Merge the co-contributor readiness pull request**
+   (`hardening/co-contributor-readiness`) after reading the independent passes
+   pasted into it.
+2. **Item 4 of the six publication decisions above is answered**: the licence
+   is now a proprietary notice in the name "The Belay project owners" (Part
+   11c). The other five are still owed, and are to be put one at a time.
+3. **A seventh publication decision, new tonight, and the one that matters
+   most: publish this repository's history, or a fresh one.** Four independent
+   passes ran before publication (their findings are pasted into the pull
+   request). None found a secret. But the history itself carries things that
+   editing today's files cannot remove: the MIT licence text in every earlier
+   commit; the owner's email address and working hours in every commit's
+   metadata; a Windows username, a cloud-routine id and session ids in dozens of
+   earlier file versions and in four old pull request descriptions; nineteen
+   branches, most abandoned; and seven orphaned commits on GitHub that belong to
+   no branch and that no branch-based scan can see, but that anyone holding
+   their id could fetch once the repository is public. **Recommended: create a
+   new public repository from a cleaned snapshot of `main`, committed under
+   GitHub's no-reply address, and keep the Atlas repository private as the full
+   archive.** Cost: commit ids and pull request numbers cited in these documents
+   will resolve only in the private archive, and a note must say so. The
+   alternative is to publish this repository as it is and accept all of the
+   above, permanently. **RULED the same night: a fresh repository — `docs/OwnerDecisions.md` Part 12b. What it leaves open is listed there.** **Those points were answered at close of night (Part 13): all six publication decisions are now answered, and the build is briefed in `docs/proposals/fresh-public-repository-brief.md`. Still yours alone: switching on "Keep my email addresses private" before Belay's first commit, creating the organization if you choose one, and the public flip itself.**
+4. **Have a professional read `LICENSE`** before Belay is sold or anyone outside
+   the two owners contributes. An AI agent wrote it as a conservative placeholder.
+5. **Write down, privately, how Belay is owned between you and the second contributor**,
+   before their first contribution merges. Nothing in the repository decides it.
+6. **When you flip the repository public**, add to the ruleset on `main`
+   described above: "Require review from Code Owners". `.github/CODEOWNERS`
+   names the owner alone for every governance path, so this is what makes those
+   a rule GitHub enforces rather than a convention.
+7. **Set your commit email to GitHub's no-reply address** for future commits
+   (GitHub, Settings, Emails, "Keep my email addresses private"), then tell the
+   next session so it can set the same address in this clone's git
+   configuration. This protects future commits only; see decision 1 above for
+   the ones already made.
+8. **Keep Issues switched on.** The ruleset list above says "Disable Issues if
+   unused"; they are now how work is claimed, so that line no longer applies.
+   Also switch on "Private vulnerability reporting" (Settings, Code security),
+   which `SECURITY.md` relies on.
+9. **Give the second contributor the repository link once it is public.** They fork it and
+   need no invitation and get no write access. Point them at `CONTRIBUTING.md`.
+
+---
+
+### Create the `belay-systems` organization and Belay itself — ADDED 2026-09-20
+
+Ruled in `docs/OwnerDecisions.md` Part 14a. **Only the owner can do steps 1
+to 3**; an agent cannot create a GitHub organization.
+
+1. **Create the free organization**: `https://github.com/organizations/plan` →
+   **Free**. Name it `belay-systems`. GitHub shares one namespace between
+   users and organizations, so if the name is free for a user it is free for an
+   organization; you will find out at creation.
+2. **Invite the second contributor**, `Eternalaether5` (canonical login
+   `eternalaether5`), as an
+   organization **Owner** — that is what Part 14a's selection means by both
+   owners being owners in GitHub's eyes.
+3. **Create the repository** `Belay` inside it, **PRIVATE**, with no README, no
+   `.gitignore` and no licence. The snapshot supplies all three, and any file
+   GitHub adds at creation would break the single-commit requirement.
+4. Then tell the session, which pushes the snapshot and confirms the five
+   checks pass. **Not before two independent passes on the snapshot report
+   clean** — `docs/OwnerDecisions.md` Part 13a makes that the owner's own
+   condition on publishing the findings register.
+
+### Make Belay public, then apply the ruleset the same day — ADDED 2026-09-20
+
+**The flip is the owner's own action and no agent performs it**
+(`docs/OwnerDecisions.md` Part 11d, re-confirmed in the build brief). Do it
+only after step 4 above reports clean and CI is green on Belay.
+
+Immediately afterwards, on `main`: require a pull request; require the five
+checks by name — `governance conformance`, `suite (py3.11)`, `suite (py3.12)`,
+`suite (py3.13)`, `dashboard builds`; require review from Code Owners; block
+force-pushes and deletion; secret scanning and push protection on; private
+vulnerability reporting on; Issues on; Actions set to require approval for
+first-time contributors (Part 13c).
+
+### Close Atlas down as a workplace — ADDED 2026-09-20
+
+After Belay is live and public:
+
+- Atlas's `README.md` gains one line saying development moved. The owner may
+  mark that repository **archived** (read-only) on GitHub. **It stays private
+  either way** — Part 12b makes that permanent.
+- On the owner's machine, rename the old folder and clone Belay into the path
+  the old one had, so tools that key their settings to a folder path keep
+  working.
+- **The scheduled review routine moves to Belay** (Part 14c), by editing the
+  existing routine in place. **Never retire and replace it** — the standing
+  note on how is the last entry in the Done section. A session can make this
+  edit with `RemoteTrigger`; it is listed here so it is not forgotten, not
+  because it needs the owner.
+
+
+### Decide whether GitHub Discussions is enabled — ADDED 2026-09-20, UNASKED
+
+**This has not been put to the owner.** It is listed so it is not lost, which is
+how it nearly was: `docs/OwnerDecisions.md` Part 14e claimed it was already
+listed here when it was not, and an independent pass caught the claim.
+
+Part 14e ruled the **wiki** stays off, because a wiki is a separate repository
+that no pull request, no check and no ruleset on `main` reaches — a second
+source of truth, which Part 11a rules against. **Discussions is not the same
+thing**: it holds conversation rather than record, so it does not compete with
+the repository as a source of truth. It is still the owner's call, and on a
+public repository it is also a place strangers can post.
+
+
+## Done
+
+### Merge order for the three register/ADR pull requests — DONE 2026-09-19
+
+**Added 2026-09-19, closed the same day (evening).** In order: PR #9 merged
+as `2f44c19`; PR #11, retargeted from `register/2026-08-21-corrected` to
+`main`, merged as `3080848`; PR #4 (`register/2026-08-21-findings`) closed as
+superseded by #9 — closed, not deleted, per Immutable Law VII. All three
+verified this session via `gh pr list --state all`. **PR #10 stayed a draft
+throughout**, as this item required. `docs/OwnerDecisions.md:1300` (Part 10a)
+and `:1360` (Part 10c) are the owner's selections that authorised this.
+
+**Superseded by, not the same item as, "Merge order — PR #12, then the
+records pull request" above** — that is a new merge, not a re-opening of this
+one.
+
+---
+
+### A local pre-push guard was installed — DONE 2026-09-19
+
+**Added and closed the same evening.** `.git/hooks/pre-push` refuses any
+direct push to `main` from this clone, printing a message and exiting 1;
+every other push is unaffected. **This clone only** — untracked, no effect on
+the cloud routine or on any other machine, removed by deleting the file.
+`docs/OwnerDecisions.md:1620` (Part 10k).
+
+---
+
+### The review cadence gate reads only the default branch — DONE 2026-09-19
+
+**Added 2026-08-27, closed 2026-09-19 in two halves**, because it was always two
+problems wearing one entry.
+
+*The repository half.* PR #6 merged as `a4e7a2a`. `scripts/review_due.py`
+enumerates `reports/review/` across every `origin/*` ref rather than the working
+tree, fetches before it reads, and answers both questions the gate asks — whether
+a review is due, and what number its first finding takes. It is standard library
+only, so it runs before any `pip install`.
+
+*The account half.* The gate's prose lived in the stored prompt of cloud routine
+`trig_<id>` ("Belay Review — biweekly red team", cron
+`0 6 * * 5`). Its Step 1 now runs `python scripts/review_due.py` and obeys the
+exit code — 0 run, 1 skip — and is told explicitly not to fall back to listing
+`reports/review/` by hand.
+
+**Two further defects in the same stored prompt were fixed while it was open**,
+both read out of the 2026-09-18 run log rather than inferred:
+
+- Step 2 instructed `pip install -e .` on a dependency failure, which installs the
+  runtime and no test runner. The 2026-09-18 run followed it, got
+  `No module named pytest`, and had to retry with `pip install -e ".[dev]"`.
+  `pyproject.toml` makes pytest an optional extra, and this is the third occasion
+  the distinction has cost a session time.
+- Step 3 instructed the reviewer to "continue the F-NNN finding numbers from where
+  the most recent report left off". That instruction **is** the collision
+  mechanism: a report's headings are what one pass called its findings, not the
+  durable series, and `reports/review/2026-08-21-review.md` heads F-007..F-015
+  while its own correction block renumbers them F-014..F-018. The number now comes
+  from the gate, which reads all prose across all refs.
+
+**The 2026-09-18 firing is the evidence this was worth closing.** It was the
+fourth consecutive firing authorised on a wrong answer — the working tree showed
+`2026-08-21` at 28 days while the real newest was `2026-09-11` at 7, on an
+unmerged branch. It did not produce a fourth duplicate review, but not because
+the gate worked: it proceeded past Step 1, went looking at remote refs on its own
+initiative, ran the then-unmerged `review_due.py` out of `/tmp`, and stopped.
+Judgment caught it four firings running, which is not a control.
+
+**Not yet verified by a real firing.** The next scheduled run is 2026-09-25, and
+the gate returns SKIP until 2026-09-23.
+
+---
+
+### Point the scheduled review task at `scripts/review_due.py` — DONE 2026-09-19
+
+**Added 2026-08-29, done 2026-09-19.** It was dated against a 2026-09-02 firing it
+did not reach; the edit landed three firings late. The substance is in the entry
+above.
+
+**This entry recorded something false, and the error is worth keeping.** It stated
+that the routine "is account configuration — no session can read or edit it,
+confirmed by `CronList` returning nothing for it", and asked for a guided
+walkthrough on that basis. A session edited it directly on 2026-09-19 with the
+`RemoteTrigger` tool — `{action: "get"}` then `{action: "update"}` against the
+trigger id — having read its 2026-09-18 run log the same way.
+
+**The confirmation was drawn from the wrong instrument.** `CronList` lists only
+jobs created by `CronCreate` *within the current session*, so it returns nothing
+for any pre-existing routine and cannot tell "does not exist" from "not mine".
+`mcp__scheduled-tasks__list_scheduled_tasks` misses it too — that tool sees local
+scheduled tasks, and this is a cloud routine. Two tools returned nothing, and the
+absence was read as a fact about permissions rather than about their coverage.
+The walkthrough this entry demanded was therefore never necessary.
+
+**Standing note for whoever edits it next: update in place, never retire and
+replace.** A rebuilt routine can come back without connector access, and this one
+uses a GitHub connector in its Step 4. Partial-update `job_config` alone; do not
+pass `mcp_connections` or `clear_mcp_connections`.

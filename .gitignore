@@ -1,0 +1,113 @@
+__pycache__/
+
+*.pyc
+
+*.egg-info/
+
+.pytest_cache/
+
+build/
+
+dist/
+
+.env
+
+.env.local
+
+.vscode/
+
+.idea/
+
+# Local Claude Code state is machine-specific and stays ignored. The skills
+# directory does not: `.claude/skills/` is project tooling that encodes
+# governance rules, so it is institutional knowledge under Law VII and belongs
+# in the repository. The `/*` form is required — git will not descend into an
+# ignored directory, so `.claude/` followed by a negation would not work.
+.claude/*
+
+!.claude/skills/
+
+.DS_Store
+
+Thumbs.db
+
+reports/generated/
+
+# The market data store. ADR-013 rule 4, and this entry is the enforcement
+# rather than a convention someone has to remember.
+#
+# Git retains every version of every file permanently by design, so a
+# daily-refreshed price series makes repository growth unbounded with no
+# prunable path — and append-only history means the mistake cannot be undone
+# later. A vendor licence may also restrict retention independently of
+# visibility, and removing data from a git history is effectively impossible
+# where removing a directory is not.
+#
+# What is kept instead, and where: `artifacts/`, tracked. ADR-014 rules 2 and 6.
+# The fetch record for every stored version carries that version's content hash,
+# its path inside this store, and the immutable source key it was filed under —
+# so the two can be checked against each other rather than assumed to agree.
+# `orphan_versions()` reports any stored version no record accounts for, and
+# `test_no_stored_version_in_this_repository_is_unrecorded` runs it.
+#
+# **That check is machine-local, and this comment says so rather than implying
+# otherwise.** This entry keeps `data/market/` out of every clone, so on a machine
+# that has not fetched, the check walks an empty store and passes with nothing
+# examined. It is real only where the bytes are. An independent pass found the
+# first version of this paragraph claiming the check without that qualification —
+# which is the same gap ADR-014 rule 9 exists to close, inside rule 9's own
+# implementation. See docs/HANDOFF.md, "Rule 7's Orphan Check Is Vacuous On Every
+# Machine But The One That Fetched".
+#
+# This paragraph replaces one that read "Nothing is lost by this ... the record
+# of what was obtained is signed and permanent whether or not the bytes are
+# under version control." **That was false for the whole time it stood here** —
+# no fetch record had ever been written to disk, which is F-002. It is not
+# restored in a milder wording, because the comparison it made was the wrong
+# one: at the daily cadence Belay actually fetches, the tracked record is larger
+# than the ignored payload it describes. The two arguments above stand on their
+# own and do not need this one.
+#
+# Added before the first byte landed, deliberately. Git history cannot be pruned
+# afterwards.
+data/market/
+
+# The cloned upstream database. Finding 14, and a separate entry from the store
+# above on purpose.
+#
+# `data/market/` holds *fetched series* — keyed by source and symbol, versioned
+# when the vendor restates. This holds a copy of the vendor's whole database. If
+# the two shared a directory, rule 4's version count would stop meaning "the
+# number of times the vendor's answer changed" and start counting clone
+# refreshes as well.
+#
+# Multi-gigabyte and reconstructible by re-cloning, so it is a cache rather than
+# a record. Nothing signed depends on it: the fetch record carries the content
+# hash of the bytes, and those bytes live in the store.
+#
+# Added before the clone was started, for the same reason the entry above was.
+data/upstream/
+
+logs/
+
+temp/
+
+.cache/
+
+# A safety net, not a policy: credential and local-database shapes that must
+# never be committed from any contributor's machine, whatever tools they use.
+# Appended at the end on purpose: this file is cited by line number in ADRs,
+# code and tests, and an insertion higher up would move every one of them.
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.pickle
+*.pkl
+*.sqlite
+*.sqlite3
+*.db
+credentials*
+secrets*
+.tokens/

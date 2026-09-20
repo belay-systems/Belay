@@ -1,0 +1,70 @@
+id: RPT-0001
+title: 'Fetch record: AAPL from DoltHub post-no-preference/stocks (CC BY-SA 4.0)'
+type: Report
+lifecycle: Draft
+strategy_stage: null
+deliverable: null
+evidence: []
+evidence_level: null
+tags: []
+summary: 28 daily bars for AAPL covering 2024-01-02 to 2024-02-09
+confidence: null
+version: 1.0.0
+schema_version: '1.0'
+created: '2026-08-02T12:55:10.098592+00:00'
+updated: '2026-08-02T12:55:10.098592+00:00'
+author: Atlas
+relationships: []
+metadata: []
+content:
+- - data_source
+  - DoltHub post-no-preference/stocks (CC BY-SA 4.0)
+- - source_key
+  - dolthub-stocks
+- - symbol
+  - AAPL
+- - requested_start
+  - '2024-01-02'
+- - requested_end
+  - '2024-02-09'
+- - covered_start
+  - '2024-01-02'
+- - covered_end
+  - '2024-02-09'
+- - observations
+  - 28
+- - content_hash
+  - a7dbcaf3fb6aba2dc179ca482986bdc7e8887f609c0ca3a3cc25a73c145272a6
+- - content_bytes
+  - 4462
+- - store_version
+  - 1
+- - store_path
+  - dolthub-stocks/AAPL/0001-a7dbcaf3fb6aba2d.bin
+- - survivorship_delisted_prices
+  - Survivors only
+- - survivorship_delisted_universe_membership
+  - Partial
+- - known_limitations
+  - "Survivorship established as \u2014 delisted prices: Survivors only, delisted\
+    \ universe membership: Partial. Basis: QUERIED 2026-08-01. Prices: ohlcv returned\
+    \ zero rows for COH (Coach, Inc., delisted October 2017) in both windows tried,\
+    \ 2015-01-05 to 2015-01-16 and 2017-10-16 to 2017-10-26, while AAPL returned rows\
+    \ over the latter, so the empty result is a property of the symbol and not of\
+    \ the query. Universe: the symbol table returned COH with last_seen 2017-10-26,\
+    \ and COUNT(*) returned 23,827 rows. INFERRED, not queried: that the price table\
+    \ therefore carries currently-listed symbols only (two delisted samples, not an\
+    \ exhaustive check); that 23,827 exceeds the number of currently-listed US stocks,\
+    \ which is external knowledge of roughly 6,000 rather than a query result; and\
+    \ that accumulation began on 2017-10-26, which the ORDER BY only shows to be the\
+    \ earliest last_seen retained. ESTABLISHED: membership is reconstructable as last_seen\
+    \ >= date, and there is no first-seen column, so a symbol not yet listed on a\
+    \ past date cannot be excluded. Survivorship bias INFLATES every return measure\
+    \ and DEFLATES drawdown and tail measures SIMULTANEOUSLY, because the instruments\
+    \ that failed have already been removed from the sample. It flatters the return\
+    \ and understates the risk in one breath, so a result that looks acceptable on\
+    \ both axes may be unacceptable on both. It cannot be corrected from the data\
+    \ itself; ADR-012 rule 10 refuses to produce a number that looks adjusted and\
+    \ is not, so it is disclosed instead. ADR-013 rule 5."
+integrity_hash: 1a2a9063dfc1b0abfb8262f6ed390792dd3295c569e03f177ebd0dc62e2ca690
+parent_hash: null

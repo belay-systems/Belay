@@ -1,0 +1,3619 @@
+# Belay Architectural Decisions
+
+## ADR-001: Artifact Framework Modernization
+
+Status:
+Accepted
+
+Date:
+2026-07-08
+
+---
+
+## Context
+
+Belay requires a durable evidence-driven communication layer between autonomous components.
+
+The existing Artifact Framework represented the correct architectural boundary but lacked:
+
+- immutable data structures
+- lifecycle governance
+- evidence provenance
+- integrity guarantees
+
+---
+
+## Decision
+
+The existing Artifact Framework will be upgraded rather than replaced.
+
+Artifacts become immutable evidence objects representing validated state transitions.
+
+---
+
+## Consequences
+
+Positive:
+
+- single source of truth for system artifacts
+- deterministic artifact evolution
+- stronger auditability
+- improved reproducibility
+- clearer promotion pipeline
+
+Negative:
+
+- existing consumers require migration
+- serialization contracts must evolve
+- validation becomes more complex
+
+---
+
+## Rejected Alternative
+
+Creating a parallel Artifact system.
+
+Reason:
+
+A second artifact representation would introduce duplicate system truth and increase architectural drift.
+
+---
+
+## Required Follow-Up
+
+- lifecycle validation
+- evidence validation
+- integrity verification
+- complete migration testing
+
+---
+
+## ADR-002: Two-Layer Architecture — Governance and Mechanics
+
+Status:
+Accepted
+
+Date:
+2026-07-26
+
+---
+
+## Context
+
+Belay is currently described in two different vocabularies.
+
+The first describes an organization: departments, a constitution, a librarian,
+an investment intelligence operating system. This vocabulary governs authority —
+who may decide, what evidence is required, which gates exist.
+
+The second describes a pipeline: market data, feature store, indicator engine,
+signal engine, risk engine, execution engine. This vocabulary governs mechanics —
+how an observation becomes a number, and a number becomes an order.
+
+These have been treated as competing descriptions of the same system. They are not.
+A fund has both an investment committee and a trading desk. Neither vocabulary is
+wrong, and neither replaces the other.
+
+The measurable problem is asymmetry, not ambiguity. As of this date the repository
+contains 79 markdown documents and 593 lines of Python, of which 101 lines are tests
+and 231 lines are the Artifact Framework. The ten files under `framework/services/`
+average four lines each and are empty placeholders.
+
+`constitution/Paper_First_Capital_Doctrine.md` defines eight lifecycle stages.
+`strategies/PromotionCriteria.md` defines the thresholds those gates apply.
+
+> **Amended 2026-07-30 by ADR-007.** This sentence read
+> "`constitution/Promotion_Pipeline.md` defines eight promotion gates." That
+> citation was false: `Promotion_Pipeline.md` contains no group of eight — it
+> has seven maturity levels and seven promotion considerations. The groups of
+> eight are in `Paper_First_Capital_Doctrine.md` (lifecycle stages) and
+> `strategies/PromotionCriteria.md` (evaluation categories). The original text
+> is preserved in this note rather than discarded: Immutable Law VII, and the
+> error is itself part of the record.
+Nothing in the repository computes a single number that any of those gates could
+evaluate. The governance layer is fully specified and has nothing to govern.
+
+This is a structural risk rather than a stylistic one. Governance documents are
+inexpensive to produce and require no verification to feel complete. A system whose
+first principle is evidence over opinion currently has a repository shaped almost
+entirely like opinion.
+
+---
+
+## Decision
+
+Belay is defined as two layers joined by a single contract.
+
+The Governance Layer specifies what evidence is required and who may promote.
+It comprises `constitution/`, `departments/`, `workflows/`, `Knowledge/`, and the
+markdown under `strategies/`. It remains prose. It is frozen: no new governance
+documents are added until the mechanics layer can produce evidence for the gates
+already written.
+
+The Mechanics Layer produces that evidence. It comprises `framework/`. All new
+code belongs here.
+
+The Artifact is the contract between them. Mechanics emit Artifacts. Governance
+consumes Artifacts. Neither layer reaches across the boundary by any other means.
+
+Both vocabularies are retained as accurate descriptions of their own layer. The
+difference between them is no longer treated as unresolved.
+
+---
+
+## Consequences
+
+Positive:
+
+- every directory has an unambiguous layer and owner
+- "which vision is correct" ceases to be an open question
+- the Artifact Framework's existing role is confirmed rather than redefined
+- new work has an explicit default location
+- the governance freeze converts documentation effort into evidence-producing work
+
+Negative:
+
+- the freeze blocks governance writing that currently feels productive
+- some existing directories span both layers and must be sorted
+- `workflows/` (prose) and `framework/workflows/` (code) remain confusingly named
+- the asymmetry becomes visible in every future review until mechanics catch up
+
+---
+
+## Rejected Alternatives
+
+Rewriting the governance documents into service-pipeline language.
+
+Reason:
+
+The governance layer is the most complete and considered work in the repository.
+Rewriting it would destroy finished work to resolve a conflict that does not exist,
+and would leave the actual gap — absent mechanics — untouched.
+
+Continuing to expand governance documentation before mechanics exist.
+
+Reason:
+
+Additional gates cannot be validated against evidence that nothing produces. This
+compounds the existing asymmetry and defers the first real test of the Artifact
+Framework's design.
+
+---
+
+## Required Follow-Up (ADR-002)
+
+- build the smallest component that emits one Artifact containing one honestly
+  computed number, establishing the mechanics layer and testing the Artifact
+  contract against a real payload
+- assign each remaining top-level directory to exactly one layer
+- resolve the `workflows/` and `framework/workflows/` naming overlap
+- record in `docs/Architecture.md` that the four departments are the governance
+  layer, not the whole system
+
+---
+
+## ADR-003: One Lifecycle Or Two
+
+Status:
+**Accepted.** Option A implemented 2026-07-26.
+
+Date:
+2026-07-26
+
+---
+
+## Context
+
+Belay describes two different lifecycles, and the code implements one of them under
+the other's name.
+
+`Knowledge/ArtifactLifecycle.md` defines the lifecycle of an artifact:
+
+    Draft → Review → Approved → Active → Archived → Historical
+
+`constitution/Paper_First_Capital_Doctrine.md` defines the lifecycle of a strategy
+earning capital:
+
+    Idea → Research → Validation → Paper Trading → Promotion Review →
+    Micro Capital → Limited Capital → Production
+
+The `ArtifactLifecycle` enum in `framework/artifacts/enums.py` carries the name of
+the first and the contents of the second. Only `Draft` appears in both.
+
+A third appeared on completing the document audit. `docs/ENGINEERING_AGENT.md`
+defines a lifecycle for code changes:
+
+    Draft → Research → Validation → Testing → Review → Merged → Production
+
+These describe different subjects. An artifact is a document or a unit of evidence;
+it is drafted, reviewed, approved, and eventually archived without ever holding
+capital. A strategy is a candidate for allocation; it earns its way through paper
+trading into progressively larger exposure. An engineering change is neither; it is
+tested and merged.
+
+The question is therefore not "one lifecycle or two" but how many kinds of thing
+Belay governs. At least three, and each already has a sequence written for it.
+
+The consequence is visible in the only real producer. `framework/metrics/drawdown.py`
+emits a REPORT artifact containing a computed drawdown figure. Its lifecycle field
+is `DRAFT`, and the only legal transition from there leads eventually to
+`MICRO_CAPITAL` and `PRODUCTION` — capital states, applied to a report about a
+number. A drawdown report will never hold capital. It should be reviewed, approved,
+and archived.
+
+Nothing breaks today, because only the tests and `drawdown.py` touch the field. The
+cost is paid later: every component built before this is settled inherits the
+conflation, and each one makes the correction more expensive.
+
+---
+
+## Options
+
+**A. One enum per governed subject.** Rename the existing enum to `StrategyLifecycle`,
+matching what it already implements. Add `ArtifactLifecycle` matching
+`Knowledge/ArtifactLifecycle.md`, and later `EngineeringChangeLifecycle` matching
+`docs/ENGINEERING_AGENT.md` when that layer is built. Artifacts carry the artifact
+lifecycle; strategy artifacts additionally carry a strategy stage.
+
+Cost: touches the enum, the validator's transition table, `drawdown.py`, and every
+lifecycle test. One transition table per subject.
+
+Benefit: each artifact carries only states that can be true of it. An illegal
+question — "is this drawdown report in micro capital?" — stops being representable.
+The pattern extends to the engineering layer instead of colliding with it.
+
+**B. One enum, renamed.** Keep a single lifecycle, rename it `StrategyLifecycle`,
+and accept that non-strategy artifacts sit permanently in `DRAFT`.
+
+Cost: `Knowledge/ArtifactLifecycle.md` becomes documentation of something the system
+does not implement. Reports have no meaningful review or archival state.
+
+Benefit: smallest change; one table.
+
+**C. Artifact lifecycle as metadata.** Keep the enum as the strategy lifecycle and
+express document status through the existing `metadata` field.
+
+Cost: unvalidated. `metadata` is an untyped tuple of pairs, so nothing constrains
+the values or the transitions between them.
+
+Benefit: no structural change.
+
+---
+
+## Recommendation
+
+Option A, on the grounds that the promotion gates in `constitution/` govern
+strategies and the review states in `Knowledge/` govern evidence, and Belay needs
+both. Option C is rejected on the same grounds as the pre-existing integrity
+findings: a governed concept expressed as unvalidated metadata is not governed.
+
+This is a recommendation, not a decision. The naming affects how every future
+component labels its output, which makes it worth deciding deliberately rather
+than defaulting into.
+
+---
+
+## Consequences Of Acceptance
+
+Implemented as described. `ArtifactLifecycle` now holds the six editorial states
+from `Knowledge/ArtifactLifecycle.md`; `StrategyLifecycle` holds the eight capital
+stages, with `IDEA` replacing `DRAFT` to match all three documents that name it.
+`Artifact` gained an optional `strategy_stage`.
+
+`ArtifactValidator` carries two transition tables and refuses to move between
+lifecycles rather than coercing, so a report can no longer be pointed at a capital
+stage. `MICRO_CAPITAL` remains where it was added; the split confirmed it sits on
+the strategy sequence, which is where the doctrine puts it.
+
+Two rules followed from the split and are enforced:
+
+- `strategies/Registry.md` states "Every strategy exists in exactly one lifecycle
+  stage", so a STRATEGY artifact without a `strategy_stage` is rejected.
+- The converse is also rejected. A report claiming a capital stage asserts something
+  untrue of it.
+
+`EngineeringChangeLifecycle` is not implemented. It should follow the same pattern
+when `docs/ENGINEERING_AGENT.md` is built, rather than reusing either existing enum.
+
+Conformance is held by `tests/test_governance_conformance.py` and
+`tests/artifacts/test_lifecycle.py`: if either enum drifts from the document that
+defines it, the suite goes red.
+
+---
+
+## ADR-004: Demotion — Depth, Floor, Authority And Evidence
+
+Status:
+**Accepted.** Rule 4 amended and ratified 2026-07-28. Rules 1 through 3
+implemented 2026-07-28: both tests rewritten first, then the ten transitions
+added. Rule 4 is unimplementable until review decisions are recorded somewhere,
+and the classification helper is deliberately still deferred — see the note at
+the end of Required Follow-Up.
+
+Date:
+2026-07-27
+
+---
+
+## Context
+
+Five documents require a strategy to be able to move backward. Three treat
+`Demote` as a formal decision outcome, listed beside `Promote`, `Remain` and
+`Retire`:
+
+- `constitution/Paper_First_Capital_Doctrine.md` — "Demotion may occur at any stage"
+- `strategies/Lifecycle.md` — "Strategies may move backward"
+- `strategies/ReviewTemplate.md` — Recommendation: Promote / Remain / **Demote** / Retire
+- `Validation/CapitalReview.md` — Outcomes include **Demote**
+- `workflows/Monthly/StrategyPromotion.md` — Decisions include **Demote**
+
+Every transition in `STRATEGY_TRANSITIONS` moves forward. Three review processes
+therefore produce a decision the system cannot record, and a strategy degrading at
+limited capital can only be left alone or retired outright — the choice demotion
+exists to avoid.
+
+The blockage was never code. How far a strategy may fall in one step, on whose
+authority, and requiring what evidence is written nowhere in the repository.
+
+---
+
+## The Doctrine Does Not Pre-Decide This
+
+The doctrine states two rules in identical form:
+
+    Demotion may occur at any stage.
+    Retirement may occur at any stage.
+
+Retirement has exactly one destination. Read consistently, "may occur at any
+stage" therefore constrains the stage a strategy may fall **from**, not the stage
+it may fall **to**. This is an interpretation, but it is the only one under which
+the two sentences mean the same thing, and it leaves the depth question open
+rather than silently answered.
+
+---
+
+## Decision
+
+**1. Depth — any distance downward.** A demotion names one destination and moves
+there in a single act. Promotion steps one stage at a time because each stage
+proves something and a skipped proof cannot be claimed. Falling proves nothing, so
+the constraint does not bind downward. Governance is asymmetric by design: a rung
+is hard to climb and easy to lose. This is what "Capital is a privilege. Never an
+entitlement" asserts.
+
+**2. Floor — `PAPER_TRADING`.** A demoted strategy may lose every unit of capital
+and be sent back to rebuild its live-behaviour record. It may not be sent below
+that. `VALIDATION`, `RESEARCH` and `IDEA` are stages of construction rather than
+operation; a strategy whose statistical proof is falsified has not been demoted, it
+has been refuted, and refutation is retirement with history preserved.
+
+**3. Authority — a review outcome, never automatic.** A demotion is recorded when
+one of the three review processes above produces a Demote decision. No threshold
+breach, drawdown trigger or risk signal demotes a strategy on its own.
+`Governance.md` places authority in process rather than hierarchy, and demotion
+changes what a strategy has *earned* — a deliberative judgment, not a reflex.
+
+**4. Evidence — written justification, no numeric gate.** `ReviewTemplate.md`
+requires "Justification. Evidence only." `Governance.md` requires that all
+decisions be documented. Requiring a promotion-grade score to *withdraw* a
+privilege would invert the doctrine: it would make capital something Belay must
+prove a strategy no longer deserves.
+
+Rule 4 originally read "a demotion satisfies both and needs nothing further".
+That sufficiency claim was withdrawn and replaced on 2026-07-28, having been
+asserted without checking `constitution/Capital_Authority.md`, which states that
+capital "shall be determined using" six named inputs — confidence, statistical
+edge, regime compatibility, portfolio exposure, correlation, drawdown limits — and
+which outranks this ADR under Immutable Law X.
+
+**Stage and allocation are different decisions, and a demotion is the first of
+two.** `Capital_Authority.md` is titled Capital *Allocation* Authority and states
+"Allocation does not imply maximum allocation". A strategy's stage is the
+*ceiling* it has earned; its allocation is the sum it actually holds, at or below
+that ceiling. Demotion lowers the ceiling. The six inputs size the position
+underneath whichever ceiling applies.
+
+They therefore run in sequence rather than competing:
+
+1. **The demotion.** Governed by rule 4. Written justification citing evidence, no
+   score, no threshold. This is a judgment about what the strategy has earned.
+2. **The re-sizing.** Governed by `Capital_Authority.md`. A demotion triggers a
+   fresh allocation determination using the six inputs, sizing the strategy inside
+   its new lower ceiling.
+
+**The six inputs may never gate the demotion itself.** `Capital_Authority.md` also
+states "Capital preservation overrides return maximization. Whenever conflict
+exists: Capital preservation wins. Always." A demotion is a capital-preservation
+act, so a reading under which an unavailable input delays one is forbidden by the
+same document that names the inputs. If step 2 cannot be completed, step 1 still
+stands and the strategy sits at its new stage.
+
+Step 2 has no implementation. There is no position-sizing or portfolio layer, and
+four of the six inputs do not exist as computed values — `strategies/PositionSizing.md`
+and `Research/RegimeDetection.md` are both carried in the `docs/ROADMAP.md`
+inventory of specified-but-unbuilt work. Until that exists, step 2 is performed by
+the reviewer in prose. This does not block rules 1 through 3.
+
+---
+
+## Resulting Transitions
+
+Ten moves become legal. Every one is a demotion; no forward transition changes.
+
+| From | May be demoted to |
+|---|---|
+| `PRODUCTION` | `LIMITED_CAPITAL`, `MICRO_CAPITAL`, `PROMOTION_REVIEW`, `PAPER_TRADING` |
+| `LIMITED_CAPITAL` | `MICRO_CAPITAL`, `PROMOTION_REVIEW`, `PAPER_TRADING` |
+| `MICRO_CAPITAL` | `PROMOTION_REVIEW`, `PAPER_TRADING` |
+| `PROMOTION_REVIEW` | `PAPER_TRADING` |
+
+The two zero-capital destinations are not interchangeable. `PROMOTION_REVIEW`
+means the capital is withdrawn but the strategy remains a candidate, to be
+re-decided at the next review. `PAPER_TRADING` means it is no longer a candidate
+and must build a fresh record before it is one again.
+
+A demoted strategy re-earns every stage through the normal gates. This follows
+from the forward transitions being left untouched; no fast lane exists.
+
+---
+
+## Consequences
+
+**Demotion exists only at or above `PROMOTION_REVIEW`.** Below the floor there is
+no capital privilege to withdraw, so the four lower stages have no demotion
+transitions at all. This narrows the literal text of "Demotion may occur at any
+stage" and the narrowing is deliberate. It is also the safe direction to be wrong
+in: lowering the floor later only adds transitions and invalidates no recorded
+history, whereas raising it would orphan strategies already sitting below it.
+
+**Two passing tests must change, and they must change *before* the table does.**
+Both use "everything except `RETIRED`" as a proxy for "forward", and that proxy
+stops being true the moment backward moves share the table.
+
+`test_no_strategy_stage_may_be_skipped` (`tests/test_governance_conformance.py`)
+filters `RETIRED` out of each tuple and asserts the remainder is exactly the next
+stage. It fails loudly on a correct table — the easy case. Note that its loop is
+bounded to `ordered[:-2]`, so it never examines `PRODUCTION` or `RETIRED`: the
+stage gaining the most new transitions is precisely the one this test does not
+check.
+
+**`RETIRED` is the highest ordinal in `StrategyLifecycle`, and that is a trap.**
+The enum declares it last, at index 8, above `PRODUCTION` at 7. "Compare stage
+ordering directly" must therefore NOT be implemented as a bare position
+comparison over `list(StrategyLifecycle)` — under one, every retirement reads as
+the deepest promotion in the system. Retirement is not on the ladder at all; the
+doctrine places it outside the sequence. Any ordering helper must exclude
+`RETIRED` from the ladder first and classify it separately, before comparing
+positions. This applies to both rewritten tests and to the classifier below.
+
+`test_promotion_path_walks_every_stage_in_order` (`tests/artifacts/test_lifecycle.py`)
+is the dangerous one. It walks the table from `IDEA` in a `while True` loop whose
+only exit is a stage having no non-`RETIRED` successor. Today `PRODUCTION` maps to
+`(RETIRED,)` alone, so the filter empties it and the walk terminates. Once
+`PRODUCTION` gains four demotion targets, every reachable stage keeps a
+non-`RETIRED` successor, and `RETIRED` — the only row with an empty tuple — is
+filtered out before it can ever be appended. The loop never exits and its
+accumulator grows without bound. No ordering of the new entries avoids this.
+
+Nothing bounds it: there is no `conftest.py`, and `pytest-timeout` is not a
+dependency. `pytest` produces no output and does not return. Anyone who changes
+the table first will see a hang with no failing test to explain it, which is a far
+worse signal than a red suite.
+
+**Legality and justification are separate concerns.** A transition table can rule
+that a move is possible; it cannot know whether a justification was written. Rule 4
+therefore has no home in `ArtifactValidator` and must be enforced wherever review
+decisions are recorded, which does not exist yet.
+
+**Belay has no halt mechanism, and rule 3 makes that visible.** A strategy
+breaching a hard risk limit needs to stop trading in seconds. Demotion runs at the
+speed of a monthly review. Keeping the two on separate axes is correct — what a
+strategy has earned is not the same question as whether it is trading right now —
+but it means the fast path is unbuilt rather than merely slow. Recorded as a new
+finding in `docs/HANDOFF.md`.
+
+---
+
+## Rejected Alternatives
+
+**One rung at a time, symmetric with promotion.** Rejected because the symmetry is
+superficial. A degrading `PRODUCTION` strategy would need three consecutive monthly
+reviews to reach zero capital, and the exposure during those three months is
+precisely the harm demotion exists to prevent.
+
+**Automatic demotion on a hard risk breach.** Rejected because it conflates the
+emergency brake with the maturity ladder, which would leave the brake running at
+committee speed. The correct fix is a halt mechanism on its own axis.
+
+**Threshold-gated demotion, requiring a named metric to cross a named line.**
+Rejected on two grounds. It inverts the burden of proof described above, and the
+thresholds are set by the Investment Committee against data Belay does not yet
+have — so adopting it would have re-blocked this finding behind a second decision
+that cannot be made until the metrics layer exists.
+
+---
+
+## Required Follow-Up
+
+Order matters. Both tests must be rewritten before the table changes, or the suite
+hangs instead of failing.
+
+- Rewrite `test_no_strategy_stage_may_be_skipped` to compare stage ordering rather
+  than filtering `RETIRED`
+- Rewrite `test_promotion_path_walks_every_stage_in_order` to take the single
+  forward successor by enum ordering rather than `onward[0]`, and bound the walk
+  by the number of stages. Its name and docstring also stop being true: it is no
+  longer following "the only available move", it is following the forward one
+- Only then add the ten transitions to `STRATEGY_TRANSITIONS` in
+  `framework/artifacts/validator.py`
+- Remove the `xfail` from `test_a_strategy_can_be_demoted` and extend it to cover
+  the floor: `PAPER_TRADING` has no demotion target, and no demotion reaches
+  `VALIDATION` or below
+- Extend the demotion test to pin the table to exactly the ten tabulated
+  transitions, so a later extra or missing demotion is caught rather than assumed
+- Update the comment above `STRATEGY_TRANSITIONS` in
+  `framework/artifacts/validator.py`. It currently reads "One stage at a time",
+  which the new table contradicts
+- Add a helper that classifies a legal transition as promotion, demotion or
+  retirement, so the review layer has something to attach a justification to.
+  Specify it before writing it: `RETIRED` must be classified before any ordinal
+  comparison (see the trap above), and the three names do not cover everything the
+  helper will be handed — artifact-lifecycle transitions, and self-transitions,
+  which are the documented "Remain" outcome and are currently rejected by
+  `validate_transition`. Defer the helper rather than guess its contract
+- On completion, update `docs/HANDOFF.md`: close finding 1, correct the open-finding
+  count, and correct the "Highest Priority Next Task" entry
+
+---
+
+## Implementation Record (ADR-004)
+
+Done 2026-07-28, in the order above.
+
+Both tests were rewritten first and run against the *unchanged* table to confirm
+they fail rather than hang: two failures in 0.18s, no timeout needed. The table
+was changed only after that. Suite: 115 passed / 8 xfail → 118 passed / 7 xfail.
+
+`test_no_strategy_stage_may_be_skipped` now compares ladder positions and keeps
+only the moves that climb, and its loop covers `PRODUCTION`.
+`test_promotion_path_walks_every_stage_in_order` was renamed
+`test_forward_path_walks_every_stage_in_order`, selects the forward successor by
+ladder position, and is bounded by the stage count. Both files derive the ladder
+as `[s for s in StrategyLifecycle if s is not RETIRED]` and carry the trap
+warning at the definition, so no ordinal comparison ever sees `RETIRED`.
+
+The ten transitions are pinned as a set by
+`test_the_demotion_table_is_exactly_what_adr_004_tabulates`, and the floor by
+`test_demotion_goes_no_lower_than_paper_trading`, which asserts the
+`PAPER_TRADING` row directly as well as by rule — a rule quantified over an
+empty set of demotions would otherwise pass against a table with none.
+
+**Still deferred, deliberately: the promotion/demotion/retirement classifier.**
+Its contract is still unsettled for exactly the reasons the follow-up gives —
+artifact-lifecycle transitions and self-transitions are outside the three names,
+and "Remain" remains an open finding. Nothing in `framework/` performs an ordinal
+comparison over `StrategyLifecycle` today, so the `RETIRED` trap is currently
+confined to the two test modules that guard against it. It becomes live the
+moment this helper is written.
+
+**Rule 4 is not enforced anywhere and cannot yet be.** Neither the written
+justification nor the re-sizing step that follows a demotion has a home: there is
+no layer that records review decisions. The transition table rules legality only,
+and the comment above it says so.
+
+---
+
+## ADR-005: Artifact-Level Confidence, And The Absent Schema Fields
+
+Status:
+**Accepted.** Ratified 2026-07-30. Rule 5 amended the same day: `Evidence Level`
+was originally left undecided, and is now ruled — see the amendment under
+Decision. Implemented 2026-07-30.
+
+Date:
+2026-07-30
+
+---
+
+## Context
+
+`Knowledge/Schema.md` lists **thirteen** required fields at lines 7-31, with
+`Optional Fields` beginning at line 35. The figure of fourteen carried in
+`docs/HANDOFF.md` was wrong and had propagated into a test docstring; it was
+counted by hand on 2026-07-30 and corrected.
+
+`Artifact` covers nine of the thirteen outright. Three are absent: **Tags**,
+**Summary**, **Current Confidence**. A fourth, **Evidence Level**, is not clearly
+either — the schema asks for an artifact-level grade and `Artifact` carries
+`evidence`, a tuple of `EvidenceRecord`, which is a different thing.
+
+Four documents require an adjustable artifact-level confidence:
+
+- `Knowledge/Schema.md:31` — `Current Confidence`, a required field
+- `strategies/Registry.md:23,25` — `Current Confidence`, worked example `38%`
+- `strategies/ReviewTemplate.md:37-43` — `Confidence Adjustment`: Increase,
+  Decrease, No Change
+- `Knowledge/Search.md:19` — `Confidence` is a primary search filter
+
+`Knowledge/Search.md:3` states "Belay retrieves information through metadata",
+and `Search.md:37` states "Search always prefers summaries before opening full
+artifacts" — so Summary is not decoration, it is what search reads first.
+
+Confidence exists today only on `EvidenceRecord`, which is frozen: fixed at
+creation, never revisable. `strategies/RegimeCompatibility.md:17` requires that
+"Belay continuously updates compatibility confidence using observed evidence",
+which is impossible as things stand.
+
+The open question was whether a revision produces a new version or alters an
+existing one. `Knowledge/Versioning.md` answers it: revisions are corrections,
+corrections are a Patch (line 15), "Knowledge records every version" (line 23),
+and "No version is overwritten" (line 25).
+
+---
+
+## Decision
+
+**1. Add `tags`, `summary` and `confidence` to `Artifact`.** The schema requires
+them and `Knowledge/Search.md` queries them. `tags: tuple[str, ...]`,
+`summary: str`, `confidence: float | None`.
+
+**2. `Artifact` remains frozen. A confidence revision produces a new version.**
+Adjusting confidence means constructing the next version of the artifact with the
+new figure and saving it alongside the old. This is what `Versioning.md` requires,
+and it is now workable rather than theoretical: `ArtifactRepository.latest()` was
+added on 2026-07-30 and orders versions semantically, so "the current confidence"
+is a question with a correct answer.
+
+An in-place mutable field is rejected. It would destroy the prior figure, and the
+revision history of a confidence estimate *is* the evidence trail — a strategy
+whose confidence fell from 0.6 to 0.3 over four reviews is a different object from
+one that has always been 0.3.
+
+**3. Confidence is stored as a fraction in 0-1, and rendered as a percentage.**
+`EvidenceRecord.confidence` is already bounded to 0-1, and two representations of
+one quantity would eventually disagree. `Registry.md`'s `38%` is presentation.
+
+**4. Confidence is optional (`None`) rather than defaulted.** A default of 0.5
+would be a fabricated estimate that nothing distinguishes from a real one — the
+silent-fallback failure this repository has already been bitten by twice. `None`
+means "not yet assessed" and says so.
+
+**5. `Evidence Level` is a stored field, derived as the strongest grade present,
+and never set by hand.** *(Amended 2026-07-30. This rule originally declined to
+decide, pending a derivation rule. The derivation is below.)*
+
+`constitution/Evidence_Standards.md` defines four classes: **A** live validated,
+**B** paper validated, **C** historical simulation, **D** hypothesis. Each
+`EvidenceRecord` already carries one. An artifact carries a tuple of records, so
+the artifact-level grade has to be derived from a set.
+
+**The strongest grade present, not the weakest.** `Evidence_Standards.md:41`
+states "Hypotheses do not invalidate production evidence." Taking the minimum
+would mean one Level D hypothesis attached to a well-evidenced artifact
+downgraded it — which is exactly a hypothesis invalidating production evidence,
+and is forbidden. The rule corroborates independently: the grade then tracks the
+capital ladder, since a strategy in research carries hypotheses (D), a backtested
+one simulation (C), a paper-traded one paper validation (B) and a live one live
+validation (A).
+
+**Stored rather than derived at read time**, because `Knowledge/Search.md:3`
+states "Belay retrieves information through metadata" and filters on Evidence
+Level at line 15. A value computed at read time is not metadata and cannot be
+filtered.
+
+**Computed by `ArtifactFactory`, verified by `ArtifactValidator`** — the same
+split already used for the integrity hash. A hand-set evidence grade is an
+opinion, and a four-class hierarchy exists precisely so that it is not one. The
+validator recomputes and rejects a mismatch, so a forged grade fails the gate.
+
+**`None` when there is no evidence**, on the same anti-fabrication ground as
+confidence: an artifact with no evidence has no grade, and inventing `D` for it
+would make "unevidenced" indistinguishable from "hypothesis".
+
+Known consequence, accepted: one Level A record among ten Level D records reads
+as Level A. Storing the distribution instead was considered and rejected —
+`Schema.md` asks for one field, and the constitution's rule is about which grade
+wins, which is a maximum.
+
+---
+
+## Consequences
+
+Positive:
+
+- three required schema fields stop being absent
+- confidence becomes revisable, which `RegimeCompatibility.md` requires
+- the revision history of an estimate is preserved rather than overwritten
+- `Knowledge/Search.md`'s filters have fields to filter on
+
+Negative:
+
+- every confidence adjustment costs a version, and `RegimeCompatibility.md`'s
+  "continuously updates" could mean a great many versions
+- `ArtifactValidator.REQUIRED` still lists three of thirteen fields; closing that
+  gap is separate work
+- adding fields changes `canonical_payload` and therefore every future integrity
+  hash
+
+On the version-count tension: `RegimeCompatibility.md` governs *compatibility*
+confidence, held per regime, which is plausibly a different quantity from the
+artifact-level `Current Confidence` of `Schema.md`. If they are the same, the
+per-version cost needs a ruling. **Scoped out of this ADR deliberately** — it
+should not be settled in passing.
+
+---
+
+## Required Follow-Up (ADR-005)
+
+- add the three fields, with `confidence` bounded to 0-1 and defaulting to `None`
+- strengthen `test_confidence_can_be_adjusted` before implementing: it currently
+  asserts only that a `confidence` field exists, which adding an immutable field
+  would satisfy, so closing finding 1 would silently mark finding 2 closed too
+- rule on `Evidence Level` separately
+- decide whether compatibility confidence and Current Confidence are one quantity
+
+---
+
+## ADR-006: Which Promotion Criteria List Governs
+
+Status:
+**Accepted.** Ratified 2026-07-30. Not yet implemented — the follow-ups edit
+three departmental documents and add a conformance test.
+
+Date:
+2026-07-30
+
+---
+
+## Context
+
+Five documents state promotion criteria and no two agree. Counts: seven
+(`constitution/Promotion_Pipeline.md:75-81`), eight
+(`strategies/PromotionCriteria.md:7-21`), six
+(`Validation/CapitalReview.md:15-25`), seven
+(`workflows/Monthly/StrategyPromotion.md:11-23`) and nine minimum metrics
+(`Validation/Backtesting.md:15-31`).
+
+**No criterion appears in all five.** `Drawdown` comes closest at four of five and
+is absent from `PromotionCriteria.md` — the one document that defines a Promotion
+Score.
+
+Shared concepts are named inconsistently in ways that are not cosmetic:
+
+- `Regime robustness` (three documents) versus `Regime Compatibility`
+  (`StrategyPromotion.md:21`). Robustness means surviving a regime change;
+  compatibility means suiting a regime. These are different claims.
+- `Operational consistency` / `Operational Stability` / `Operational readiness`
+  across four documents. Readiness is a precondition; consistency is a track
+  record.
+- `Risk-adjusted returns` (`Promotion_Pipeline.md:76`) versus bare `Risk`
+  (two documents). Return per unit of risk is not exposure to loss.
+
+`workflows/Monthly/StrategyPromotion.md` is the workflow that actually runs
+promotion reviews, and it omits Liquidity, Execution and Statistical Performance —
+all three of which the Constitution requires promotion to consider.
+
+The `Promotion Score` at `PromotionCriteria.md:25-27` has a range of 0-100, no
+weights, no mapping from the eight categories, and defers its threshold entirely
+(`line 29`: "Promotion thresholds are determined by the Investment Committee").
+It is uncomputable from the documents as written.
+
+`scripts/status.py:48-56` and `docs/ROADMAP.md:47-56` are both built solely on the
+constitutional seven, while `docs/ROADMAP.md:221-222` warns that "no code change
+should rest on `Promotion_Pipeline.md` alone" — which is exactly what the
+dashboard does, and `ROADMAP.md:210-211` concedes "The choice of seven is a
+working assumption".
+
+---
+
+## Decision
+
+**1. The constitutional seven govern.** `constitution/Promotion_Pipeline.md:75-81`
+is the authoritative promotion criteria list. `constitution/Governance.md:7` states
+"The Constitution possesses authority", and Immutable Law X ranks it above
+departmental documents. The dashboard's existing choice is ratified and stops being
+a working assumption.
+
+**2. The five lists are not five rivals. They sit at three altitudes.**
+
+- `Promotion_Pipeline.md` states the *criteria* — what promotion must consider.
+- `Validation/Backtesting.md` states *instruments* — the nine metrics that measure
+  some of those criteria. A metric list and a criteria list do not compete; they
+  intersect at one word (`Drawdown`) because that is the only criterion currently
+  named identically in both.
+- `CapitalReview.md` and `StrategyPromotion.md` are *departmental checklists*
+  operating the constitutional criteria. Where they diverge, they are wrong, not
+  authoritative.
+
+**3. The constitutional wording is canonical where documents disagree on a name.**
+`Regime robustness`, not compatibility. `Operational consistency`, not stability or
+readiness. `Risk-adjusted returns`, not bare `Risk`.
+
+**4. The 0-100 Promotion Score is suspended, not adopted.** A score with no weights
+and no threshold cannot be computed, and a number that looks computed but is not is
+worse than no number. It becomes live when the Investment Committee supplies both.
+
+**5. The departmental omissions are defects to be corrected, not permitted
+narrowings.** `StrategyPromotion.md` must consider Liquidity, Execution quality and
+Statistical performance, because the Constitution requires it.
+
+---
+
+## Consequences
+
+Positive:
+
+- `scripts/status.py`'s "1 of 7 computable" becomes a governed figure
+- the naming collisions stop being silent disagreements
+- the uncomputable score stops being a pending obligation
+
+Negative:
+
+- three departmental documents need editing, and the governance layer is frozen by
+  ADR-002 — though the freeze bars *adding* documents, not correcting existing ones
+- ratifying seven criteria does not make six of them computable
+
+---
+
+## Required Follow-Up (ADR-006)
+
+- update `ROADMAP.md:210-211,221-222` to record the seven as ruled rather than
+  assumed
+- reconcile the three departmental lists to the constitutional wording
+- add a conformance test asserting `scripts/status.py`'s `PROMOTION_CRITERIA`
+  equals `Promotion_Pipeline.md:75-81`, parsed from the document
+
+---
+
+## ADR-007: The Lifecycle Sequence, And An Amendment To ADR-002
+
+Status:
+**Accepted.** Ratified 2026-07-30. The amendment to ADR-002 was applied the same
+day; the original false sentence is preserved in the amendment note rather than
+discarded.
+
+Date:
+2026-07-30
+
+---
+
+## Context
+
+Four documents state a promotion sequence: eight stages in
+`constitution/Paper_First_Capital_Doctrine.md:13-41`, the same eight in
+`README.md:43`, seven maturity levels in `constitution/Promotion_Pipeline.md`,
+and nine in `strategies/Lifecycle.md`, which adds Retirement.
+
+Divergence is confined to the first two stages, whether a promotion review exists,
+and whether retirement is a stage. **From Validation onward all four agree**, and
+every source that mentions capital tiers includes Micro Capital.
+
+Separately, and materially: **ADR-002 contains a false citation.**
+`docs/DECISIONS.md:102` states "`constitution/Promotion_Pipeline.md` defines eight
+promotion gates." That file contains no group of eight. It has seven maturity
+levels and seven promotion considerations. The documents that do contain a group
+of eight are `Paper_First_Capital_Doctrine.md` (eight lifecycle stages) and
+`strategies/PromotionCriteria.md` (eight evaluation categories) — the latter cited
+in ADR-002's very next sentence for a different purpose.
+
+ADR-002 is Accepted and has never been amended, so the error stands inside a
+ratified decision while `ROADMAP.md`, `HANDOFF.md` and `CHANGELOG.md` each
+separately record that it is wrong.
+
+---
+
+## Decision
+
+**1. The doctrine's eight stages are the lifecycle.** `Idea, Research, Validation,
+Paper Trading, Promotion Review, Micro Capital, Limited Capital, Production`.
+`StrategyLifecycle` already implements exactly this and is ratified unchanged.
+
+**2. `Promotion_Pipeline.md`'s seven levels are a maturity model, not the
+lifecycle.** They describe how proven a strategy is; the lifecycle describes what
+capital it has earned. Two axes, not two competing sequences.
+
+**3. Retirement is not a stage.** Already ruled by ADR-004 and by the doctrine,
+which places retirement outside the sequence and reachable from anywhere.
+`strategies/Lifecycle.md`'s ninth entry is a state, not a rung.
+
+**4. ADR-002 is amended.** The sentence at `DECISIONS.md:102` is corrected to cite
+`constitution/Paper_First_Capital_Doctrine.md` for the eight stages. The amendment
+is recorded rather than the text silently edited, because ADR-002 is Accepted and
+`Governance.md:11` requires that all decisions be documented.
+
+---
+
+## Consequences
+
+Positive:
+
+- the enum stops being defensible only by inference
+- an error inside an Accepted ADR is corrected rather than annotated in three
+  other documents
+- "which sequence is right" ceases to be an open question
+
+Negative:
+
+- amending a ratified ADR sets a precedent that must be used sparingly
+- `strategies/Lifecycle.md` and `Promotion_Pipeline.md` still read as sequences and
+  will mislead until edited
+
+---
+
+## Required Follow-Up (ADR-007)
+
+- amend `DECISIONS.md:102` with a dated amendment note
+- add a conformance test parsing the doctrine's eight stages and asserting
+  `StrategyLifecycle` matches, `RETIRED` excluded
+- record in `Promotion_Pipeline.md` that its levels are a maturity model
+
+---
+
+## ADR-008: Remain Is An Outcome, Not A Transition
+
+Status:
+**Accepted.** Ratified 2026-07-30. Unimplementable until review decisions are
+recorded somewhere, which is the same blockage as ADR-004 rule 4. Rule 4 below
+(`Reject`) was sharpened on ratification — see the note there.
+
+Date:
+2026-07-30
+
+---
+
+## Context
+
+Three documents list `Remain` as a formal review outcome, and all three name it
+differently:
+
+- `strategies/ReviewTemplate.md:51` — `Remain`, under `Recommendation`
+- `Validation/CapitalReview.md:33` — `Remain Current Stage`, under
+  `Possible Outcomes`
+- `workflows/Monthly/StrategyPromotion.md:31` — `Remain Current Stage`, under
+  `Possible Decisions`
+
+`CapitalReview.md:31` adds a fifth outcome, `Reject`, which appears in no other
+list, is never defined, and is never distinguished from `Retire`.
+`PromotionCriteria.md:35` nonetheless requires "Every rejection requires written
+justification" — an obligation attached to an outcome the monthly workflow cannot
+produce.
+
+`constitution/Governance.md:11` requires "All decisions require documentation",
+and `StrategyPromotion.md:37` requires "Every decision requires written
+justification". A review that holds a strategy at Limited Capital has made a
+decision.
+
+`ArtifactValidator.validate_transition` rejects every self-transition, because no
+stage appears in its own successor tuple. So a documented decision to Remain is
+currently indistinguishable from no review having taken place.
+
+---
+
+## Decision
+
+**1. `Remain` is a review outcome. It is not a lifecycle transition, and no
+self-transition is added.** The transition table rules the legality of *movement*;
+Remain is the absence of movement. Adding `X -> X` rows would make the table a
+record of decisions, which the comment above it explicitly denies — "Legality
+only" — and would still not distinguish "reviewed and held" from "never reviewed",
+because a legal move is not a performed one.
+
+**2. Remain is recorded where review decisions are recorded.** That layer does not
+exist. This ADR rules what Remain *is* so that the layer can be built correctly,
+rather than bending the lifecycle to absorb it. ADR-004 rule 4 and the re-sizing
+step are blocked on the same missing layer; this is a third obligation on it, and
+the three should be built together.
+
+**3. The canonical name is `Remain Current Stage`.** Two of three documents use
+it, and it is unambiguous where bare `Remain` is not.
+
+**4. `Reject` and `Remain Current Stage` are one event named from two sides.**
+*(Sharpened on ratification, 2026-07-30. The original text called `Reject` a
+synonym without saying why only one document carries both.)*
+
+`Validation/CapitalReview.md` is the only document listing both, and its own
+framing explains that: lines 7 and 9 state "Capital Review does not allocate
+capital. Capital Review **recommends** promotion." It processes a *request*.
+`Reject` names the decision on the request; `Remain Current Stage` names the
+effect on the strategy. Rejecting a promotion leaves the strategy where it is.
+The other two documents list only the state-side name because neither is framed
+as handling an application.
+
+A competing reading is recorded rather than dismissed: `Reject` could mean
+rejected *as a candidate* — dropped out of `PROMOTION_REVIEW` back to
+`PAPER_TRADING` — which ADR-004 already distinguishes ("falling out of it means
+it is no longer a candidate"). Under that reading `Reject` is a specific
+demotion, not a synonym. The document supports both readings and the code
+supports neither, so the ruling above is adopted and `CapitalReview.md` must
+state it explicitly rather than leave it inferable.
+
+---
+
+## Consequences
+
+Positive:
+
+- the four outcomes become one vocabulary across three documents
+- the lifecycle table stays a statement about legality
+- the missing review-decision layer acquires a third, specified obligation
+
+Negative:
+
+- nothing is implementable until that layer exists, so the finding stays open in
+  practice even once this is ratified
+- ruling `Reject` a synonym may be wrong if it was meant to carry a distinct
+  meaning nobody wrote down
+
+---
+
+## Required Follow-Up (ADR-008)
+
+- specify the review-decision record, carrying at minimum: artifact identifier,
+  version reviewed, reviewer, date, outcome, written justification
+- correct `ReviewTemplate.md` to `Remain Current Stage`
+- correct or define `Reject` in `CapitalReview.md`
+- only then revisit the promotion/demotion/retirement classifier ADR-004 defers —
+  it needs the outcome vocabulary this ADR settles
+
+---
+
+## ADR-009: The Review Decision Record
+
+Status:
+**Accepted.** Ratified 2026-07-31 and implemented the same day, as drafted — no
+rule was amended on ratification. See the Implementation Record at the end for
+three decisions taken during implementation that the ruling did not cover.
+
+Date:
+2026-07-31
+
+---
+
+## Context
+
+Three ratified obligations block on one missing component, and nothing else in
+the repository has that property:
+
+- **ADR-004 rule 4** — a demotion requires written justification. ADR-004's own
+  implementation record states it "is not enforced anywhere and cannot yet be",
+  because "there is no layer that records review decisions".
+- **ADR-004's re-sizing step** — a demotion triggers a fresh allocation
+  determination, performed by the reviewer in prose until a position-sizing layer
+  exists. Nowhere records that prose.
+- **ADR-008** — `Remain Current Stage` is a review outcome, "recorded where review
+  decisions are recorded. That layer does not exist."
+
+`constitution/Governance.md:11` states "All decisions require documentation."
+`strategies/ReviewTemplate.md` specifies the form of a review — identifier,
+reviewer, date, version, confidence adjustment, recommendation, justification —
+and no code holds it. A review that decides to hold a strategy at Limited Capital
+has made a decision, and today it is indistinguishable in the system's state from
+no review having happened.
+
+**Written justification is required by four documents, and between them they
+cover all four outcomes:**
+
+- `strategies/PromotionCriteria.md:33` — "Every promotion requires written justification."
+- `strategies/PromotionCriteria.md:35` — "Every rejection requires written justification."
+- `constitution/Governance.md:15` — "All retirements require justification."
+- `workflows/Monthly/StrategyPromotion.md:37` — "Every decision requires written justification."
+- ADR-004 rule 4 — demotion.
+
+ADR-008 cited only `PromotionCriteria.md:35`. **Line 33 exists and was not cited**;
+it places the same obligation on promotion. Opened and read on 2026-07-31, not
+carried over from ADR-008.
+
+The outcome vocabulary, as the three documents write it:
+
+| Document | Heading | Outcomes |
+|---|---|---|
+| `strategies/ReviewTemplate.md:47-55` | Recommendation | Promote, Remain, Demote, Retire |
+| `Validation/CapitalReview.md:29-39` | Possible Outcomes | Reject, Remain Current Stage, Promote, Demote, Retire |
+| `workflows/Monthly/StrategyPromotion.md:27-35` | Possible Decisions | Promote, Remain Current Stage, Demote, Retire |
+
+ADR-008 rule 3 rules `Remain Current Stage` canonical. Rule 4 rules `Reject` the
+decision-side name for the same event.
+
+---
+
+## Decision
+
+**1. The review decision record is an Artifact of type `REVIEW`.**
+
+Not a parallel record type. Five reasons, in order of weight:
+
+- **It inherits signing and integrity.** A decision record that can be altered
+  after the fact documents nothing. `Governance.md:11` requires decisions be
+  documented, and an unsigned, unversioned file is not a record of one. This alone
+  would decide it.
+- **`ArtifactType.REVIEW` already exists.** No new member is added, so this does
+  not touch the open `ArtifactType` finding — see the boundary below.
+- **`Knowledge/Identifiers.md:39-41` already assigns `REV` to Review**, with the
+  worked example `REV-0048` at line 17. The identifier space was reserved for this
+  before any code existed.
+- **ADR-002 permits no second channel.** "Mechanics emit Artifacts. Governance
+  consumes Artifacts. Neither layer reaches across the boundary by any other
+  means." A review decision is consumed by governance.
+- **It satisfies `Governance.md:19-25`** — identifier, version, author, date,
+  status — on machinery that already exists and is already tested.
+
+**This routes around the `ArtifactType` finding. It does not settle it.** That
+finding asks whether `ArtifactType` is a closed enum that must grow or a coarse
+enum plus a subtype, and asks that members not be added without deciding which.
+This ADR needs no new member, so it does not force the answer and must not be read
+as having supplied one.
+`test_artifact_type_can_name_the_documented_deliverables` stays `xfail`.
+
+Noted because it will confuse someone: `ArtifactType.REVIEW` and
+`ArtifactLifecycle.REVIEW` are different enums that share a name. A review
+artifact awaiting approval is `type=REVIEW, lifecycle=REVIEW`. That is correct and
+reads like a mistake. ADR-003 split these deliberately; the collision is the price.
+
+**2. The record carries its subject in typed fields, separate from its own identity.**
+
+`ReviewTemplate.md:3-9` opens with `Identifier`, `Reviewer`, `Date`, `Version`.
+Read as the review's own identity, the template names no subject at all — nothing
+else in the file says which strategy was reviewed, which cannot be right. Read as
+the subject's, the template is self-consistent. ADR-008's follow-up reads it the
+same way, independently: "artifact identifier, version reviewed".
+
+But the record is an Artifact, so `id` and `version` are already spoken for by
+`Governance.md:19-25`. The subject therefore needs its own fields:
+
+- `subject_id` — the identifier of the artifact reviewed
+- `subject_version` — the version of it that was reviewed
+
+`subject_version` is not bookkeeping. Under ADR-005 a confidence revision produces
+a *new version*, so recording which version was in front of the reviewer is the
+difference between a decision about the artifact they read and a decision about an
+artifact that has since changed underneath it.
+
+**3. Four outcomes. `Reject` is not a fifth.**
+
+`PROMOTE`, `REMAIN_CURRENT_STAGE`, `DEMOTE`, `RETIRE`, spelled as ADR-008 rule 3
+rules. `Reject` is documented on the enum as the decision-side name for
+`REMAIN_CURRENT_STAGE`, per ADR-008 rule 4, and is not a member. One event with two
+names must not become two members — that is the drift this vocabulary exists to
+stop, and `CapitalReview.md` listing five where the other two list four is the drift
+already in progress.
+
+**4. Written justification is mandatory for every outcome, and is enforced.**
+
+Four documents require it; `StrategyPromotion.md:37` requires it of every decision
+without qualification. A record whose justification is empty or blank is refused at
+construction.
+
+This is where ADR-004 rule 4 finally lands. The transition table rules that a move
+is legal; the record rules that a reason was written. ADR-004 said exactly this —
+"Rule 4 therefore has no home in `ArtifactValidator` and must be enforced wherever
+review decisions are recorded".
+
+The check is on non-blank content, because whitespace is not a justification.
+
+**5. The record names the resulting stage, and the outcome must agree with it.**
+
+- `REMAIN_CURRENT_STAGE` — the resulting stage equals the stage at review. This is
+  precisely what makes a held strategy distinguishable from an unreviewed one,
+  which is ADR-008's entire purpose.
+- `RETIRE` — the resulting stage is `RETIRED`.
+- `PROMOTE` — the resulting stage is higher on the ladder, and legal under
+  `STRATEGY_TRANSITIONS`.
+- `DEMOTE` — the resulting stage is lower on the ladder, and legal under
+  `STRATEGY_TRANSITIONS`.
+
+`RETIRED` is removed from the ladder before any position is compared. It is
+declared at index 8, above `PRODUCTION` at 7, so a bare ordinal comparison reads
+every retirement as the deepest promotion in the system. ADR-004 flagged this trap
+and warned it "becomes live the moment this helper is written". This is the first
+code outside the two guarded test modules to compare stage positions, so the trap
+is now live and is handled the same way both test modules handle it.
+
+**This is not the classifier ADR-004 defers, and does not discharge it.** The
+deferred classifier derives a *name* from a transition, and must cope with inputs
+this never sees. `Draft → Review → Approved` is not a promotion, a demotion or a
+retirement, and `ArtifactLifecycle` still has no vocabulary for what it is. ADR-008
+settled self-transitions; it left artifact-lifecycle transitions untouched, and it
+must not be read as clearance.
+
+What this rules is the inverse and strictly narrower: given an outcome the reviewer
+**declared**, and a stage pair they **declared**, are the two consistent? It is only
+ever handed `StrategyLifecycle` values, and it is never asked to name a transition
+nobody named. No general `classify(current, target)` helper is added to
+`framework/`, and ADR-004's follow-up stays open.
+
+**6. Confidence adjustment is a recorded direction; the resulting figure is optional.**
+
+`ReviewTemplate.md:37-43` lists `Increase` / `Decrease` / `No Change` as a decision
+the review makes, so it is recorded as one: required, with no default. A default
+would be a fabricated decision — the failure ADR-005 rule 4 already ruled against
+for confidence itself, where 0.5 "would be a fabricated estimate that nothing
+distinguishes from a real one".
+
+The resulting figure is optional. ADR-005 rules that a confidence revision produces
+a new version of the **subject** artifact; deciding to adjust and producing that
+version are separate acts, and the second may not have happened yet. Where a figure
+is supplied it is bounded to 0-1, like every other confidence in the system.
+
+**7. The re-sizing note is optional, and that is a ruling rather than an omission.**
+
+ADR-004 sequences a fresh allocation determination after a demotion, and records
+that it has no implementation: "Until that exists, step 2 is performed by the
+reviewer in prose."
+
+It must not be required. `constitution/Capital_Authority.md` states "Capital
+preservation overrides return maximization... Capital preservation wins. Always",
+and ADR-004 concludes from it: "If step 2 cannot be completed, step 1 still stands
+and the strategy sits at its new stage." A **required** re-sizing field would let a
+missing input block the recording of a demotion — the exact reading ADR-004
+forbids. The reason is written here so that a later session does not "tighten" this
+into a defect.
+
+**8. The template's six prose sections are content, not typed fields.**
+
+Operational Summary, Observed Behavior, Expected Behavior, Performance Summary,
+Risk Assessment and Regime Compatibility are narrative. Nothing computes on them.
+They are carried in the artifact's existing `content` field.
+
+Typing them would add six fields with no consumer, and `Artifact` fields are inside
+the integrity hash — every one added is permanent, and ADR-005 already recorded
+that adding fields "changes `canonical_payload` and therefore every future
+integrity hash". If a component later needs to compute on Risk Assessment or Regime
+Compatibility, promoting one to a typed field is a schema change to be ruled then,
+on evidence that a consumer exists.
+
+**9. `ArtifactSerializer` gains `load()`.**
+
+It implements `dump` and nothing else, so an artifact can be written and never read
+back. A decision record that cannot be read back cannot inform the next review,
+which is most of why it exists — and `Knowledge/Search.md:3` builds retrieval
+entirely on reading stored metadata.
+
+**The acceptance test is the round trip through integrity, not through equality:**
+`dump`, then `load`, then `ArtifactIntegrity.verify_hash` returns `True`. A loader
+that reconstructs every field but produces a different canonical payload has
+silently broken every signature it touches. Field-by-field equality would not catch
+a value that renders to the same text and hashes differently, which is the failure
+mode that matters here.
+
+`load()` does not sign. An artifact read from disk keeps the hash it was stored
+with, exactly as `Artifact` keeps whatever hash it is given: re-signing on load
+would hand every tampered file a fresh valid signature, which is the reasoning
+already recorded for `dataclasses.replace()` and guarded by
+`test_replace_does_not_resign_an_artifact`.
+
+**10. Nothing is enforced about who may review.**
+
+`Governance.md:3` places authority in process rather than hierarchy, and no
+document in the repository names reviewer roles or an authority list. `reviewer` is
+required and non-empty; nothing checks it against a roster, because no roster is
+written. Inventing one would be writing doctrine, which ADR-002's freeze and
+ADR-004's "specify it before writing it" both forbid.
+
+---
+
+## Consequences
+
+Positive:
+
+- three ratified obligations acquire the single home they were all waiting on
+- ADR-004 rule 4 becomes enforceable for the first time since it was ratified
+- a strategy held at a stage stops being indistinguishable from an unreviewed one
+- artifacts become readable, closing a gap that has been noted in `HANDOFF.md`
+  since 2026-07-30 without ever being recorded as a finding
+
+Negative:
+
+- `ArtifactType.REVIEW` acquires a specific meaning it did not carry before, and
+  the open `ArtifactType` question is routed around rather than answered
+- `load()` is a second place that must know the artifact schema. A field added to
+  `Artifact` and not to the loader would be silently dropped on read — pinned by a
+  test that compares the loader against `dataclasses.fields(Artifact)` rather than
+  against a transcribed list
+- the record can attest that a justification was written. It can never attest that
+  the justification is any good, and no test should be written implying otherwise
+
+---
+
+## Rejected Alternatives
+
+**A separate `ReviewDecision` type outside the artifact system.**
+
+Reason: it would need its own persistence, integrity and versioning, all three of
+which already exist and are tested. ADR-001 rejected a parallel artifact
+representation because it "would introduce duplicate system truth and increase
+architectural drift", and this would be one.
+
+**Adding a `REVIEW_DECISION` member to `ArtifactType`.**
+
+Reason: `REVIEW` already exists and fits. Adding a member would take a position on
+the open `ArtifactType` finding as a side effect of unrelated work — precisely what
+that finding asks not to be done.
+
+**Recording the subject through a relationship rather than typed fields.**
+
+Reason: `Knowledge/Relationships.md` defines eleven types and none means "reviews".
+`Derived From` is the closest and is a stretch. Relationship targets are bare
+identifiers with no version, so `subject_version` — the field that makes the record
+precise — would have nowhere to live. A twelfth relationship type may later be
+right, but it is new doctrine and should be ruled deliberately rather than
+introduced to serve one field of one record.
+
+**Requiring justification only for demotion and rejection, which is what ADR-004
+and `PromotionCriteria.md:35` say literally.**
+
+Reason: `StrategyPromotion.md:37` requires it of every decision, and
+`PromotionCriteria.md:33` and `Governance.md:15` extend it to promotion and
+retirement. Implementing only the narrow rules would leave the broadest one
+unimplemented while appearing to have satisfied the requirement.
+
+---
+
+## Required Follow-Up (ADR-009)
+
+Not to be started before ratification.
+
+- add `ReviewOutcome` and `ConfidenceAdjustment` to `framework/artifacts/enums.py`
+- add the review decision record, built through `ArtifactFactory` so it is signed
+  like everything else
+- enforce: non-empty justification, non-empty reviewer, outcome/stage agreement,
+  confidence bounds, and the `RETIRED`-off-the-ladder rule
+- add `ArtifactSerializer.load()`, with the dump/load/verify round trip as its
+  acceptance test
+- pin the loader against `dataclasses.fields(Artifact)`, so a future field cannot
+  be silently dropped on read
+- add a conformance test parsing the outcome lists from all three documents and
+  asserting `ReviewOutcome` covers them, `Reject` mapped per ADR-008 rule 4
+- correct `strategies/ReviewTemplate.md:51` to `Remain Current Stage` — an ADR-008
+  follow-up this unblocks
+- correct or define `Reject` in `Validation/CapitalReview.md` — likewise
+- do **not** write the promotion/demotion/retirement classifier. ADR-004's
+  follow-up stays open, and rule 5 above is not it
+
+---
+
+## Implementation Record (ADR-009)
+
+Done 2026-07-31, in the order of the follow-up list. Tests were written first and
+run against the unchanged code to prove they fail rather than pass vacuously: the
+round-trip module gave 11 failed, the review module failed at collection because
+`ReviewOutcome` did not exist, and the outcome conformance test failed on the
+import. Suite 168 → 211 passed, 4 xfail, 1 skipped.
+
+`framework/artifacts/review.py` holds the record. `ReviewOutcome`,
+`ConfidenceAdjustment` and `STRATEGY_LADDER` are in
+`framework/artifacts/enums.py`; `ArtifactSerializer.load()` is in
+`serializer.py`.
+
+**The `ArtifactType` watcher was verified still `xfail`, not assumed to be.**
+Rule 1 claimed this ADR adds no enum member and therefore does not answer the
+open `ArtifactType` finding. `test_artifact_type_can_name_the_documented_deliverables`
+remains among the four xfails after implementation, so the claim holds.
+
+**ADR-004's `RETIRED` trap is now live and is handled.** `_check_outcome_matches_movement`
+branches on `RETIRE` and on a `RETIRED` destination *before* taking any ladder
+position, and `STRATEGY_LADDER` has `RETIRED` removed so `.index()` raises rather
+than lying if one reaches it. Two tests pin it: a retirement recorded as a
+promotion and one recorded as a demotion are both refused. Under a bare ordinal
+comparison the first would have been accepted as the deepest promotion in the
+system.
+
+**Legality is delegated, not re-decided.** The record asks
+`ArtifactValidator.validate_transition` whether the move is legal rather than
+carrying its own view. ADR-004 rules the ten demotions and the `PAPER_TRADING`
+floor; a second opinion here would eventually disagree with it. So a promotion
+that skips a stage and a demotion below the floor are refused by the existing
+table.
+
+### Three decisions the ruling did not cover
+
+**`subject_version` must be a semantic version.** Not in the ruling. It applies
+an invariant the repository already holds — `ArtifactRepository.save()` refuses a
+non-semantic version because append-only storage could never correct such a
+filename. A review naming `v2` could not be matched against any stored version of
+its subject, so the field would record a decision about nothing. Recorded here
+rather than left implicit, since it is a constraint a future reviewer will hit.
+
+**`review_fields()` refuses a hollow record rather than returning `None`s.** An
+artifact typed `REVIEW` but not built by `review_artifact` carries no decision,
+and a dict of `None`s would let it pass for one. This is the silent-fallback
+failure that left the dashboard reporting no priorities at all for two sessions,
+so it raises.
+
+**`ArtifactSerializer.dump` now renders timestamps as `isoformat` strings rather
+than native YAML timestamps.** This goes beyond "add `load()`" and is the one
+change to existing behaviour, so it is recorded rather than buried.
+
+The reason as first written was wrong and is corrected here. The comment claimed
+PyYAML converts an offset timestamp to UTC and returns it naive; **checked
+directly, the installed version round-trips `+05:00` to an identical isoformat.**
+So this fixes no live bug. What it removes is a dependency:
+`ArtifactIntegrity.canonical_payload` hashes `created.isoformat()`, which makes
+the exact rendering of a timestamp signature-critical, while PyYAML's timestamp
+construction is library behaviour Belay does not control and has not pinned —
+and older releases did return naive UTC. `canonical_digest`'s own docstring
+already asks callers to pass "a timestamp as `.isoformat()`". Nothing pinned the
+dump format and no artifacts are stored in the repository, so the change costs
+nothing today.
+
+`load()` refuses a stored timestamp with no offset rather than assuming UTC, for
+the same anti-fabrication reason `EvidenceRecord` refuses naive timestamps: a
+value whose meaning depends on an assumption is not reproducible evidence.
+
+### Still open, deliberately
+
+**The promotion/demotion/retirement classifier is not written.** Rule 5 is not
+it, and no `classify(current, target)` is exported. ADR-004's follow-up stays
+open: `Draft → Review → Approved` is still not a promotion, a demotion or a
+retirement, and `ArtifactLifecycle` still has no vocabulary for what it is.
+
+**`ArtifactRepository` still cannot return an artifact.** `load()` exists on the
+serializer, but `latest()` returns a version string and no `get()` was added —
+that is a repository change ADR-009 did not rule and no caller yet needs. It is
+now a small piece of work rather than a blocked one.
+
+**The re-sizing step remains prose.** `resizing_note` is a free-text field
+because there is no position-sizing layer and four of the six inputs
+`Capital_Authority.md` names do not exist as computed values. ADR-004 says step 2
+is performed by the reviewer in prose until then, and rule 7 keeps it optional so
+a missing input can never block the recording of a demotion.
+
+~~**`ArtifactRepository` still cannot return an artifact.**~~ Closed 2026-07-31.
+`get()` exists, delegates to `latest()` when no version is named, and verifies
+integrity on read. The reasoning is in the method.
+
+---
+
+## ADR-010: ArtifactType Is A Coarse Type With A Constrained Subtype
+
+Status:
+**Accepted.** Ratified 2026-07-31 as drafted; no rule was amended on
+ratification. Implemented the same day. `DeliverableType` carries the
+twenty-four members the eleven documents declare,
+`test_artifact_type_can_name_the_documented_deliverables` is rewritten to rule 9
+and its `xfail` marker is removed.
+
+**Implementation surfaced one thing the ADR did not anticipate**, recorded as a
+new finding rather than fixed by widening this ruling: `ArtifactType` and
+`Knowledge/Identifiers.md` are two vocabularies that should agree and do not.
+`PORTFOLIO` and `FAILURE` are enum members with no identifier prefix, and `DOC`
+is a prefix with no member. Rule 9's mapping assigns three deliverables to
+`PORTFOLIO` and one to `FAILURE`, so those artifacts have no prefix to carry.
+See `docs/HANDOFF.md`.
+
+Date:
+2026-07-31
+
+---
+
+## Context
+
+`ArtifactType` has nine members. `docs/HANDOFF.md` has recorded since 2026-07-26
+that the departmental and workflow documents name "roughly twenty" deliverables
+the enum cannot name, and asked for a ruling: **closed enum that must grow, or
+coarse enum plus a subtype.** Every session since has routed around it. ADR-009
+routed around it deliberately and said so.
+
+**The figure was an estimate and is now counted.** Every document under
+`departments/`, `Research/`, `Validation/`, `Operations/` and `workflows/` was
+read on 2026-07-31 — 31 documents, 13,049 characters. Eleven of them declare
+deliverables under an explicit `Output`, `Outputs`, `Deliverable` or
+`Deliverables` heading:
+
+| Document | Entries |
+|---|---|
+| `departments/Research/README.md` | 5 |
+| `Research/ChiefScientist.md` | 1 |
+| `Research/ResearchAnalyst.md` | 1 |
+| `Research/UniverseDiscovery.md` | 1 |
+| `Validation/Critic.md` | 1 |
+| `Validation/README.md` | 5 |
+| `Operations/README.md` | 4 |
+| `workflows/Daily/MarketClose.md` | 4 |
+| `workflows/Daily/MarketOpen.md` | 5 |
+| `workflows/Monthly/InvestmentCommittee.md` | 3 |
+| `workflows/Weekly/WeeklyResearch.md` | 4 |
+
+**34 entries, 25 distinct** once singular and plural are treated as one name.
+Four more are named only in prose — `Portfolio Snapshot`
+(`Operations/PortfolioManager.md`, "Generate daily portfolio snapshots"),
+`Exception Report` (`workflows/Daily/MiddayReview.md`), `Portfolio Summary`
+(`workflows/Weekly/WeeklyPortfolioReview.md`) and `Historical Summary`
+(`workflows/Events/StrategyRetirement.md`). **29 in total, against nine enum
+members.** So "roughly twenty" was an undercount, not a rough count.
+
+Four properties of that list decide this ADR, and none of them was visible from
+the estimate.
+
+**1. The enum can already *type* almost all of them. What it cannot do is
+*distinguish* them.** Sixteen of the 25 are report-shaped — ten end in `Report`,
+plus `Daily Summary`, `Investment Committee Minutes`, `Research Digest`,
+`Literature Review`, `Promotion Review` and `Paper Trade Log`. Every one of those
+is honestly an `ArtifactType.REPORT` today. The finding's title is exact: the enum
+cannot *name* them. It has never been unable to type them.
+
+**2. The same deliverable is produced by different producers at different
+cadences.** Seven of the 25 are declared by more than one document. `Universe
+Report` is declared three times — as a Research *department* deliverable, as the
+output of a Research *function* (`Research/UniverseDiscovery.md`), and as a
+*daily workflow* deliverable of `MarketOpen`. `Regime Report`, `Research Memo`,
+`Research Digest`, `Critique Report` and `Performance Report` are each declared
+twice. A closed enum has to decide whether the daily universe report and the
+departmental universe report are one member or two, and nothing in any document
+suggests they are different documents.
+
+**3. Three of the entries are not artifacts at all.** `Knowledge Update` appears
+in three Deliverables lists — `MarketClose`, `MarketOpen`, `InvestmentCommittee`
+— but `workflows/WorkflowEngine.md` lists "Update Knowledge" as a step in the
+execution model of *every* workflow, and `workflows/Events/StrategyPromotion.md`
+lists `Repository Update` and `Knowledge Graph Update` as workflow steps. These
+are effects on stored state, not documents produced. Growing the enum to cover
+the Deliverables lists literally would make `ArtifactType` name things that are
+not artifacts.
+
+**4. Three names plausibly denote one thing, and this ADR does not know.**
+`Research Memo` (`Research/ResearchAnalyst.md`: Hypothesis, Expected Mechanism,
+Supporting Evidence, Risks, Required Tests, Confidence, Open Questions),
+`Research Proposal` (`Research/ChiefScientist.md`: Motivation, Hypothesis,
+Expected Edge, Validation Plan, Potential Failure Modes, Estimated Research
+Value) and `Experiment Proposal` overlap heavily. Both documented structures are
+"a testable hypothesis with an expected edge and a validation plan."
+
+---
+
+## The Precedent Already Exists
+
+This shape has been chosen here once already. **ADR-009 made a review decision an
+`Artifact` of type `REVIEW` carrying its subject in typed content fields rather
+than in its own identity**, and its Rejected Alternatives explicitly refused to
+add a member: adding one "would take a position on the open `ArtifactType`
+finding as a side effect of unrelated work — precisely what that finding asks not
+to be done."
+
+So the coarse-type-plus-typed-detail pattern is not being invented here. It is
+being generalised from a ratified decision, which is the difference between
+applying a ruling and extending one.
+
+---
+
+## Decision
+
+**1. `ArtifactType` stays closed and coarse. It is not grown to name
+deliverables.** Its nine members describe what *kind of thing* an artifact is.
+Twenty-nine members would make it a list of documents rather than a type, and it
+would have to grow every time a workflow document names an output.
+
+**2. A second field carries the specific kind.** `Artifact` gains
+`deliverable: DeliverableType | None`. `ArtifactType` answers "what kind of thing
+is this"; `deliverable` answers "which documented output is this". A universe
+report is `(REPORT, UNIVERSE_REPORT)`.
+
+**3. The subtype is a constrained enum, never free text.** This is the whole risk
+of the coarse-plus-subtype shape and the reason it cannot be waved through: a free
+string re-opens exactly the hole that produced the finding, where an orphaned
+draft passed `artifact_type="UniverseReport"` and nothing refused it.
+`DeliverableType` is an enum and `ArtifactValidator` refuses anything else — the
+same treatment `RelationshipType` received.
+
+**4. The vocabulary is derived from the documents, never transcribed.** A
+conformance test parses the `Output`/`Outputs`/`Deliverable`/`Deliverables`
+sections of the eleven declaring documents and asserts `DeliverableType` equals
+what they declare. A list copied into code would drift from the documents exactly
+as silently as the code has drifted before — and the drift is the thing being
+guarded against, so the documents have to be the input. **No new governance
+document is created**, so ADR-002's freeze is untouched: the vocabulary lives in
+code and is checked against documents that already exist.
+
+**5. Effects are not deliverables.** `Knowledge Update`, `Repository Update` and
+`Knowledge Graph Update` get no member. They are steps in
+`workflows/WorkflowEngine.md`'s execution model, performed by every workflow, and
+an artifact is not produced. The parser in rule 4 must exclude them by name, and
+the exclusion must be stated where it is applied rather than left as a silent
+filter.
+
+**6. A deliverable declared by several documents is one member.** Cadence and
+producer are not part of a deliverable's identity. `Universe Report` is one
+member whether Research produces it on request or `MarketOpen` produces it daily.
+The producing workflow is already recoverable from the artifact's author and
+timestamps, and duplicating it into the type would put the same fact in two
+places.
+
+**7. `deliverable` is optional and defaults to `None`.** Most artifacts are not
+workflow deliverables — a strategy specification is not one, and a review record
+is not one. `None` means "not a documented deliverable", which is a real state and
+must not be confused with an unset field. It is refused as a caller-supplied value
+on artifacts whose type cannot carry one.
+
+**8. It is inside the integrity hash.** Every field a governance gate reads must
+be covered by the signature, which is the reasoning ADR-005 applied to
+`confidence` and `evidence_level`. A promotion gate that accepts a critique report
+must not accept an artifact whose `deliverable` was changed to `CRITIQUE_REPORT`
+after signing.
+
+**9. The watcher is rewritten to assert the pair, not the member.** Once this is
+ratified and implemented,
+`test_artifact_type_can_name_the_documented_deliverables` asserts that **every
+deliverable declared by the eleven documents resolves to a
+`(ArtifactType, DeliverableType)` pair**, and its `xfail` marker is removed. That
+sentence is the answer to the question the finding has been holding open, and it
+is why the test could not honestly be strengthened before now.
+
+**10. The three overlapping research names are NOT merged by this ADR.**
+`Research Memo`, `Research Proposal` and `Experiment Proposal` each get their own
+member, and whether they are one concept is left open. Merging them is a
+departmental ruling about what Research produces, and it would be made here as a
+side effect of a typing decision — which is the failure mode ADR-004 named and
+ADR-009 refused. Recorded as an open question rather than resolved quietly.
+
+---
+
+## Consequences
+
+Positive:
+
+- the longest-open P2 finding gets an answer rather than another routing-around,
+  and the last weak `xfail` watcher gets a specification
+- `ArtifactType` stops needing to grow whenever a workflow document names an
+  output, which is what would have made it unstable
+- twenty-nine deliverables become nameable and, more importantly,
+  *distinguishable* — sixteen of them are indistinguishable `REPORT`s today
+- the vocabulary is checked against the documents, so a deliverable added to a
+  departmental document without a corresponding member turns the suite red
+
+Negative:
+
+- every artifact now carries two type fields, and callers must learn which
+  question each answers. Mitigated by rule 7's `None` default: code that does not
+  care never sees it
+- `DeliverableType` is a second enum that must track eleven documents rather than
+  one, so its parser has eleven places to break. `RelationshipType` tracks one
+- rule 6 asserts that a daily universe report and a departmental universe report
+  are the same kind of document. That is a reading of the documents, not
+  something any document states
+- three research deliverables are given separate members that may later merge,
+  and members are hard to remove once artifacts carry them
+
+---
+
+## Rejected Alternatives
+
+**Growing `ArtifactType` to twenty-nine members.**
+
+Reason: it would have to grow again whenever any workflow document names an
+output, and three of the twenty-nine are not artifacts. It also forces a decision
+this ADR avoids — whether `MarketOpen`'s universe report and Research's universe
+report are the same member — where the coarse-plus-subtype shape lets producer
+and cadence stay out of identity entirely.
+
+**A free-text `subtype` string.**
+
+Reason: it re-opens the exact hole the finding was raised about. An orphaned draft
+passed `artifact_type="UniverseReport"` and nothing refused it; a free string
+would make that legal rather than fixing it.
+
+**A new governance document listing the deliverables, parsed as one vocabulary.**
+
+Reason: ADR-002 freezes the addition of new governance documents until the
+mechanics layer can feed the gates already written, and this would be one. Rule 4
+achieves the same result against the eleven documents that already declare
+deliverables.
+
+**Leaving it open until the workflow layer is built.**
+
+Reason: the finding has been open since 2026-07-26 and has been routed around
+three times. The evidence needed to rule it is in documents that already exist and
+has now been gathered; waiting would not improve it. Nothing here depends on the
+workflow layer, because the deliverables are declared by departmental documents as
+well as workflow ones.
+
+---
+
+## Required Follow-Up (ADR-010)
+
+- add `DeliverableType` to `framework/artifacts/enums.py`, parsed-and-checked
+  rather than transcribed
+- add `deliverable` to `Artifact`, to `ArtifactIntegrity.canonical_payload`, and
+  to `ArtifactSerializer.load`'s enum reconstruction — `load()` is a second place
+  that must know the schema, and ADR-009 recorded that a field added to one and
+  not the other is dropped in silence
+- `ArtifactValidator` refuses an unknown `deliverable`, and refuses one on an
+  artifact type that cannot carry it
+- a conformance test parsing the eleven declaring documents against
+  `DeliverableType`, excluding the three effects by name
+- rewrite `test_artifact_type_can_name_the_documented_deliverables` to rule 9 and
+  remove its `xfail` marker
+- record the `Research Memo` / `Research Proposal` / `Experiment Proposal` overlap
+  as an open departmental question in `docs/HANDOFF.md`
+
+---
+
+### Still open, deliberately
+
+**Whether the three research deliverables are one concept.** Rule 10. It is a
+question about what the Research department produces, not about typing, and it
+should be ruled by whoever rules on `Research/ChiefScientist.md` versus
+`Research/ResearchAnalyst.md`.
+
+**Which deliverables the nine `ArtifactType` members map to.** Rule 9 requires
+every deliverable to resolve to a pair, but this ADR does not tabulate the
+mapping. Sixteen are plainly `REPORT`; `Market Snapshot` and `Portfolio Summary`
+are arguably `PORTFOLIO`; `Failure Investigation` is arguably `FAILURE`. The
+tabulation belongs with the implementation, where each choice can be tested
+rather than asserted in prose.
+
+---
+
+## ADR-011: Metric Conventions Are Stated, Never Defaulted
+
+Status:
+**Accepted.** Ratified 2026-07-31 as drafted; no rule was amended on
+ratification. Implemented the same day — `returns.py`, `volatility.py`,
+`risk_adjusted.py` and `reporting.py` under `framework/metrics/`, with
+`drawdown.py` migrated onto the same helper per rule 13.
+
+**Every citation below was re-checked against the files by a second reader
+before any code was written** — the check that caught the `Knowledge/Schema.md`
+miscount on 2026-07-30. Twenty claims, **four wrong**, all four corrected in
+place and marked rather than quietly rewritten:
+
+- the document is forty-nine lines, not fifty
+- its nine metric names sit on lines 15-31 on alternating lines, not 13-31 one
+  per line; line 13 is the heading
+- the claim that `risk-free`, `target return` and `standard deviation` appear in
+  **no** document was false and self-refuting — this ADR contains `risk-free`
+  seventeen times. Narrowed to "no document outside `docs/`", which is the claim
+  the ruling actually rests on and which does hold
+- the `Risk-adjusted returns` entry is `scripts/status.py:50`, not `:52` — line
+  52 is `Regime robustness`
+
+None of the four touches a rule. The reason for recording them is that the
+drafting error rate on this ADR was one citation in five, and the next session
+should size its own trust in a first draft accordingly.
+
+Date:
+2026-07-31
+
+---
+
+## Context
+
+`Validation/Backtesting.md` names **nine minimum metrics** and one of them is
+built. The document was opened and read in full — it is forty-nine lines, and the
+nine names sit on lines 15-31, on alternating lines under the `Minimum Metrics`
+heading at line 13. **It gives a name and nothing else: no formula, no parameter,
+no convention.**
+
+Four of the nine are not determined by their names.
+
+- **Sharpe** requires a risk-free rate. The document does not give one. Every
+  markdown file in the repository was searched — 101 of them — and **`risk-free`
+  appears in no document outside `docs/`**, which is to say in no specification
+  and no governance document. The only hits are inside this ADR and the
+  `docs/HANDOFF.md` brief that asked for it.
+  `strategies/StrategyTemplate.md:81` has an `Expected Sharpe` field and defines
+  nothing.
+- **Sortino** requires a target return. The same silence, and the same scope:
+  `target return` appears in no document outside `docs/`.
+- **CAGR** is a Compound *Annual* Growth Rate, so it requires knowing how many
+  periods a year holds. Nothing in a sequence of floats says whether they are
+  daily, weekly or monthly, and `252`, `trading days` and `periodicity` appear
+  nowhere outside `docs/` either.
+- **Volatility**, which Sharpe and Sortino both divide by, requires a choice
+  between the sample and population standard deviation and a choice of
+  annualization. `standard deviation` is in no specification document.
+
+> The scoping in those four bullets is a correction. They were drafted claiming
+> the strings appear "in no document at all", which the verification pass showed
+> to be false and, as written, self-refuting: the ADR that says `risk-free`
+> appears nowhere contains the word seventeen times. The substantive claim — that
+> **no document Belay governs itself by defines any of these conventions** —
+> survives intact, and it is the claim the ruling rests on. Recorded rather than
+> silently reworded, because a citation that had to be narrowed is exactly the
+> kind of thing a later session should be able to see.
+
+So four of the nine minimum metrics **cannot be computed at all** without a
+decision the constitution does not make. Making those decisions inside a function
+body, where no reviewer would see them, is what this ADR exists to prevent.
+
+`docs/HANDOFF.md` anticipated exactly this and asked for a ruling rather than a
+convention. This is that ruling, widened by two things found while checking its
+brief.
+
+---
+
+## Two Claims In The Brief Are Wrong
+
+Both were checked by opening the files rather than inherited, which is the
+discipline `docs/HANDOFF.md` closes with. Recorded here because the second one
+changes what Stage 1 can honestly contain.
+
+**1. `EvidenceRecord` does not have fields for the four required disclosures.**
+
+`docs/HANDOFF.md:1287` states that `Validation/Backtesting.md`'s requirement to
+record Assumptions, Data Source, Sample Period and Known Limitations is covered
+because "`EvidenceRecord` already has fields for it". Opened:
+`framework/artifacts/evidence.py` declares `source`, `methodology`, `level`,
+`confidence`, `provenance`, `timestamp` and `hash`. `Data Source` is `source`.
+**`Assumptions`, `Sample Period` and `Known Limitations` have no field.**
+
+`docs/ROADMAP.md:107-109` states this correctly — "`EvidenceRecord` has
+`methodology` and `provenance` but no structure for these four". The two
+documents disagree and the roadmap is right.
+
+**2. Two of the four metrics the brief calls computable are not computable.**
+
+`docs/HANDOFF.md:5321` states that "CAGR, Win Rate, Exposure and Trade Count are
+computable from a return series alone."
+
+- **Trade Count cannot be.** A return series contains no trades. Nothing in a
+  sequence of period returns says how many positions were opened, and a series
+  produced by one position held for a year is identical to one produced by
+  weekly turnover.
+- **Exposure cannot be.** A period return of `0.0` is indistinguishable between
+  "no position was held" and "a position was held and the price did not move".
+  Exposure is the fraction of time capital was deployed, and the series does not
+  carry it.
+- **Win Rate is not wrong so much as undetermined.** The fraction of *periods*
+  that were positive and the fraction of *trades* that were profitable are
+  different numbers, and `Validation/Backtesting.md:23` says only `Win Rate`.
+
+`docs/ROADMAP.md:104-105` has it right: "The first four are computable from a
+return series alone... The last five require trade-level records, so they depend
+on Stage 3." Its first four are Drawdown, CAGR, Sharpe and Sortino. (Its reason
+for grouping `Benchmark Comparison` with the trade-level metrics is loose — that
+one needs a second *series*, not trades — but on the three that decide this ADR
+it is correct and HANDOFF is not.)
+
+**The consequence is that the honest Stage 1 slice against a return series is
+CAGR, volatility, Sharpe and Sortino — four metrics, not the wider set the brief
+implies.** That is smaller because the brief was wrong, not because scope was
+cut. Rule 11 records what is excluded and why.
+
+---
+
+## Decision
+
+**1. No convention is defaulted. Every parameter the document leaves open is a
+required argument.** `sharpe_ratio` takes `risk_free_rate` with no default;
+`sortino_ratio` takes `target_return` with no default; every annualized figure
+takes `periods_per_year` with no default. ADR-005 rule 4 refused to default
+`confidence` to 0.5 because a fabricated figure is indistinguishable from a real
+one. A Sharpe silently computed at a risk-free rate of zero is the same defect
+wearing a number: at a promotion gate it looks exactly like a rate somebody
+chose.
+
+**2. The convention travels with the number, inside the integrity hash.** A
+Sharpe of 1.4 computed at `rf = 0.00` and a Sharpe of 1.4 computed at
+`rf = 0.04` are two different claims about two different strategies. Every
+parameter that entered a computation is recorded in the artifact's `content`,
+which is already covered by the signature — `framework/artifacts/integrity.py:55`
+is the line that puts it in the payload, confirmed by a second reader.
+A number whose assumptions can be edited after signing is not evidence, which is
+the reasoning ADR-005 applied to `confidence` and ADR-010 rule 8 to `deliverable`.
+
+**3. Returns are simple period returns; growth is geometric.**
+`r_t = P_t / P_(t-1) - 1`, and CAGR compounds them:
+`(prod(1 + r_t)) ** (periods_per_year / n) - 1`. Log returns are not used.
+`Validation/Backtesting.md:15` asks for a *Compound* Annual Growth Rate, and the
+arithmetic mean of log returns is not the compound growth rate — carrying both
+conventions would let two Belay components disagree about what a return is.
+
+**4. Volatility is the sample standard deviation, `n - 1`, annualized by
+`sqrt(periods_per_year)`.** A backtest series is a sample of a process, not the
+population of it: the population is every return the strategy will ever produce,
+most of which has not happened. `n - 1` is the estimator that does not understate
+dispersion — and understating dispersion inflates every risk-adjusted number
+computed from it, in the direction that flatters a strategy. Where two
+conventions are both defensible, Belay takes the one that cannot flatter.
+
+**5. A series shorter than two observations is refused, not answered.** One
+observation has no dispersion, and returning `0.0` would report a strategy with
+no variance rather than a series that cannot answer the question. This is the
+refusal `max_drawdown` already makes for an empty series
+(`framework/metrics/drawdown.py:36-39`) and for the same stated reason: unusable
+input must not reach a promotion gate looking like evidence.
+
+**6. Sharpe is the annualized mean excess return over annualized volatility.**
+`mean(r_t - rf_period) * periods_per_year / (stdev(r_t) * sqrt(periods_per_year))`.
+The risk-free rate is supplied as an **annual** rate and divided by
+`periods_per_year` inside the function, because that is how a risk-free rate is
+quoted everywhere and demanding a per-period rate invites a silent
+factor-of-252 error that nothing would catch.
+
+Recorded as a choice rather than a fact: **this is not `(CAGR - rf) / volatility`**.
+The two differ whenever returns are volatile, because compounding is not linear.
+The arithmetic form is used because its numerator and denominator are computed
+from the same sample in the same way.
+
+**7. Sortino divides by downside deviation about the target, over the full
+sample.** Deviations are `max(0, target_period - r_t)`, squared, summed, and
+divided by `n - 1` **over the whole series** — not by the count of below-target
+periods. Dividing by the below-target count shrinks the denominator along with
+the numerator, so a strategy with one bad period in a hundred scores like one
+with fifty. Both conventions are in use, the choice is invisible in the result,
+and this is the one that stays comparable across series.
+
+**8. Sortino's target is the target in both places.** The numerator is the mean
+return in excess of the same `target_return` that defines the downside, not in
+excess of a risk-free rate. Mixing the two produces a number that is neither a
+Sortino ratio nor a Sharpe ratio and is labelled as one of them.
+
+**9. The four disclosures are mandatory on a metric artifact, and a blank one is
+refused.** `Validation/Backtesting.md:35-43`: "Backtests must document —
+Assumptions, Data Source, Sample Period, Known Limitations." That is a
+requirement, and this repository's recurring defect is a requirement nothing
+enforces. They are recorded in `content` under fixed keys, covered by the
+signature under rule 2, and a metric artifact cannot be emitted with any of the
+four empty.
+
+**10. The disclosures are NOT added to `EvidenceRecord`.** Two reasons, one hard
+and one structural.
+
+Hard: `EvidenceRecord.canonical_payload` is pinned by a literal digest at
+`tests/artifacts/test_evidence_hashing.py:18`, whose comment states the rule —
+"If this value moves, historical evidence stopped verifying." Adding fields to
+that payload moves every evidence hash ever computed, and
+`Knowledge/Versioning.md:25` forbids rewriting history. An evidence record that
+stops verifying is worse than one missing a field.
+
+Structural: the four describe **the run**, not one record of it. A backtest
+carrying three evidence records has one sample period, and putting it on each
+record puts the same fact in three places where they can disagree.
+
+**11. `Win Rate`, `Exposure`, `Trade Count`, `Benchmark Comparison` and `Tail
+Events` are out of scope, and stay out.** Not by preference. `Trade Count` and
+`Exposure` need an input a return series does not carry; `Win Rate` needs a
+ruling on what a win counts; `Benchmark Comparison` needs a second series; `Tail
+Events` needs a threshold no document states. Building any of them today means
+inventing the missing input, which is the failure this ADR exists to prevent.
+
+**12. Every metric artifact carries `deliverable = BACKTEST_REPORTS`.** ADR-010
+rule 2 gave artifacts a subtype and metric artifacts are the case it was built
+for: without it a drawdown, a Sharpe and a universe report are three
+indistinguishable `REPORT`s. `Backtest Reports` resolves to `ArtifactType.REPORT`
+and `REPORT` has the `RPT` prefix — **checked by running it, not read off the
+table**, so the open `PORTFOLIO`/`FAILURE` identifier finding does not bite here.
+
+**13. `framework/metrics/drawdown.py` is brought onto this ruling, not left
+beside it.** It predates ADR-010 and this ADR, so it carries no `deliverable` and
+none of the four disclosures. `AGENTS.md` forbids parallel implementations, and
+the only worked example being the one example that does not follow the rules is
+how a convention dies in a repository this size.
+
+---
+
+## Consequences
+
+Positive:
+
+- four of the nine minimum metrics become computable, and `Risk-adjusted returns`
+  — one of the constitutional seven — gets a component behind it for the first
+  time. The dashboard moves 1 of 7 to 2 of 7
+- every metric number carries the assumptions that produced it, signed, so a
+  review reads a claim rather than a figure
+- `Validation/Backtesting.md`'s documentation requirement becomes executable
+  rather than aspirational, which is the difference between the constitution
+  being obeyed and being quoted
+- two wrong claims in `docs/HANDOFF.md` are corrected in the record instead of
+  being carried into the code that implements them
+
+Negative:
+
+- every metric function has more required arguments than its textbook form, and
+  no Sharpe can be computed without somebody deciding a risk-free rate. That is
+  the intent and it will read as friction
+- rule 6 picks one of two defensible Sharpe formulations. A future session
+  comparing a Belay Sharpe against an externally quoted one may find a small
+  difference and has to check which form the other used
+- rule 9 admits no draft exemption, so an exploratory number cannot be emitted as
+  an artifact without four sentences of prose behind it
+- the disclosures are free text in `content`. Nothing checks that a `Sample
+  Period` string denotes a period, only that it is not empty. A stronger type is
+  possible later and is not attempted here
+- rule 13 changes the integrity hash of every drawdown artifact. Nothing has been
+  stored, so nothing breaks today — but this is the last moment at which that is
+  true, and the ADR is deliberately taking it now rather than later
+
+---
+
+## Rejected Alternatives
+
+**Defaulting the risk-free rate to zero, and saying so in a docstring.**
+
+Reason: it is the most common convention in the industry and it would be
+defensible. But a docstring is not the artifact, and the artifact is what a
+promotion gate reads. A zero rate silently applied is indistinguishable, at the
+gate, from a rate somebody chose — which is the exact shape ADR-005 rule 4
+refused for `confidence`.
+
+**Deriving `periods_per_year` from the series length, or from timestamps.**
+
+Reason: a bare return series has no timestamps, and inferring "252 observations
+means daily" is a guess that is wrong for every strategy with under a year of
+history. The market data boundary that would carry real timestamps is Stage 2 and
+does not exist. Guessing the frequency would make the annualization silently
+wrong rather than absent.
+
+**Adding `assumptions`, `sample_period` and `known_limitations` to
+`EvidenceRecord`.**
+
+Reason: rule 10. It moves a pinned hash that the test guarding it says must never
+move, and it puts run-level facts onto record-level objects.
+
+**Building `Win Rate` as the fraction of positive periods.**
+
+Reason: it is one of two readings of a word the document leaves undefined.
+Choosing quietly between two readings is exactly how the five-way
+promotion-criteria divergence happened, and it needs its own ruling.
+
+**Waiting for the market data boundary so the disclosures can be filled
+automatically.**
+
+Reason: it inverts the dependency. The disclosure block is what makes a
+hand-supplied series **honest** — "supplied by hand, carries no provenance" is a
+Known Limitation, and recording it on every artifact matters more before Stage 2
+than after.
+
+---
+
+## Required Follow-Up (ADR-011)
+
+- `framework/metrics/returns.py` — period returns from a price series, and CAGR
+- `framework/metrics/volatility.py` — sample standard deviation and annualization
+- `framework/metrics/risk_adjusted.py` — Sharpe and Sortino. **The path is not
+  cosmetic**: `scripts/status.py:50` names exactly that file as the expected
+  component for `Risk-adjusted returns`. (Drafted as line 52, which is
+  `Regime robustness`. Corrected by the verification pass.)
+- one shared helper that builds a metric artifact and refuses a blank disclosure,
+  so rule 9 is enforced in a single place rather than remembered in four
+- `framework/metrics/drawdown.py` migrated onto that helper — rule 13
+- tests written first and run against the unchanged code to prove they fail
+- **nothing to change in `scripts/status.py`.** `PROMOTION_CRITERIA` already names
+  `framework/metrics/risk_adjusted.py`, and
+  `test_promotion_criteria_match_the_constitution` holds the criterion *names* to
+  `Promotion_Pipeline.md`, not the paths. The figure moves on its own when the
+  file lands
+- **`framework/metrics/statistics.py` is deliberately NOT created**, and this is a
+  ruling rather than an omission. It is what the dashboard expects for
+  `Statistical performance`, and `implementation_state()` grades a file `built` on
+  twenty non-blank lines with no view of what is inside them. Putting CAGR there
+  would turn a criterion green that nothing satisfies — statistical performance is
+  significance and sample adequacy, not a growth rate. `scripts/status.py`'s own
+  docstring says it exists to prevent "a reassuring half-truth", and this would be
+  one
+- correct the two claims in `docs/HANDOFF.md` identified above
+
+---
+
+### Still open, deliberately
+
+**What a `Win Rate` counts.** Periods or trades. The trade reading needs Stage 3
+either way, but the ruling can be made before it.
+
+**`Tail Events`' threshold.** Worst *k*, beyond *n* standard deviations, or a
+quantile. The document names the metric; no document names the cut.
+
+**Whether the disclosure block belongs to the metric or to the backtest.** Rule 9
+puts it on the metric artifact because that is the only artifact that exists.
+When Stage 3 emits a backtest producing several metrics at once, the four may
+belong on the backtest with the metrics inheriting them.
+
+---
+
+## ADR-012: Statistical Review — Significance, Sample Adequacy, And What Belay Refuses To Conclude
+
+Status:
+**Accepted.** Ratified 2026-07-31 as drafted; no rule was amended on
+ratification. Implemented the same day — `framework/metrics/statistics.py`,
+carrying the Student's t distribution, the significance test, and rule 8's
+sample-adequacy calculation.
+
+Every citation was re-checked against the files by a second reader before
+implementation, the practice that caught four wrong citations in ADR-011 a few
+hours earlier. Any correction is marked inline below.
+
+Date:
+2026-07-31
+
+---
+
+## Context
+
+**Seven documents demand statistical validity. Not one of them defines it.**
+
+| Document | What it says |
+|---|---|
+| `constitution/Promotion_Pipeline.md:27` | maturity Level 2, `Validated`, **is** "Passed statistical review." |
+| `constitution/Promotion_Pipeline.md:75` | `Statistical performance` — first of the seven authoritative criteria |
+| `constitution/Capital_Authority.md:11-14` | "Capital shall be determined using: ... `Statistical edge`" |
+| `Validation/README.md:23` | "Evaluate statistical significance." — a departmental responsibility |
+| `Validation/Workflow.md:15` | `Statistical Review`, a step between Backtesting and Capital Review |
+| `strategies/PromotionCriteria.md:7` | `Statistical Performance` heads its eight categories |
+| `constitution/Mission.md:16` | "Discover statistically valid investment opportunities." |
+
+Two of those are unusually load-bearing. `Promotion_Pipeline.md:27` defines a
+maturity level **as** the passing of this test — the only one of the seven levels
+defined that way. And `Capital_Authority.md:11-14` makes `Statistical edge` one
+of six inputs that *determine capital*, so the number this ADR rules is not
+merely reported to a review: it sizes positions.
+
+**All 101 markdown files in the repository were searched for the vocabulary that
+would define any of it.** `p-value`, `confidence interval`, `sample size`,
+`t-test`, `hypothesis test`, `null hypothesis`, `significance level`, `degrees of
+freedom`, `out-of-sample` and `overfit` return **exactly one hit outside this
+ADR's own text, and it is not a definition**: `docs/ROADMAP.md:72`, a sentence
+added earlier the same day observing that Belay computes none of this.
+
+> **This paragraph was drafted wrong and is corrected here, not silently.** It
+> claimed three hits, "two of them the version string `v1.0.0-alpha`". The
+> version string contains none of the ten terms enumerated above — `alpha` on its
+> own is not one of them — so the count could only have been reached by a search
+> whose terms differed from the list the sentence gives. **That is precisely the
+> defect ADR-011 recorded a few hours earlier**, where a bullet claimed
+> `risk-free` appeared in no document while sitting inside an ADR containing it
+> seventeen times. Two ADRs in one day, the same error: a search was run, its
+> terms were then written down from memory, and the two drifted. The lesson is
+> narrower and more useful than "check citations" — **paste the query, do not
+> paraphrase it.**
+
+So this is ADR-011's situation with the stakes raised. ADR-011's metrics
+*describe* a series. This one draws a **conclusion** from one, and
+`Capital_Authority.md` routes that conclusion into position sizing.
+
+### Two Immutable Laws bear on this directly
+
+**Law IV — "Past performance is evidence. It is never proof."**
+(`constitution/Immutable_Laws.md:29-33`.) That is a precise statement of what a
+significance test does and does not establish, and it is therefore a constraint
+on what this module is allowed to say. A p-value is the formalisation of Law IV;
+a pass/fail verdict presented without one is its violation.
+
+**Law II — "Every investment decision must be explainable. Black-box reasoning
+is prohibited."** (`constitution/Immutable_Laws.md:13-17`.) This constrains the
+*implementation*, not only the output. It is the reason rule 5 rejects a
+dependency in favour of code a reviewer can check against a printed table.
+
+---
+
+## Decision
+
+**1. The question is "is this distinguishable from luck", never "is this good".**
+The module computes the probability of observing a track record at least this
+strong if the strategy had no edge whatsoever. It does not score a strategy, and
+it does not rank one against another.
+
+**2. The null hypothesis is supplied, never assumed.** `null_return` is a
+required argument with no default. Testing against zero is the conventional
+choice and it is still a choice: a strategy that beats zero but not the
+risk-free rate has no edge worth capital, and `Capital_Authority.md` makes that
+distinction load-bearing. ADR-011 rule 1, applied to a second silent convention.
+
+**3. Alpha is supplied, never defaulted.** No Belay document states a
+significance level. 0.05 is convention, and strategy selection is precisely the
+setting where convention is argued to be far too loose — many candidates are
+screened, and the loosest defensible threshold is the one that lets the most
+luck through. Belay does not pick a number nobody wrote down.
+
+**4. The test is a two-sided one-sample Student's t-test on the mean period
+return, with n-1 degrees of freedom.** Two-sided rather than one-sided: a
+one-sided test encodes the assumption that the edge is positive, which is the
+assumption under examination, and it halves the p-value for free.
+`Validation/README.md:11` — "Validation seeks flaws."
+
+**5. The t-distribution is implemented in this repository, not imported.**
+`scipy` is neither installed nor declared in `pyproject.toml`; adding it for one
+function is a large dependency for a small need. The regularized incomplete beta
+is about thirty-five lines of standard numerical code, and it is pinned in tests
+against **published t-table critical values** rather than against another
+implementation — a number a reviewer can check by opening a textbook is
+explainable in the sense Law II means; one produced by an opaque dependency is
+not. Verified before this ADR was written: the implementation reproduces the
+published two-sided critical values at df 10, 20, 30 and the normal limit to five
+decimal places.
+
+**6. `numpy` is not adopted either.** Same reasoning, plus one more: it is
+present today only as a transitive dependency of `pandas` and appears nowhere in
+`pyproject.toml`. Building on a package nobody declared is the 2026-07-26 defect
+in the other direction — there, `pyyaml` was declared but not installed, and
+`ArtifactRepository.save()` had never once executed while the suite reported 46
+passing.
+
+**7. The parametric assumptions are recorded on every artifact as Known
+Limitations, never buried.** The t-test assumes returns are independent and
+identically distributed. Financial returns are neither — they are
+autocorrelated, heteroskedastic, and fatter-tailed than the t distribution
+allows. **The consequence has a direction and must be stated: a p-value computed
+on real returns is optimistic. It understates the probability that a track
+record is luck.** ADR-011 rule 9 already makes the four disclosures mandatory;
+this rule fixes what the `assumptions` and `known_limitations` strings must say
+for a significance artifact, so it is impossible to emit one that does not admit
+this.
+
+**8. Sample adequacy is a separate question with its own answer.** "Is this
+significant?" and "is this sample large enough to conclude anything?" are
+different questions, and a short sample can return a significant p-value by
+chance. `minimum_observations_for_significance` answers the second directly:
+given the observed effect size, how many observations would be needed to reach
+the stated alpha. **A sample below that number has not failed the test — it has
+not taken it**, and reporting those two states identically is the failure this
+rule exists to prevent.
+
+**9. Fewer than two observations computes nothing.** ADR-011 rule 5 extended: a
+standard error needs at least two observations, and a t-statistic on one is
+undefined rather than zero.
+
+**10. Multiple-testing and data-snooping corrections are deliberately out of
+scope.** Deflated Sharpe, Bonferroni and White's Reality Check all require the
+number of strategies that were tried, and **Belay records that nowhere** —
+`strategies/Registry.md` is a stub and the experiment queue is unbuilt.
+Correcting against an unknown trial count produces a number that looks adjusted
+and is not, which is worse than an unadjusted number that says so. Rule 7's
+disclosure names it explicitly.
+
+**11. The module reports whether the caller's threshold was met. It does not
+decide promotion.** `significant` is `p < alpha` and nothing further.
+`Promotion_Pipeline.md:27` makes "Passed statistical review" a maturity level and
+it is tempting to write that gate here — but a gate is a governance decision.
+ADR-009 rule 5 drew this exact line for review outcomes, and the same line holds:
+comparing a computed number to a declared threshold is not deciding what follows
+from it. Promotion remains a review outcome recorded through
+`framework/artifacts/review.py`.
+
+**12. The artifact is a `Validation Report`, not a `Backtest Report`.**
+`Validation/README.md:37` declares `Validation Reports` among the department's
+outputs, and `Validation/Workflow.md:15` places Statistical Review as a step
+distinct from Backtesting. `DeliverableType.VALIDATION_REPORTS` already exists
+and maps to `ArtifactType.REPORT`, so no enum member is added and ADR-010's
+vocabulary is untouched.
+
+**13. ADR-011's scope watcher has a false positive, and this ADR fixes it.**
+`test_only_the_backtest_metrics_adr_011_scopes_in_are_built` tokenises `Tail
+Events` as the substring `tail`. A two-sided test is naturally implemented as a
+function with `two_tailed` in its name, which would make that watcher report
+`Tail Events` as built — **one day after the watcher was written, by the very
+next piece of work.** The token is tightened to `tail_event`. A watcher that
+reports a gap as closed when it is open is the "reassuring half-truth"
+`scripts/status.py` exists to prevent, and it is worse than no watcher.
+
+---
+
+## Consequences
+
+Positive:
+
+- `Statistical performance` — the **first** of the seven constitutional criteria
+  — becomes computable. The dashboard moves to 3 of 7, honestly this time
+- `Promotion_Pipeline.md:27`'s "Passed statistical review" becomes something that
+  can be evaluated rather than asserted, which is what a maturity level defined
+  by a test requires
+- Law IV becomes operational rather than aspirational: the module's entire output
+  is a statement about evidence rather than proof, and rule 7 forces the caveat
+  onto every artifact that carries the number
+- no new runtime dependency, and rule 5's implementation is checkable against a
+  printed table by anyone who doubts it
+
+Negative:
+
+- Belay now maintains about thirty-five lines of numerical code. Pinning against
+  published tables rather than another implementation mitigates it; it does not
+  make it free
+- **the t-test is the weakest defensible test for this purpose.** It ignores
+  autocorrelation, fat tails and multiple testing, every one of which makes it
+  optimistic. Rule 7 discloses this and does not fix it, which is the honest
+  arrangement but leaves a real bias in place
+- rule 10 leaves the largest known bias in strategy evaluation unaddressed. A
+  strategy that survived a hundred variations before passing at p = 0.04 has
+  demonstrated nothing, and Belay currently cannot tell that from a single
+  pre-registered test
+- rules 2 and 3 make the function harder to call than any textbook version.
+  Deliberate, and it will read as friction exactly as ADR-011's did
+
+---
+
+## Rejected Alternatives
+
+**Defaulting alpha to 0.05.**
+
+Reason: the same objection ADR-011 raised to a silently-zero risk-free rate. It
+is convention rather than doctrine, and this is the setting where a selection
+process should be *stricter* than convention rather than equal to it. A default
+would also be indistinguishable, at a promotion gate, from a threshold somebody
+chose.
+
+**A one-sided test.**
+
+Reason: it assumes the sign of the edge, which is the thing under examination,
+and it halves the p-value at no cost. `Validation/README.md:11` says Validation
+seeks flaws; a test tuned to find fewer of them is the wrong instrument for the
+department that owns it.
+
+**Adding `scipy`.**
+
+Reason: rule 5. A large dependency for one function, and a less explainable one
+than thirty-five lines pinned to a published table. Law II is about
+explainability, and "the library said so" is the answer it prohibits.
+
+**Using the normal distribution instead of Student's t.**
+
+Reason: `statistics.NormalDist` is in the standard library and would have cost
+nothing — and it is wrong precisely where this ADR cares most. At small n the
+normal approximation understates the p-value enough to change a conclusion, and
+the whole sample-adequacy half of this ruling is about small samples.
+
+**Computing the 0-100 Promotion Score.**
+
+Reason: ADR-006 rule 4 suspended it — no weights, no mapping, threshold deferred
+to the Investment Committee. Reviving it as a side effect of a statistics module
+is exactly the failure ADR-004 named and ADR-009 and ADR-010 each refused.
+
+**Writing the "Passed statistical review" gate.**
+
+Reason: rule 11. The arithmetic belongs here; the decision does not.
+
+---
+
+## Required Follow-Up (ADR-012)
+
+- `framework/metrics/statistics.py` — standard error, t-statistic, two-sided
+  p-value, confidence interval, and rule 8's minimum-observations calculation
+- the Student's t distribution, pinned in tests against **published critical
+  values** at several degrees of freedom including the normal limit, never
+  against another implementation
+- `significance_artifact`, emitting a `Validation Report` through ADR-011's
+  `metric_artifact` so the disclosure rules apply unchanged
+- rule 7's fixed assumption and limitation strings, so the i.i.d. caveat cannot
+  be omitted from an artifact
+- rule 13: tighten the ADR-011 watcher's `Tail Events` token to `tail_event`
+- tests written first and run against the unchanged code
+- `docs/HANDOFF.md`, `docs/ROADMAP.md` and the dashboard
+
+---
+
+### Still open, deliberately
+
+**Multiple-testing correction.** Rule 10. It needs a trial count Belay does not
+record, and it becomes possible when the experiment queue or a real strategy
+registry exists. Until then the disclosure is the whole of the answer.
+
+**Whether the null should be zero or the risk-free rate as a matter of
+doctrine.** Rule 2 makes the caller state it. Which one a *promotion review*
+must use is a governance question about what "edge" means, and it belongs with
+whoever rules on `Capital_Authority.md`'s six inputs.
+
+**What minimum sample Belay requires.** Rule 8 computes how many observations an
+observed effect would need. No document says how many Belay *demands* before a
+strategy may be promoted, and `Promotion_Pipeline.md:27` makes that a real gap:
+a maturity level is defined by passing a review whose sample requirement nobody
+has written down.
+
+---
+
+## ADR-013: The Data Boundary — Provenance, Two Contracts, And What A Fetched Series Is
+
+Status:
+**Accepted and implemented.** Ratified 2026-07-31 by the repository owner, **as
+corrected** — no rule was amended on ratification. **Implemented 2026-08-01 in
+all ten rules**, as ROADMAP Stage 2; see the Required Follow-Up below for what
+that pass established, closed and opened.
+
+> **This block read "Not implemented" for one commit after implementation
+> landed**, so the ADR contradicted its own Required Follow-Up inside a single
+> file — one commit after `0a6d5f7`, whose entire subject was closing two stale
+> ADR-013 statuses found by a close-out sweep. Caught by the implementation's
+> independent verification pass, which is the third consecutive pass on this ADR
+> to find something the author's own reading did not.
+
+**Ratified after two verification passes, not one**, and the corrections the
+second pass forced were material rather than cosmetic — rule 6's premise was
+unrecorded anywhere in the repository until it was fixed. **Read the scorecard
+below before building on any rule here.**
+
+Every citation was read in the drafting session rather than carried from
+`docs/EndState.md` or `docs/HANDOFF.md`; where a claim in either did not survive
+being opened, it is corrected inline and marked. **Two claims in this ADR's own
+first draft did not survive either, and are marked the same way.**
+
+**Two passes ran on this draft, and the second one is the reason to trust the
+first one less.**
+
+**The author's pass found one defect** — rule 2 cited a law by the wrong number
+while its line number was right, which made the draft contradict its own Rejected
+Alternatives. Corrected inline and marked.
+
+**An independent pass then ran with no knowledge of the drafting, and found three
+more defects and six imprecisions across 71 distinct claims.** All three defects
+are corrected and marked inline below. They were:
+
+- **rule 6 rested on a premise no file in this repository contained.** The owner's
+  answer that Belay trades equities and options was given but never written down,
+  and this ADR cited `docs/OwnerDecisions.md` for it. The fact was asserted in
+  three files all written in one commit, each pointing at the others. **Fixed at
+  the root:** `docs/OwnerDecisions.md` Part 4 question 5 now records it.
+- **"five of eight" was a miscount; there are ten rules**, and it had already
+  propagated into `docs/ROADMAP.md`, `CHANGELOG.md` and a commit subject.
+- **rule 7's supporting bullet was carried near-verbatim from `docs/EndState.md`
+  and re-attributed** — the exact thing the sentence below claims this draft did
+  not do.
+
+**The honest scorecard, with the denominator this block originally lacked: 71
+claims checked, 11 wrong or questionable — 4 defect-grade. The author's own pass
+caught 1 of the 4.** The earlier version of this block claimed "twenty-two
+citations checked, one wrong", a figure that could not be reproduced under any
+counting rule and that flattered the draft using a denominator nobody could audit.
+Reporting a good error rate against a made-up denominator is the shape ADR-012
+rule 10 refuses — a number that looks adjusted and is not.
+
+For comparison, and stated more carefully than the earlier version did:
+`docs/HANDOFF.md` records four wrong citations in ADR-011's first draft, of which
+**one** was self-refuting, and one wrong in twenty for ADR-012. The earlier text
+here called both "self-refuting", which overstates ADR-011's record.
+
+**The verification practice, not the draft, is what this record vindicates.**
+
+Date:
+2026-07-31
+
+---
+
+## Context
+
+ROADMAP Stage 2's entire deliverable is *"A defined boundary for obtaining a
+price series, with provenance recorded on the resulting evidence"*
+(`docs/ROADMAP.md`, Stage 2). **A boundary is an adapter contract**, so Stage 2
+cannot be built without answering what shape the thing behind it has and whether
+there can be more than one. **ADR-011's central holding, extended rather than
+applied**, makes avoiding the question uncomfortable: a single hard-coded fetcher
+does not dodge the ruling, it *makes* it — silently — that there is only ever one
+source, and that its properties are whatever they happen to be.
+
+> **Named as an extension by the independent pass, and the distinction is one this
+> repository has recorded three times.** ADR-011 rules that *metric conventions*
+> are never defaulted — a risk-free rate, a target return, a period count. Source
+> multiplicity is not a metric parameter, so this is reasoning by analogy from an
+> existing ruling rather than the ruling applying on its own terms.
+> `docs/EndState.md` calls extending a document rather than applying one "the
+> failure this repository has now recorded three times", so the analogy is kept
+> and labelled instead of being dressed as precedent. **Rule 2 does not depend on
+> it** — Law VI carries that ruling alone.
+
+Everything Belay has computed to date was fed in by hand. Stage 2 is what makes
+that sentence false.
+
+> **A stronger claim was removed here rather than softened.** This read "and every
+> artifact says so inside its own signature." The independent pass showed it is
+> not true in two ways: **no artifacts are stored anywhere** (rule 7 relies on the
+> same fact), and the "supplied by hand" wording exists only as a caller-supplied
+> string in five test modules. `framework/metrics/reporting.py` requires
+> `data_source` to be non-blank and requires nothing about what it says.
+> Inherited from `docs/HANDOFF.md`, which overstates it the same way.
+
+**Four facts settled since `docs/EndState.md` was written**, recorded in
+`docs/OwnerDecisions.md`, all of which this ADR is drafted against:
+
+- Belay trades **equities and options, depending on the strategy**.
+- Positions are held **days to months**, decided once a day on **daily bars**.
+- The market-data budget is **effectively zero** to start.
+- **The repository is private**, verified. Committing a fetched series is no
+  longer publication, so row 13 becomes a design question rather than a bar.
+
+  > **Note added 2026-09-20, outside the ADR.** The bullet above is reproduced
+  > exactly as ratified. Its premise no longer holds: Belay is to be public, so
+  > committing a fetched series would be publication again. The ADR is not
+  > amended — only the owner may do that — see `docs/OwnerDecisions.md` 14h.
+
+### What the governing documents require
+
+Read in full for this ADR rather than quoted from a prior document:
+
+- **`Validation/Backtesting.md:35-43`** — "Backtests must document / Assumptions
+  / Data Source / Sample Period / Known Limitations", closing at `:47` with
+  "Outputs become evidence."
+- **`constitution/Immutable_Laws.md:45`** (Law VI) — "Research and execution
+  remain independent."
+- **`constitution/Immutable_Laws.md:51`** (Law VII) — "Institutional knowledge
+  shall never be intentionally discarded."
+- **`constitution/Operational_Constraints.md:5`** — "Belay shall maintain
+  accurate records."
+- **`constitution/Operational_Constraints.md:9-17`** — "Belay shall distinguish:
+  Facts / Assumptions / Predictions / Opinions."
+- **`constitution/Operational_Constraints.md:25-27`** — "Belay shall remain
+  strategy-agnostic. No asset class, security, or investment methodology
+  possesses inherent preference."
+- **`constitution/Operational_Constraints.md:29`** — "Tradable universes must be
+  discovered through evidence."
+- **`Knowledge/Versioning.md:23-27`** — "Knowledge records every version. No
+  version is overwritten. Historical versions remain searchable."
+- **`Research/UniverseDiscovery.md:7`**, **`:17`** "Evaluate option market
+  quality", **`:25`** "Evaluate survivability."
+- **ADR-002 Decision** — "Mechanics emit Artifacts. Governance consumes
+  Artifacts. Neither layer reaches across the boundary by any other means."
+
+### Three things found by reading that no prior document records
+
+**1. `constitution/Operational_Constraints.md:29` makes the survivorship
+argument constitutional rather than departmental.** `docs/EndState.md` rested it
+on `Research/UniverseDiscovery.md:7`, a departmental document. The identical
+sentence — "Tradable universes must be discovered through evidence" — is in the
+constitution, and `constitution/Governance.md:7` reads, in full, "The Constitution
+possesses authority." **The argument was stronger than the document making it
+knew.**
+
+> The scope gloss "authority over everything" was removed by the independent
+> pass. Line 7 does not say "over everything" — that reading comes from line 5,
+> "Departments possess responsibility", sitting beside it. Defensible, and it was
+> presented as what the line says. ADR-006 rule 1 cites the same line correctly,
+> pairing it with Immutable Law X to rank the constitution above departmental
+> documents, which is the argument this sentence was reaching for.
+
+**2. `constitution/Operational_Constraints.md:25-27` decides the
+equities-versus-options question, and it decides it against an equities-only
+boundary.** "No asset class, security, or investment methodology possesses
+inherent preference." A contract that can only express an equity price series
+does not merely *omit* options — it gives equities inherent preference by
+construction, because a strategy needing option data could not be expressed at
+all. This line has never been cited in any ADR.
+
+**3. `constitution/Evidence_Standards.md` has no class for observed market data.**
+Its four levels — A live-validated, B paper-validated, C historical *simulation*,
+D hypothesis — are each a statement about how well a **strategy** has been
+tested. A fetched price is none of them; nothing was simulated. Grading it C
+because C is nearest would be exactly the unstated convention ADR-011 refuses.
+**The constitution has the right vocabulary elsewhere:**
+`Operational_Constraints.md:9-17` distinguishes Facts from Assumptions,
+Predictions and Opinions, and a price observation is a Fact in that sense.
+
+### Two claims in prior documents that did not survive being opened
+
+**`docs/EndState.md` Part 5 lists five things this ADR must settle. It is five of
+ten.** The five it does not name are the identity question (rule 3), the
+instrument-shape question (rule 6), the evidence-grade question (rule 8), the
+refusal of an unstating source (rule 9) and the `Market Snapshot` exclusion
+(rule 10). None was visible without opening `Knowledge/Identifiers.md`,
+`framework/artifacts/enums.py` and `constitution/Evidence_Standards.md` together,
+which is the pass this ADR ran and that document did not.
+
+> **Corrected by the independent verification pass. This read "five of eight" and
+> named three.** The Decision section has ten numbered rules; 5 + 3 left rules 9
+> and 10 unaccounted for, and both are substantive — rule 9 adds a
+> construction-time refusal rule 5 does not require, and rule 10 excludes a
+> specific `DeliverableType`. **The miscount had already propagated into
+> `docs/ROADMAP.md`, `CHANGELOG.md` and a commit subject before it was caught**,
+> which is the same shape as the `Knowledge/Schema.md` miscount of 2026-07-30 that
+> reached a test docstring. Counted by listing the numbered headings, not by
+> re-reading the sentence.
+
+**The sixth item `docs/HANDOFF.md` added — where the halt lives — is removed from
+this ADR deliberately.** It was added earlier the same day and it is wrong to
+keep. Rule 2 holds that market data and execution are two contracts because
+designing the dangerous one in the language of the safe one is how the vocabulary
+for danger goes missing. Ruling an execution-safety property inside a
+data-boundary ADR would commit that error inside the document ruling against it.
+Finding 11 stays open for a Stage 6/7 ruling.
+
+---
+
+## Decision
+
+**1. Provenance is one obligation and it covers everything that crosses into
+Belay from outside.** Every fact Belay did not compute itself arrives with a
+recorded source, and that record sits inside the consuming artifact's signature.
+This is the one thing that genuinely generalises across market data, a broker and
+any future outside party. It is already half-built: `Disclosure.data_source` at
+`framework/metrics/reporting.py:125` is enforced non-blank and is inside the
+integrity hash.
+
+> **This read `:58` and was correct until the implementation moved it.**
+> Implementing rule 7 inserted `SamplePeriod` above `Disclosure`, so `:58-59`
+> now fall inside a docstring. Repointed to `:125` and `:132` on 2026-08-01,
+> and recorded rather than silently repaired because **an edit invalidating a
+> citation in the document it is implementing is a failure mode this repository
+> had not previously named** — the citation was accurate when written and was
+> broken by work done in obedience to it. `Backtesting.md:39` requires it, `Operational_Constraints.md:5`
+requires accurate records, and Law VII requires Belay to keep its own copy rather
+than rely on someone else's system to remember.
+
+**2. Market data and execution are two contracts, not one, and no shared base
+class joins them.** Three independent reasons, the third constitutional:
+
+- **Direction, and the cost of being wrong.** Market data is a read. An execution
+  adapter writes to the world and the write moves money irreversibly. An
+  interface designed for reads has no vocabulary for idempotency, partial fills,
+  cancel-in-flight, or a halt path.
+- **Opposite failure policies.** Retrying is *how* a data fetch recovers from a
+  dropped connection. A retried order submit doubles a position. A shared base
+  class must pick one default and be wrong for the other.
+- **Law VI at `Immutable_Laws.md:45`** — "Research and execution remain
+  independent." Market data feeds research; the broker *is* execution. A shared
+  abstraction is a shared dependency across a boundary the constitution declares
+  independent.
+
+  > **Corrected during this ADR's own verification pass, marked rather than
+  > quietly rewritten.** The draft read "Law VII at `Immutable_Laws.md:45`". The
+  > line number is right and the law number was wrong — `Immutable_Laws.md:43` is
+  > `## Law VI`; Law VII is at `:49-51` and is the retention law rule 1 rests on.
+  > **The draft therefore cited two different laws by one name and contradicted
+  > its own Rejected Alternatives section**, which had it right. Third ADR
+  > running in which the verification pass caught a citation defect in a draft
+  > written by someone who had opened every file.
+
+Note what rules 1 and 2 do together: **the obligation is shared and the contract
+is not.** "A swappable adapter" is two decisions wearing one name.
+
+**3. A fetched series is not an Artifact. The fetch record is, and it carries the
+series' fingerprint rather than its contents.**
+
+This is the structural ruling, and it is forced by the existing vocabulary rather
+than chosen. `Knowledge/Identifiers.md:27-57` defines eight prefixes — STRAT,
+EXP, RS, REV, RPT, REGIME, WF, DOC — and **none names market data**.
+`ArtifactType` carries nine members and none names it either. A price series has
+no honest identity under the vocabulary Belay has, and manufacturing one means
+editing `Knowledge/`, which widens the open finding that those two vocabularies
+already disagree (`docs/HANDOFF.md` finding 4).
+
+The resolution is to notice that **the data is an input, not evidence.** What Law
+VII requires Belay to retain is the knowledge of *what was obtained, from where,
+when, covering what, and what it cannot be trusted to mean* — a record, not a
+table of numbers. So:
+
+- The fetch record is an `Artifact` of type `REPORT`, which holds the `RPT`
+  prefix. ADR-010's principle applies unchanged: the type describes what the
+  artifact **is**, and this one reports what was obtained.
+- It carries **`deliverable = None`**. Verified by opening
+  `framework/artifacts/artifact.py:29-36`, whose comment already states the
+  needed meaning — *"None means 'not a documented deliverable' — a real state,
+  not an unset field."* No governance document declares a data fetch among any
+  department's deliverables, and ADR-010 rule 4 scopes that vocabulary to what
+  the documents declare. **No enum member is added and ADR-010 is untouched.**
+- It carries a **content hash of the bytes returned**, inside the integrity hash.
+
+The hash is what makes the arrangement work. Reproducibility becomes checkable
+rather than asserted — re-fetch, hash, compare. And if the data store is lost,
+the artifacts still record what was fetched and what it hashed to, which is the
+institutional knowledge Law VII protects as distinct from the bytes.
+
+**4. The series is stored, versioned, never overwritten — and kept out of git.**
+
+`Knowledge/Versioning.md:23-27` is load-bearing here and has never been cited for
+it. **Data vendors restate history.** Splits, dividend adjustments and corrected
+prints mean the same ticker over the same dates can return different numbers next
+month. That is normal vendor behaviour, not a fault. Two consequences:
+
+- **A backtest run against a series nobody kept is not reproducible**, and its
+  irreproducibility is silent. Law VII and `Versioning.md:25` — "No version is
+  overwritten" — therefore require the series to be kept.
+- **A re-fetch that differs is a new version, not a correction.** It gets its own
+  fetch record and both remain, because `Versioning.md:27` requires historical
+  versions to remain searchable, and because *which* restatement a result was
+  computed against is part of the result.
+
+**Out of git, and that is a ruling rather than an omission.** Three reasons, the
+third deciding:
+
+- Git retains every version of every file permanently by design. A
+  daily-refreshed series makes repository growth unbounded with no prunable path,
+  and append-only history means the mistake cannot be undone later.
+- A vendor licence may restrict retention independently of visibility. Removing
+  data from a git history is effectively impossible; removing a directory is not.
+- **Rule 3 already covers the integrity requirement.** The artifact carries the
+  content hash, so the record of what was fetched is signed and permanent whether
+  or not the bytes are under version control. Committing them adds no guarantee
+  rule 3 does not already provide.
+
+The store is a versioned directory, and the `.gitignore` entry is the enforcement
+rather than a convention someone has to remember.
+
+**5. Survivorship is a Stage 2 acceptance criterion in two halves, and the answer
+is a fixed constant on every artifact derived from the source.**
+
+Two different questions, and a source can pass one and fail the other:
+
+- **Delisted prices** — can the source return a history for an instrument that no
+  longer trades, if you already know to ask for it?
+- **Delisted universe membership** — does the source know which instruments were
+  in a universe *on a past date*, as opposed to which are in it today?
+
+**The second is the one that causes the damage**, and
+`Research/UniverseDiscovery.md` makes Belay universe-driven by design. So the
+criterion is not "does the source have delisted data" but **"can the adapter
+answer both questions, and is the answer recorded rather than assumed?"**
+
+**`constitution/Operational_Constraints.md:29` makes this constitutional** — a
+universe drawn from a survivor-only source has been selected on the outcome under
+prediction, so it was not discovered through evidence in the sense that line
+means. `Research/UniverseDiscovery.md:25` requires Belay to "Evaluate
+survivability", which cannot be done honestly from a dataset that has already
+removed everything which failed to survive.
+
+The disclosure follows ADR-012 rule 7's shape exactly: a **fixed module
+constant**, not a caller-supplied string, naming the bias **and its direction**.
+The direction is worse than the usual single-sided case — survivorship **inflates
+every return measure and deflates drawdown and tail measures simultaneously**, so
+it flatters the return and understates the risk in one breath. ADR-012 rule 10
+already settled the response to a bias that cannot be corrected: refuse to produce
+a number that "looks adjusted and is not", and disclose instead.
+
+**6. The contract expresses equities and options both. Neither gets inherent
+preference, and implementation order is not preference.**
+
+`constitution/Operational_Constraints.md:25-27` decides it: "No asset class,
+security, or investment methodology possesses inherent preference." **A contract
+that can only express an equity price series gives equities inherent preference by
+construction**, because a strategy needing option data could not be expressed at
+all.
+
+**They are two shapes, not one shape with a flag.** A price series is one
+instrument over time. An option chain is, for each date and underlying, many
+contracts each with a strike, an expiry, a right, and its own quotes and open
+interest. One is a sequence; the other is a sequence of sets.
+
+**And survivorship means something different for an option, which is the part
+most likely to be got wrong.** An option **expires by design** — its
+disappearance is the instrument working correctly, not an instrument failing. So
+the two halves restate rather than transfer:
+
+- Does the source retain chains for **expired** contracts, or only live ones?
+- Does it know the **underlying's** universe membership historically?
+
+The same `Disclosure` machinery records both. **Nothing about rule 5's mechanism
+changes; only the questions it asks do.**
+
+Implementation order is equity daily bars first, on cost and coverage rather than
+on preference.
+
+> **This paragraph originally read "Free sources do not carry historical option
+> chains, so `Research/UniverseDiscovery.md:17`'s 'Evaluate option market quality'
+> is unsatisfiable until that is bought." That is false, and it was asserted from
+> general knowledge rather than checked** — flagged by the independent
+> verification pass as an unsourced external claim, and independently falsified by
+> going and looking. It is corrected rather than deleted because **an ADR whose
+> rules 5 and 9 forbid a vendor from asserting coverage it has not established
+> must not do the same thing itself.**
+
+Checked: **`post-no-preference/options` on DoltHub** is a free, daily-updated,
+version-controlled option chain database carrying bids, asks, implied volatilities
+and greeks — roughly 2,098 option symbols, 2019 to present, about 6 GB as CSV. So
+option data is *reachable* at a zero budget.
+
+**Two properties remain unestablished, and rule 9 governs them exactly as it
+governs any vendor:**
+
+- **Whether expired contracts are retained.** This is rule 6's first survivorship
+  half, and it is documented nowhere located. An option **expires by design**, so
+  a source keeping only live chains is not obviously defective — it is simply
+  unusable for a backtest, and the difference must be established rather than
+  hoped for.
+- **The licence.** DoltHub states most of its data is Creative Commons; that was
+  not confirmed for this database, and rule 4's storage ruling depends on it.
+
+**Two facts also constrain what the data can support, and both are disclosures
+rather than blockers.** History begins in 2019, which is short: ADR-012 rule 8's
+sample-adequacy question decides whether a given effect can be concluded from it,
+and that is a per-strategy answer rather than a property of the source. And the
+symbol coverage is a subset rather than the market.
+
+**A free path exists for the harder half too.** Point-in-time index membership can
+be approximated from a tracking ETF's monthly holdings disclosures, published free
+back to 2006. **It is survivorship-*reduced*, not survivorship-free** — the ETF
+commits only to holding "at least 90%" of assets in index securities, some
+companies drop out for missing price data, and ticker renames are mapped by hand.
+**That is a legitimate answer under rule 9 and an honest artifact under ADR-012
+rule 10**, where a universe silently built from today's constituents is neither.
+
+**7. `sample_period` becomes two dates, not prose. Now, before any artifact
+carrying the prose form is signed.**
+
+`Disclosure.sample_period` at `framework/metrics/reporting.py:132` (`:59` when
+this was written — see rule 1's note) was a free-form `str` validated only as
+non-blank, so "last five years" satisfied it. Three things now depend on it being
+machine-readable:
+
+- **Tax years are calendar-bounded** (`docs/EndState.md:546-547`) **and the
+  taxable branch is live** (`docs/OwnerDecisions.md` Part 4 question 2, not row
+  6). Deriving a tax year by parsing prose is the defect
+  `docs/DocumentStandard.md:42` exists to prevent — "index every document
+  deterministically without parsing prose."
+
+  > **Corrected by the independent verification pass, and this one is the
+  > embarrassing kind.** The bullet originally attributed both halves to
+  > `docs/OwnerDecisions.md` row 6, which contains neither, and was near-verbatim
+  > `docs/EndState.md:546-550` — **carried from a prior document and
+  > re-attributed, which is precisely what this ADR's Status block claims it did
+  > not do.** The claim is true; the sourcing was not. Same class as the Law
+  > VI/VII defect, and the reason the Status block's error rate is now stated with
+  > a denominator rather than a boast.
+- **Rule 4's versioning must compare coverage** between two fetches of the same
+  instrument. Two prose strings cannot be compared.
+- **Reproducibility.** A backtest that cannot state its exact window cannot be
+  re-run.
+
+**The cost of doing this now is zero, and that was verified rather than assumed.**
+A search for stored artifacts across the repository returns none, so no signature
+exists to break. After Stage 2 signs its first artifact this becomes a migration
+of permanent append-only records, which `Versioning.md:25` forbids rewriting.
+
+**8. A fetch record carries no evidence grade, and this changes nothing about
+metrics.**
+
+`constitution/Evidence_Standards.md` grades how well a **strategy** has been
+tested: live, paper, simulation, hypothesis. A price observation is on none of
+those axes, and grading it C — "historical simulation" — would assert that
+something was simulated when nothing was.
+
+**The machinery already produces the right answer and needs no change.**
+`ArtifactFactory.create` derives `evidence_level` via `strongest_evidence_level`,
+which returns `None` for an artifact carrying no `EvidenceRecord`s, and
+`framework/artifacts/artifact.py:38-44` states the reasoning — *"an unevidenced
+artifact has no grade, and inventing D for it would make 'unevidenced' read as
+'hypothesis'."* A fetch record carries no evidence records, so it carries no
+grade, and that is honest rather than incomplete.
+
+**Metrics computed from the series stay Level C, exactly as today.** That grade
+was always about the simulation, never about the prices. Nothing in
+`framework/metrics/` changes.
+
+**No new evidence level is proposed.** `Evidence_Standards.md` is in the frozen
+governance layer, and rule 3 means Belay does not need a grade for a thing it has
+ruled is not evidence. The gap is recorded as a finding instead of patched.
+
+**9. A source that cannot state its survivorship properties is refused, not
+assumed clean.** The adapter requires both answers at construction. "Unknown" is
+a legitimate answer and must be *stated* as unknown, which then travels into
+`known_limitations` — the same shape as ADR-011 rule 5 and ADR-012 rule 9, where
+unusable input is refused rather than answered. A source silently assumed
+survivor-free is the failure this rule set exists to prevent, and it fails in the
+direction that flatters.
+
+**10. A fetch record is not a `Market Snapshot`.**
+`DeliverableType.MARKET_SNAPSHOT` exists and is tempting. It is a daily *workflow*
+deliverable describing the state of the market, and a ten-year historical
+backfill is not a snapshot of anything. Recorded because the wrong mapping is
+easy, cheap to make, and permanent once signed. Rule 3's `deliverable = None` is
+the answer.
+
+---
+
+## Consequences
+
+Positive:
+
+- Stage 2 is unblocked, and the thing blocking it is ruled rather than defaulted
+- one provenance obligation covers market data, brokers and anything else that
+  crosses in, so the generalisation that is real is made once
+- the two contracts that must not be merged are kept apart on a constitutional
+  ground rather than an aesthetic one
+- no new identifier prefix, no new `ArtifactType`, no new `DeliverableType`, no
+  new governance document — ADR-002's freeze and ADR-010's vocabulary are both
+  untouched and open finding 4 is not widened
+- reproducibility becomes checkable rather than asserted, via rule 3's hash
+- a free data source becomes usable *honestly*, because rule 5 makes the
+  resulting bias a signed, undeletable property of every number derived from it
+- `sample_period` is fixed at the only moment it is free to fix
+
+Negative:
+
+- **universe-driven strategies cannot be honestly evaluated at a zero budget**,
+  and rule 5 makes that visible on every artifact rather than letting it pass.
+  Correct, and still a real limit on what Belay can conclude
+- **option-based strategies are blocked on a data purchase**, and rule 6 names it
+  rather than deferring the discovery to Stage 3
+- rule 7 changes `Disclosure`, which is inside the integrity hash — free today,
+  and only today
+- rule 3 means the price data is not itself governed by the artifact lifecycle;
+  its integrity rests on a hash rather than on the store being trustworthy
+- rule 4's store grows without bound, and this ADR does not rule a retention
+  policy because Law VII points away from one and no document sets a limit
+
+---
+
+## Rejected Alternatives
+
+**One adapter interface covering both market data and execution.**
+Reason: rule 2. Their correct retry defaults are opposites, and Law VI puts them
+on opposite sides of a boundary the constitution declares independent. The economy
+is apparent rather than real.
+
+**Making the price series itself an Artifact.**
+Reason: it has no honest identifier and no honest type under
+`Knowledge/Identifiers.md` and `ArtifactType`, and manufacturing one widens open
+finding 4. It would also put a large, restatement-prone dataset inside a contract
+designed for immutable signed records.
+
+**Committing the fetched series now that the Atlas archive is private.**
+Reason: permitted is not wise. Rule 4's third argument decides it — the artifact
+already carries the content hash, so committing the bytes adds no guarantee while
+making repository growth unbounded and irreversible.
+
+**Adding a fifth evidence level for observed data.**
+Reason: `Evidence_Standards.md` is in the frozen governance layer, and rule 3
+means Belay does not need a grade for a thing it has ruled is not evidence. The
+gap is recorded as a finding instead.
+
+**Equities-only for Stage 2, with options deferred to a later contract.**
+Reason: `constitution/Operational_Constraints.md:25-27`. An equities-only contract
+gives equities inherent preference by construction. Deferring the
+*implementation* is fine and is what rule 6 does; deferring the *expressibility*
+is not.
+
+**Writing one hard-coded fetcher and calling Stage 2 done.**
+Reason: ADR-011's central holding. It does not avoid the ruling, it makes it
+silently — that there is only ever one source, and that its survivorship
+properties are whatever they happen to be.
+
+---
+
+## Required Follow-Up (ADR-013)
+
+- ~~ratify or amend~~ — **done 2026-07-31, Accepted as corrected, no rule
+  amended.** Implementation deliberately deferred to a later session
+- ~~implement; tests written first and run against unchanged code~~ — **done
+  2026-08-01, all ten rules.** `framework/data/` holds the contract, survivorship
+  disclosure, fetch record, versioned store and two adapters. Every test was
+  written first and run against unchanged code; each failed at import before the
+  module it names existed. Suite 388 → 520.
+
+  > **Rule 7 could not be implemented as written and the workaround is a
+  > finding.** Splitting `sample_period` into two fields turns the suite red:
+  > `tests/test_governance_conformance.py` parses `Validation/Backtesting.md` and
+  > holds `Disclosure`'s field **names** to the document. The rule changes the
+  > field's **type** instead — `sample_period: SamplePeriod` — and the dates are
+  > rendered into `content` as encoded ISO strings, because `canonical_digest`'s
+  > docstring asks callers not to rely on its `default=str` backstop. The rule's
+  > three stated purposes are all met. Cost was zero as predicted:
+  > `git ls-files "*.yaml"` still returns nothing
+- ~~a second reader re-opens every file cited above and checks each claim at the
+  stated line, before implementation~~ — **done, 2026-07-31. 71 claims checked,
+  11 wrong or questionable, 4 of them defect-grade.** All four are corrected and
+  marked inline above. See the Status block for the scorecard and for why the
+  author's own pass is not a substitute
+- ~~establish, before implementation rather than during it, whether the chosen
+  option-data source retains expired contracts, and under what licence~~ —
+  **both done 2026-08-01, established against the source rather than from a
+  document.** DoltHub's web page is JavaScript-rendered and yielded nothing, so
+  both were answered through its SQL API.
+
+  **Licence: Creative Commons Attribution-ShareAlike 4.0 International**, from
+  the repository's own `LICENSE.md` via `SELECT doc_name, doc_text FROM
+  dolt_docs`. Section 4 grants the right to "extract, reuse, reproduce, and Share
+  all or a substantial portion of the contents of the database", so **rule 4's
+  storage ruling rests on unbounded repository growth alone rather than on a
+  licence bar**. ShareAlike binds only on *sharing* adapted material, which a
+  private research repository does not do; attribution attaches regardless and is
+  carried in the adapter's `name`, which lands inside the integrity hash.
+
+  **Expired contracts are retained**, established empirically rather than from
+  prose. `SELECT date, expiration, act_symbol FROM option_chain ORDER BY date ASC
+  LIMIT 3` returns a contract observed 2019-02-09 expiring 2019-02-15, still
+  present in a database whose newest row is 2026-07-31; a full chain across
+  strikes and both rights for an expiry of 2019-03-15, observed 2019-03-02, is
+  also still queryable. A live-chains-only source would have dropped these in
+  2019. **Options are therefore backtestable at a zero budget**, and rule 6's
+  first survivorship half is answered `Retained` for this source
+
+- **NEW, and it belongs here rather than in a finding alone: the *equity* source
+  is survivor-only in its prices.** Rule 9 applied to Belay's own choice a second
+  time, and the answer is the reverse of the expected shape. `SELECT date,
+  act_symbol, close FROM ohlcv WHERE act_symbol='COH' AND date BETWEEN
+  '2015-01-05' AND '2015-01-16'` returns zero rows, while the same query for AAPL
+  over 2017-10-16..2017-10-26 returns three — Coach, Inc. traded actively until
+  October 2017 and has no history in the price table at all. Meanwhile `SELECT
+  act_symbol, security_name, last_seen FROM symbol ORDER BY last_seen ASC`
+  returns COH with `last_seen` 2017-10-26, in a table of 23,827 rows against
+  roughly 6,000 currently-listed US stocks. **The source fails the
+  delisted-prices half and partly passes the delisted-universe half** — precisely
+  the "a source can pass one and fail the other" case rule 5 sets out, arriving
+  in the direction nobody predicted. Recorded as `SURVIVORS_ONLY` / `PARTIAL` in
+  `framework/data/dolthub.py`, which under rule 9 is an established answer rather
+  than an unknown one
+- ~~record the `Evidence_Standards.md` gap as a finding~~ — done in the same
+  commit as this ADR; `docs/HANDOFF.md` finding 12
+- ~~record the option-data blocker as a finding~~ — done, and then **rewritten**,
+  because its premise was false: option data is reachable at a zero budget. See
+  rule 6's correction and `docs/HANDOFF.md` finding 13
+- ~~a conformance test holding the survivorship disclosure constants to ADR-012
+  rule 7's shape~~ — **done.** `tests/data/test_survivorship.py` asserts
+  `inflates`, `deflates` and `simultaneous` on the constant and on the artifact's
+  `known_limitations`, mirroring ADR-012's assertion of "optimistic". It also
+  asserts the converse — a clean source must *not* carry the warning, or the
+  warning stops distinguishing the sources it exists to distinguish
+- ~~`.gitignore` gains the data store path, as rule 4's enforcement~~ — **done,
+  before the first byte landed.** `data/market/`, and
+  `test_the_default_store_root_is_ignored_by_git` asks `git check-ignore` itself
+  rather than reading `.gitignore` for a string, because a rule in the wrong
+  section or shadowed by a later negation would read correctly and behave wrongly
+- ~~`docs/ROADMAP.md` Stage 2 updated to cite this ADR once ratified~~ — **done**,
+  and updated again on implementation
+- **NEW: the hosted SQL API cannot serve a backfill, and the fix is a transport
+  rather than a ruling.** Measured 2026-08-01: a novel month-sized query takes
+  35–55s and frequently exceeds the server's ~54s deadline (3/3 attempts at three
+  months, 2/2 at one novel month); the same month in weekly chunks succeeded but
+  cost 111 seconds. Thirteen years is roughly 6.6 hours per symbol. The adapter
+  chunks on calendar months — boundaries derived from the requested window alone,
+  so the content hash stays comparable, which a tunable chunk size would have
+  broken. **Dolt's intended path is `dolt clone`**, and the adapter's transport is
+  already an injected `Callable[[str], bytes]`, so this is a second
+  implementation of an existing seam. `docs/HANDOFF.md` finding 14. **No rule of
+  this ADR is affected**
+
+### Deliberately not settled here
+
+**Where the halt lives.** Removed from scope on the reasoning in the Context
+section. `docs/HANDOFF.md` finding 11.
+
+**A retention policy for the data store.** Rule 4 grows it without bound. Law VII
+points away from deletion and no document sets a limit, so inventing one here
+would be the failure ADR-011 names.
+
+**Which vendor is implemented first.** A licence and coverage question to settle
+against a current price list at implementation time, not a doctrine question.
+Rule 2 makes it reversible, which is the point of ruling the contract first.
+
+> **Settled 2026-08-01: DoltHub `post-no-preference/stocks`, free, CC BY-SA 4.0,
+> survivor-only in its prices and disclosed as such.** A second adapter,
+> `framework/data/ibkr.py`, was written alongside it to test whether the contract
+> is genuinely a contract rather than one implementation wearing a general name;
+> it required no change to `MarketDataSource` despite a structurally different
+> wire format. **It has never been run against the live IBKR API** and records
+> that inside its own survivorship basis, so the admission travels onto every
+> artifact derived from it.
+>
+> **IBKR was considered and does not solve the problem.** Its own documentation
+> states "the API always requires Level 1 streaming real time data to return
+> historical data" — so historical data is not included with an account — and
+> "if data is not available for a specific instrument, data type, or period
+> within a TWS chart it will also not be available from the API", where a
+> delisted instrument has no chart. **It costs money and buys the same
+> survivorship limitation.** The fee is waivable above a monthly commission
+> threshold, which a paper-first system generating no commissions cannot reach.
+>
+> **Using the broker as the data source would not violate rule 2**, and it is
+> worth stating because the opposite reading is natural. Rule 2 forbids a shared
+> *abstraction* — one interface for reads and writes, which must pick one retry
+> default and be wrong for the other. The vendor behind each contract is not what
+> the rule is about. `MarketDataSource` carries no order vocabulary and
+> `test_the_contract_has_no_execution_vocabulary` asserts it never acquires one.
+
+**When survivorship-free data must be bought, and the distinction that decides
+it.** Recorded here because the ADR's Consequences section states the limit
+without stating the trigger. **Survivorship bias is not "this data is wrong"; it
+is "selecting from this data is wrong".** A backtest of an instrument named in
+advance is unbiased for that instrument, which survived. The bias enters when
+instruments are *chosen* by screening a survivor-only universe, because
+everything that failed was removed before anyone looked. So the free source is
+adequate for named-instrument work and inadequate the moment Belay screens —
+which rule 6's own scoping already defers to Stage 3. **The trigger is the first
+time Belay selects instruments rather than being handed them**, and nothing
+before that point justifies the purchase.
+
+---
+
+## ADR-014: Where Artifacts Live — Persistence, What Git Tracks, And What A `.gitignore` May Claim
+
+Status:
+**Accepted and implemented, 2026-08-02, in all nine rules.** Ratified the same
+day by the repository owner as drafted; no rule was amended on ratification.
+
+> **This block read "Accepted. Not implemented in any part." for one commit after
+> implementation landed** — the same defect ADR-013's Status block carries a note
+> about, in the ADR that cites that note. Found by the independent pass, not by
+> the implementer.
+
+**The verification pass this ADR requires ran AFTER implementation, not before,
+and that breaches its own Required Follow-Up.** The item below reads "before
+implementation"; `docs/HANDOFF.md`'s START HERE, written by the same author in the
+same session, placed it after step 6, and the implementer followed the weaker of
+the two. Two governance documents gave opposite orderings for one mandatory step.
+**The cost is not hypothetical: the pass found 19 defect-grade errors across 93
+claims, eight of them in code already committed**, and rule 6's one-way door —
+signed content, free to change only while nothing is stored — had already closed.
+Recorded rather than quietly fixed, because the sequencing is the whole reason
+that follow-up item exists. Drafted the same day in
+response to F-002 (`reports/review/2026-08-01-review.md`). **No code, no
+`.gitignore` edit and no directory was created by the session that wrote or
+ratified this**, deliberately: F-002 is a ruling about where artifacts live and
+what a tracked file may assert, and wiring a persistence layer first would settle
+it by accident. Implementation is deferred to a later session, on the same
+separation ADR-013 used.
+
+**Ratification does not make the rules true of the repository.** Every rule below
+describes a state Belay is not yet in. `.gitignore:46-49` still carries the false
+claim rule 9 refuses, `fetch_and_record` still returns a record nobody stores, and
+the AAPL bytes still have none — until the Required Follow-Up is worked through in
+its stated order.
+
+**Read this before building on it: it has had no independent verification pass.**
+Every ADR in this file that has had one lost claims to it — ADR-011 four, ADR-012
+one in twenty, ADR-013 eleven of seventy-one with four defect-grade, and in each
+case the author's own pass caught at most one. This draft's citations were opened
+and read at the stated line in the drafting session, which is exactly what the
+authors of those three drafts could also have said.
+
+**Three findings opened while drafting this**, before any of it was ratified.
+They are in `docs/HANDOFF.md` and each is a fact about the repository as
+committed rather than a consequence of this ruling: the fetch record cannot name
+the bytes it records; the identifier space cannot fund one record per fetch; and
+an identifier reused at a new version is silently mis-filed. **The second of
+those blocks rule 4** and is called out in the Required Follow-Up rather than
+ruled here.
+
+Date:
+2026-08-02
+
+---
+
+## Context
+
+**F-002 in one sentence: `fetch_and_record` builds the signed record ADR-013 rule
+3 requires, returns it, and nothing in Belay has ever written one to disk.**
+`framework/data/fetch_record.py:203` returns `Fetch(...)`; `git ls-files` returns
+no artifact of any type; `ArtifactRepository` is constructed nowhere outside its
+own module and the test suite; and the only production caller of
+`fetch_and_record` is `scripts/verify_clone.py:67`, which builds its store in
+`tempfile.mkdtemp` (`:61`), `rmtree`s it (`:177`) and drops the record.
+
+**What that falsifies is not a comment, it is an argument.** `.gitignore:46-49`
+gives the reason the fetched bytes are not committed: "Nothing is lost by this.
+Rule 3 already covers the integrity requirement: the fetch record artifact
+carries the content hash, so the record of what was obtained is signed and
+permanent whether or not the bytes are under version control."
+`framework/data/store.py:21-23` makes the same argument from the other side, and
+ADR-013 rule 4's third bullet — the one its own text calls "deciding" — is that
+argument. The record was neither signed into anything durable nor permanent, so
+the third leg of a ruling in this file rested on a fact that has never been true.
+
+**This is a structural question and not a missing call to `save()`.** Answering
+it requires deciding where artifacts live, which of them git tracks, whether
+persistence belongs to the fetch or to its caller, what becomes of the one series
+Belay already holds, and what a `.gitignore` comment is allowed to assert about a
+subsystem it does not control. Each of those has a consequence that is permanent
+once a signed record lands, which is why the ruling comes first.
+
+### Nothing in this repository says where an artifact goes
+
+Checked rather than assumed, because it decides how rule 1 has to be worded.
+`Knowledge/` was read for a storage location — `ArchiveManager.md`,
+`ArtifactLifecycle.md`, `Librarian.md`, `MemoryIndex.md`, `Search.md`,
+`KnowledgeGraph.md`, `Schema.md`, `Versioning.md`, `Identifiers.md` — together
+with `docs/Architecture.md` and `AGENTS.md`. **They specify identity, indexing,
+ordering, retention and lifecycle, and not one of them names a directory.**
+`Knowledge/MemoryIndex.md` says every artifact is indexed by ten fields;
+`Knowledge/Search.md` says retrieval is through metadata. Both describe a
+searchable store without saying where it is.
+
+`ArtifactRepository.__init__` (`framework/artifacts/repository.py:25-27`) takes
+`root` as a required argument with no default, so every caller has always chosen
+one and no two callers had to agree. Compare `framework/data/store.py:35-39`,
+where `STORE_ROOT = Path("data") / "market"` is a module constant with the reason
+written beside it — "so the store travels with a clone while its contents do
+not". The data store answered this question in its first commit. The artifact
+repository never has.
+
+**So rule 1 is a choice, and it is labelled as one.** `docs/EndState.md` names
+extending a document rather than applying one as "the failure this repository has
+now recorded three times", and inventing a location and then citing
+`Knowledge/Librarian.md` for it would be that failure. What the documents supply
+is the *constraints* — permanent, never deleted, searchable, indexed by
+identifier — and those decide the shape of the answer without deciding the path.
+
+### What the governing documents do require
+
+Read in full for this ADR at the lines given:
+
+- **`constitution/Governance.md:27`** — "Institutional memory is mandatory."
+- **`constitution/Immutable_Laws.md:51`** (Law VII) — "Institutional knowledge
+  shall never be intentionally discarded."
+- **`constitution/Operational_Constraints.md:5`** — "Belay shall maintain
+  accurate records."
+- **`constitution/Operational_Constraints.md:9-17`** — "Belay shall distinguish:
+  Facts / Assumptions / Predictions / Opinions."
+- **`Knowledge/ArtifactLifecycle.md:27`**, **`:29`** — "No artifact is deleted.
+  Artifacts become historical evidence."
+- **`Knowledge/ArchiveManager.md:7`**, **`:11`** — "Archives are immutable.
+  Belay never deletes evidence."
+- **`Knowledge/Identifiers.md:3-5`** — "Identifiers are permanent. They are never
+  reused."
+- **`Knowledge/Versioning.md:23-27`** — "Knowledge records every version. No
+  version is overwritten. Historical versions remain searchable."
+
+**Law VII does not cleanly reach F-002 and the review said so.** Law VII forbids
+knowledge being *intentionally* discarded, and no persistence layer was ever
+wired up, so this is a gap rather than a decision. `Governance.md:27` is
+unambiguous and carries the breach on its own. That distinction is kept here
+because it also decides rule 2: mandatory institutional memory is a statement
+about what must survive the machine, not about what must be hashed.
+
+### Four things measured for this draft rather than argued
+
+Every figure below was produced by running the thing, against the repository as
+committed. They are here because rules 2, 5 and 8 turn on magnitudes, and this
+file's own ADR-013 rule 6 records what happens when a size claim is asserted from
+general knowledge instead of checked.
+
+**1. A fetch record is 2,869 bytes of YAML**, built through `fetch_record()` from
+`DoltHubStocksSource` and dumped through `ArtifactSerializer`. **1,680 of those
+bytes are the survivorship `known_limitations` constant**, identical in every
+record that source will ever produce.
+
+> **Both figures were wrong when this was drafted and both are corrected here.**
+> The draft said 2,732 and 1,535. 2,732 reproduces only with a whole-second
+> timestamp — `utc_now()` carries microseconds, which adds 7 bytes to each of
+> `created` and `updated` — and the draft then projected growth for the *post*-
+> rule-6 world using a *pre*-rule-6 measurement, while rule 6 is in this same ADR
+> and adds three fields. 1,535 was the Python string length rather than its
+> serialised size; escaped and folded into YAML the same constant occupies 1,680.
+> **2,869 is the record that actually shipped**, measured as the git blob of
+> `artifacts/RPT-0001/1.0.0.yaml`. Every ratio below is recomputed against it and
+> every one of them moved. It cannot be deduplicated: ADR-013 rule 5
+exists so the caveat travels *on* the artifact and inside its signature, and a
+record pointing at a shared copy of its own disclosure would be the substitution
+that rule refuses.
+
+**2. The one series Belay holds is 4,462 bytes.**
+`data/market/dolthub-stocks/AAPL/0001-a7dbcaf3fb6aba2d.bin`, 28 bars, and its
+full SHA256 is `a7dbcaf3fb6aba2dc179ca482986bdc7e8887f609c0ca3a3cc25a73c145272a6`
+— the filename carries the first 16 hex characters of it, as
+`framework/data/store.py:41-49` specifies. Its record is 64.3% of its size (61% in the draft, against the pre-rule-6 record).
+
+**3. The payload is two JSON documents joined by a newline, and the envelope
+costs 633 bytes each.** (The draft said "concatenated", and its two document
+sizes sum to 4,461 against a 4,462-byte file; the missing byte is the separator.) The adapter chunks on calendar months (ADR-013's Required Follow-Up
+on the transport ceiling), so the stored bytes for 2024-01-02 to 2024-02-09 are
+one document of 3,028 bytes carrying 21 rows and one of 1,433 carrying 7. Rows
+cost about 114 bytes each.
+
+**4. Therefore, at the cadence Belay has actually chosen, the record is larger
+than the data it records.** `docs/OwnerDecisions.md:733` settles that positions
+are held days to months and `:737` that Stage 2 fetches daily bars, so the
+steady-state fetch is one trading day: roughly **747 bytes** of payload (one envelope, one
+row) against a **2,869-byte** record. **The tracked half is 3.84 times the size of
+the ignored half** (3.7 in the draft). For a thirteen-year backfill the ratio inverts completely —
+about 472 KB of payload against one 2,869-byte record — and both facts are true
+at once, which is precisely why `.gitignore:46-49`'s "nothing is lost by this"
+cannot be repaired by rewording it. It compares the wrong two quantities.
+
+---
+
+## Decision
+
+**1. Artifacts are persisted under one root, `artifacts/` at the repository root,
+and the root is a module constant rather than a caller's argument.**
+
+The constant is what makes the question answerable by anything other than a
+person. `framework/data/store.py:35-39` already carries the pattern and the
+reason — a relative module constant, so the store travels with a clone while its
+contents do not, where "an absolute path would make the store machine-specific
+and silently empty everywhere else". Every word of that applies here.
+`ArtifactRepository(root)` keeps its argument, because tests and diagnostics must
+be able to write somewhere else; what changes is that there is a default and it
+is named in code.
+
+**Not under `data/`.** ADR-013 rule 3 rules that the fetched series is an *input*
+and the record is not; `data/` holds two trees that are both inputs and both
+ignored (`.gitignore:53`, `:69`). Filing the records beside them would put the
+one permanent thing inside the directory whose two entries exist to say "this is
+not permanent".
+
+**The layout is the one `ArtifactRepository` already implements** —
+`{root}/{identifier}/{version}.yaml`, from `repository.py:29-37` — so this rule
+adds a location and changes no behaviour.
+
+**2. Every artifact under that root is tracked by git, and `.gitignore` gains no
+entry for it.**
+
+`Governance.md:27` makes institutional memory mandatory and a file on one machine
+is not institutional memory — that is the whole of F-002's failure paragraph. The
+asymmetry with ADR-013 rule 4 is deliberate and rests on three differences that
+are properties of the things themselves rather than preferences:
+
+- **Size.** Measured above. A record is kilobytes where a backfill is hundreds of
+  kilobytes per symbol and a clone is gigabytes.
+- **Reproducibility, and it runs the opposite way.** ADR-013 rule 4 keeps the
+  bytes out of git partly because they can be re-obtained. **A fetch cannot.** The
+  bytes a vendor returned on a date, and the fact that Belay asked on that date,
+  are not re-observable once the vendor restates — which is the same premise rule
+  4 uses to argue the series must be *versioned*, arriving here as an argument
+  that the record must be *committed*.
+- **Licence.** `.gitignore:42-43` names vendor retention terms as a reason to
+  keep the bytes prunable. A record carries a hash and a coverage window, not the
+  vendor's data.
+
+**The repository already distinguishes these two classes and this rule copies
+it.** `.gitignore:34` ignores `reports/generated/`, which the dashboard rebuilds
+on every run, while `reports/review/2026-08-01-review.md` is tracked because it is
+a record. Derived output is ignored; records are committed.
+
+**3. The root is the boundary between an experiment and a record, and nothing
+enforces it but the choice of root.**
+
+A run that does not mean to record permanently passes its own root and gets a
+temporary one. `scripts/verify_clone.py` already does exactly this
+(`tempfile.mkdtemp` at `:61`, `rmtree` at `:177`) and **must keep doing it after
+rule 4 lands** — it hardcodes the identifier `RPT-9001` at `:68`, and a
+diagnostic that wrote into the tracked root would mint a permanent institutional
+record every time somebody checked the clone still worked. Stated as a rule
+because the natural reading of rule 4 is that everything now persists, and that
+reading is wrong.
+
+**4. `fetch_and_record` persists the record. The repository is a required
+argument, exactly as the store already is.**
+
+**The argument is the function's own docstring, applied to the half it left
+out.** `framework/data/fetch_record.py:159-172` explains why fetching and storing
+are one call: "These are one act, and separating them is how the failure goes
+silent" — because until 2026-08-01 `SeriesStore` had no caller, so "every signed
+record carried a `content_hash` pointing at bytes nobody kept". F-002 is the same
+sentence with the two halves swapped: every stored byte belongs to a fetch nobody
+recorded. The fix that closed the first one is the fix for the second.
+
+**The order is forced and is not a preference.** Fetch, store the bytes, sign the
+record over their hash, save the record. The record cannot precede the payload it
+hashes. The gap between the two writes is where `docs/HANDOFF.md`'s "A Fetch
+Stores Its Bytes Before Discovering The Series Is Empty" already lives, and rule 7
+names the check that makes such a gap visible rather than silent.
+
+**Rejected, and it is the review's own proposal:** a thin `scripts/fetch.py` that
+saves the returned record. See Rejected Alternatives — persistence would then be a
+property of one script rather than of the act, and every other caller would have
+to remember. F-002 is what remembering looks like when it fails.
+
+**5. One record per stored series version, not one per fetch.**
+
+`framework/data/store.py:137-141` already rules the parallel case and gives the
+reason: a re-fetch whose bytes are identical returns the existing version rather
+than writing a second copy, because "nothing was restated, so there is no new
+fact to record". `fetch_and_record` builds a record unconditionally, so today the
+two halves of one function disagree about what a new fact is. Under this rule a
+fetch that produced no new store version produces no new record, and a fetch that
+differs produces both.
+
+**What this rule costs, stated rather than buried: the fact that Belay asked
+again on a later date and the answer was unchanged is not retained anywhere.**
+That fact is real, and Law VII has a claim on it. It is left unsettled below
+rather than answered here, with the arithmetic attached, because both available
+answers are bad in a way the numbers decide: recording confirmations as artifact
+versions costs about 723 KB per symbol per year of permanently tracked YAML, and
+not recording them loses a fact about what Belay checked and when.
+
+**6. The record must be able to name the bytes it is a record of. The signed
+content gains the source key, the store version and the store-relative path.**
+
+Today it cannot. `fetch_record.py:88-108` writes `("data_source", source.name)`
+and nothing else that identifies the file, while `fetch_record.py:191` files the
+bytes under `source.key` — and `framework/data/contract.py:199-206` says in terms
+why those two are separate: the display name "carries the licence attribution CC
+BY-SA requires" and is expected to be edited, where the key is "short, lowercase,
+and never changed once data exists". **So the one identifier the record carries is
+the one the store deliberately does not use.** The join survives only through the
+content hash, and only by hashing every file in the store until one matches.
+
+**This rule is in this ADR because of when it is free.** ADR-013 rule 7 changed
+`Disclosure` on the explicit ground that "the cost of doing this now is zero, and
+that was verified rather than assumed" — no artifact was stored, so no signature
+existed to break. That window is still open and rule 4 closes it: the first saved
+record makes every later change to the signed content a migration of permanent
+append-only records, which `Knowledge/Versioning.md:25` forbids rewriting. **Rules
+4 and 6 must land in that order or not at all.**
+
+**7. A stored version with no record is a state Belay can name and detect.**
+
+Rule 4 makes the pairing the normal case; it does not make the unpaired case
+impossible, and finding 13 is a live path to one. The check is mechanical and
+follows `tests/data/test_store.py:216`'s shape of asking the tool rather than
+reading a file for a string: for every version in the store, hash the file and
+require a committed fetch record whose `content_hash` equals it. Anything left
+over is an orphan and is reported as one.
+
+**This is also what makes rule 8's claim checkable rather than asserted**, which
+is the property `.gitignore:46-49` has been missing since it was written.
+
+**8. The one series Belay already holds: nothing is fabricated and nothing is
+deleted.**
+
+`data/market/dolthub-stocks/AAPL/0001-a7dbcaf3fb6aba2d.bin` stays exactly where it
+is. **No retroactive record is written for it.** Its fetch timestamp is not
+recoverable, and a record is signed over `created`; inventing one would file an
+Assumption under Facts, which `constitution/Operational_Constraints.md:9-17`
+separates precisely so that it cannot happen. Until it has a record the file is
+an unprovenanced input and is not eligible to feed anything that produces
+evidence.
+
+**The path back is a re-fetch, and it costs nothing.** Under rule 4, re-fetching
+the same window either returns identical bytes — in which case
+`framework/data/store.py:145-148` returns the *existing* version 1 and the new
+record's `content_hash` proves it describes the file already on disk, so the
+orphan is adopted without anything being asserted that was not observed — or
+returns different bytes, in which case the vendor restated: the new bytes land as
+version 2 with a record, and version 1 stays on disk permanently unprovenanced,
+which is a true statement about it rather than a loss.
+
+**So the first act after ratification is a fetch, not a migration.** That is the
+cheapest moment this will ever be, and it is cheap only because Belay holds 4,462
+bytes of data.
+
+**9. What a `.gitignore` comment is permitted to assert.**
+
+A comment may state what its own entry enforces. It may state a fact about
+another subsystem **only where something checkable holds that fact true** — and
+the check must interrogate the system, not the prose. `.gitignore:46-49` asserted
+a property of the artifact layer, nothing held it, and it was false from the
+moment it was written; it read exactly as it would have read if it were true,
+which is the failure mode this repository has recorded against a dashboard
+parser, an `xfail` marker and a test docstring already.
+
+Concretely:
+
+- **Until rule 7's check exists, `.gitignore:46-49` must say what is true** — that
+  the record layer is ruled and not yet built, and that the bytes are therefore
+  currently ignored on the size and licence arguments alone. Those two arguments
+  are unaffected by F-002 and survive on their own.
+- **Once it exists**, the claim may be restated, and must then name the tracked
+  directory rather than gesture at "the fetch record artifact".
+- **The "nothing is lost by this" sentence does not come back in any form.** The
+  measurement above shows it compares the wrong two quantities: at Belay's chosen
+  daily cadence the tracked record is 3.7 times the ignored payload, so whatever
+  is true about committing the bytes, it is not that the arrangement is free.
+
+---
+
+## Consequences
+
+Positive:
+
+- F-002's breach of `Governance.md:27` closes, and closes at the point where the
+  bytes and the record are produced rather than in a script somebody has to
+  remember to run
+- the third leg of ADR-013 rule 4 becomes true for the first time, and rule 7's
+  check makes it *checkable* — which is what rule 3 claimed for it all along
+- `ArtifactRepository`, written across three sessions and exercised only by its
+  own tests, acquires its first production caller
+- the record gains the fields that let it name its own bytes, in the last window
+  where changing signed content is free
+- the AAPL series is recoverable without anything being fabricated, and the ruling
+  says so with the mechanism rather than with an intention
+
+Negative:
+
+- **git growth becomes unbounded in exactly the way ADR-013 rule 4 refused for the
+  bytes.** Measured: 2,869 bytes per record, of which 1,680 is a constant that
+  rule 5 forbids deduplicating. At 50 symbols on a daily cadence that is about
+  **36 MB per year**, permanent and unprunable; at a 6,000-symbol universe it is
+  about **4.3 GB per year**. The first is survivable for years and the second is
+  not, and this ADR does not rule a retention policy — Law VII points away from
+  one and no document sets a limit, which is the same ground on which ADR-013
+  declined to rule one for the store. **The trigger to revisit is the same trigger
+  ADR-013 already named for buying data: the first time Belay selects instruments
+  rather than being handed them.** Named here so it is a decision rather than a
+  discovery
+- rule 6 changes the signed content of every fetch record, and after rule 4 lands
+  that becomes a migration of append-only records rather than an edit
+- rule 5 loses the fact that a re-fetch was performed and matched. Left open below
+- rule 3 is enforced by nothing but the choice of root. A caller that passes the
+  default root by mistake writes a permanent record, and the repository will
+  accept it because it is a valid signed artifact
+- the artifact round trip is now load-bearing where it was not. **Established
+  rather than assumed for this shape:** a fetch record built through
+  `fetch_and_record`, saved, and read back through `ArtifactRepository.get()`
+  returned identical `content` and an identical integrity hash on the repository
+  as committed. No defect there — recorded because a round trip that had never
+  been run against this artifact shape is not evidence that it works
+
+---
+
+## Rejected Alternatives
+
+**A thin `scripts/fetch.py` that saves the returned record, as F-002 proposes.**
+Reason: it makes persistence a property of one script instead of a property of
+the act. Every other caller — the test harness, a Stage 3 backfill, a scheduler,
+the next session's throwaway — would have to remember, and F-002 exists because
+remembering failed for the entire life of the module. Rule 4 puts persistence
+where `fetch_record.py:159-172` already put storage, on the same argument that
+docstring makes.
+
+**Writing a retroactive record for the existing AAPL bytes.**
+Reason: rule 8. The fetch timestamp is unrecoverable and the record is signed over
+it. A signed artifact whose `created` is a guess is an Assumption filed as a Fact,
+and `constitution/Operational_Constraints.md:9-17` is the line that separates
+them. The re-fetch costs seconds and asserts nothing.
+
+**Deleting the unprovenanced bytes and starting clean.**
+Reason: `Knowledge/ArchiveManager.md:11` — "Belay never deletes evidence" — and
+`Knowledge/ArtifactLifecycle.md:27`. Deleting is also unnecessary: rule 8's
+re-fetch either adopts the file or leaves it standing beside a version 2 that has
+a record, and both outcomes are honest.
+
+**Putting the artifact root under `data/`.**
+Reason: rule 1. `data/` is where inputs live and both of its entries are ignored;
+the records are the one permanent thing in the arrangement.
+
+**Ignoring the artifact root, and treating records as machine-local.**
+Reason: this is the current state, and it is the finding. `Governance.md:27`
+requires institutional memory, and a record that exists on one machine is a record
+that a reimage destroys — which is F-002's failure paragraph exactly.
+
+**Ruling a retention or pruning policy for records now.**
+Reason: ADR-013 declined the identical question for the store, on the ground that
+Law VII points away from deletion and no document sets a limit. Inventing one here
+would be the defaulting failure ADR-011 names. The growth is recorded with a
+trigger instead.
+
+**Widening the identifier pattern as part of this ADR.**
+Reason: it is a separate ruling with a separate blast radius —
+`Knowledge/Identifiers.md` is governance and `framework/identifiers.py:33-35` is
+the code that turned its examples into a rule. It is a **prerequisite** to rule 4
+rather than a part of it, and it is recorded as a finding so that it is settled on
+its own terms.
+
+---
+
+## Required Follow-Up (ADR-014)
+
+- ~~ratify or amend~~ — **done 2026-08-02, Accepted as drafted, no rule amended.**
+  The owner's call covered rule 1 (a new tracked top-level directory), rule 2
+  (permanent git growth accepted with a stated trigger) and rule 5 (a fact
+  deliberately not retained). Implementation deliberately deferred to a later
+  session
+- ~~settle the identifier ruling first~~ — **done, and it needed no governance
+  amendment.** `Knowledge/Identifiers.md` states no digit count and its seven
+  examples all stay valid, so `framework/identifiers.py` widened to
+  `[0-9]{4}|[1-9][0-9]{4,}` and nothing in `Knowledge/` changed. An alternation
+  rather than `[0-9]{4,}`, which would admit `RPT-00217` beside `RPT-0217` as two
+  directories for one number. **`[0-9]` rather than `\d` and `\Z` rather than
+  `$` came from the independent pass**, which found three Unicode digit forms and
+  a trailing newline reaching `save()` through the first version of the widening.
+- **superseded, kept because the reasoning is the record:** `docs/HANDOFF.md`, "The Identifier Space
+  Cannot Fund One Record Per Fetch". Rule 4 mints permanent identifiers, and
+  `Knowledge/Identifiers.md:3-5` makes them permanent and never reused, so a
+  wrong answer here cannot be corrected afterwards. **This blocks rule 4 and
+  nothing else in this ADR**
+- ~~a second reader re-opens every file cited above and checks each claim at the
+  stated line~~ — **done, and late: after implementation rather than before, which
+  the Status block records as a breach. 93 claims checked, 23 wrong, 19
+  defect-grade.** Eight were in committed code and are fixed, each with a
+  regression test confirmed red against the pre-fix implementation; the rest were
+  citations and arithmetic in this document, corrected and marked inline above.
+  **The author's own review of the same work found none of the nineteen** —
+  fourth consecutive session with that result
+- **implement rules 6 and 4 in that order**, tests written first and run against
+  unchanged code. Reversing them makes rule 6 a migration
+- **rule 7's check**, in the shape `tests/data/test_store.py:216` uses — ask the
+  system, not the prose
+- **re-fetch the AAPL window under rule 4** and record which of the two outcomes
+  in rule 8 occurred. If the bytes differ, that is a vendor restatement observed
+  in the wild and it is worth its own note
+- **rewrite `.gitignore:46-49` twice**: once now, to say what is true, and once
+  after rule 7's check exists, to name the directory. **The interim rewrite was
+  deliberately not made by the session that drafted this** — it is rule 9's to
+  authorise, and editing it first would have been the ADR settling itself
+- **`docs/ROADMAP.md` and `CHANGELOG.md` on ratification**, and not before. ADR-013
+  records a miscount that propagated into both plus a commit subject before anyone
+  caught it
+
+### Deliberately not settled here
+
+**Whether a re-fetch that changed nothing is recorded at all, and where.** Rule 5
+declines to mint an artifact for it and does not claim the fact is worthless. The
+three candidate homes are: a new version of the existing record (about 723 KB per
+symbol per year of tracked YAML, at 252 confirmations a year against a 2,869-byte
+record); an unsigned log, which Law VII would not obviously accept as
+institutional knowledge; or nothing, which is rule 5 as written. **It is the same
+open question `docs/HANDOFF.md` records for an empty fetch** — "refusing to write
+bytes is not the same as refusing to record that the source was asked and said
+nothing" — and the two should be settled together rather than twice.
+
+**The upstream database revision.** `framework/data/dolt_clone.py:81-85` excludes
+the clone's commit hash from the payload for a good reason: `dolt pull` advances
+it whenever upstream moves, so every unchanged series would hash differently and
+produce a phantom restatement. That ruling is about the *payload*. The record's
+`content` is a different place, where the same value would cost nothing and would
+answer "which revision of a version-controlled database said this" — a question
+rule 3's re-fetch-hash-compare cannot answer when the comparison fails. Not ruled
+here because it is a fourth field on top of rule 6's three and belongs with
+whoever verifies this draft.
+
+**A retention policy for artifacts.** See Rejected Alternatives. The growth is
+recorded with a trigger instead of a limit.
+
+**Whether artifacts other than fetch records need anything beyond rules 1 to 3.**
+Rules 1, 2, 3 and 9 are written for artifacts generally, because F-002's evidence
+is that *no* artifact of any type has ever been committed. Rules 4 to 8 are
+specific to fetch records, since that is the only producer in the repository with
+a caller. A metric artifact, a review record and a strategy will each raise the
+question of who calls `save()` and when, and nothing here answers it.

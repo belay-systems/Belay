@@ -1,0 +1,118 @@
+# Belay conformance. The first thing in this repository that verifies anything
+# without a human choosing to run it.
+#
+# `AGENTS.md:7` states "GitHub is the canonical source of truth", and until this
+# file landed the canonical source verified nothing: every green figure in
+# `docs/HANDOFF.md`, in `CHANGELOG.md` and in every review report was produced by
+# whoever wrote the change, on their own machine, and reported by them.
+# `docs/HANDOFF.md` records what that is worth — four sessions running, a
+# fresh-context pass found 4, 6, 6 and then 19 defect-grade errors in work whose
+# author's own review found none.
+#
+# **This does not replace that independent pass and must never be read as
+# doing so.** It catches mechanical drift only. The 2026-08-21 review found two
+# places where a one-token mutation to load-bearing logic passes all 626 tests
+# (F-013, F-014 — numbering corrected 2026-09-19: read F-016 and F-017; the
+# original numbers were the 2026-08-21 report's own headings, and that report's
+# correction block remaps them), and four more defects no test could see. A green
+# badge here means the suite ran, which is a weaker claim than health and is the
+# only claim this file is entitled to make.
+
+name: conformance
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Read-only. Nothing here writes to the repository.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Split out from `suite` deliberately, and redundant with it on purpose. A
+  # breach of the constitution should not arrive looking like an ordinary unit
+  # test failure — the value here is the name of the check that goes red.
+  # `tests/test_governance_conformance.py` parses `constitution/` and holds the
+  # code to it; it is the enforcement arm of the governance layer and nothing
+  # has ever guaranteed it runs.
+  governance:
+    name: governance conformance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # The `[dev]` extra is required: `pyproject.toml:26` makes pytest an
+      # optional dependency, so a bare `pip install -e .` installs the runtime
+      # and no test runner. That cost a session ten minutes on 2026-08-21.
+      - run: pip install -e ".[dev]"
+      - run: python -m pytest -q tests/test_governance_conformance.py
+
+  suite:
+    name: suite (py${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      # Every version reports independently. A failure on one must not hide the
+      # others, because which versions fail is the finding.
+      fail-fast: false
+      matrix:
+        # `pyproject.toml:10` claims `requires-python = ">=3.11"`. That claim went
+        # untested for the life of the project — Belay has run on one Windows
+        # machine and, from 2026-08-21, one Linux container, both on 3.11.
+        #
+        # **Established 2026-08-26, before this file was committed**, by building
+        # a clean venv per version and running the suite in each:
+        #
+        #   3.11  626 passed, 1 skipped, 5 xfailed
+        #   3.12  626 passed, 1 skipped, 5 xfailed
+        #   3.13  626 passed, 1 skipped, 5 xfailed
+        #
+        # So the matrix is a regression guard rather than an open question, and
+        # it should go green on its first run. **If a version later goes red,
+        # that is a true result, not noise.** The fix is to narrow
+        # `requires-python` to what actually works, never to drop the version
+        # from this matrix — an untested compatibility claim is the same shape as
+        # the uncited counts `docs/DocumentStandard.md:5-7` records this
+        # repository already paying for twice.
+        python: ["3.11", "3.12", "3.13"]
+    steps:
+      # A plain checkout, not an export. Three tests shell out to
+      # `git check-ignore` to prove that what is supposed to be outside version
+      # control really is, and that what is supposed to be tracked really is:
+      #
+      #   tests/data/test_store.py:206       the market data store is ignored
+      #   tests/data/test_dolt_clone.py:598  the upstream clone is ignored
+      #   tests/artifacts/test_repository.py:366  the artifact root is tracked
+      #
+      # All three fail without a `.git` directory. Confirmed by running the
+      # suite against a `git archive` tree on 2026-08-26: 3 failed, 623 passed,
+      # and `git init` in the same tree restored 626.
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -e ".[dev]"
+      - run: python -m pytest -q
+
+  dashboard:
+    name: dashboard builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev]"
+      # Exits non-zero when the suite is not green, and fails outright if the
+      # regular expressions in `scripts/status.py` stop matching the prose they
+      # parse. That is not hypothetical: `docs/DocumentStandard.md` is "specified,
+      # not applied", so the dashboard reads headings, priority lines and ADR
+      # status blocks with regexes, and every one of them is a silent failure
+      # waiting for somebody to rewrite a sentence.
+      - run: python scripts/status.py
