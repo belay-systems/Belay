@@ -5543,7 +5543,11 @@ Five lenses — the settings, what is now world-readable, documents the flip mad
 false, the routine, and what a stranger can now do — then two refutation angles
 on every finding. 81 agents. **38 raw findings, 11 survived both angles, 27 were
 refuted or narrowed.** The session's own review of the same work had found one
-thing. That ratio is now five sessions running.
+thing. The Working Agreement records four earlier sessions with that shape at
+`docs/HANDOFF.md:5417-5418` (4, 6, 6, then 19), and the pre-public pass of
+2026-09-20 was another. This is the next. No running total is given here,
+because the earlier counts were graded by different passes against different
+definitions of "defect-grade" and adding them would invent a series.
 
 It corrected this session as well as the repository: the claim that both bypass
 inferences were unproven was written into `docs/OperatorChecklist.md` by this
