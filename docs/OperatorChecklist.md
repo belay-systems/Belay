@@ -152,20 +152,20 @@ secrets found, no MUST-FIX item. These six remain, each the owner's call:
 
 ---
 
-### Immediately after going public — a ruleset on `main`
+### Immediately after going public — a ruleset on `main` — DONE 2026-09-20
 
-**Added 2026-09-19 (evening), to run right after the visibility change, not
-before (branch protection could not be configured while the plan restriction
-recorded below applied).**
+**Added 2026-09-19 (evening). Every item below was applied on 2026-09-20 by
+`scripts/public_settings.py --apply`, which had never run before, so its first
+run was its test. The account of that run is the last section of this file.
+This block keeps its original length so that no line citation into it moves.**
 
-1. Require a pull request before merging.
+1. Require a pull request before merging. — done, in `main: checks`.
 2. Require the five conformance checks by name: `governance conformance`,
-   `suite (py3.11)`, `suite (py3.12)`, `suite (py3.13)`, `dashboard builds`.
-3. Block force-pushes; restrict branch deletion.
-4. Enable secret scanning and push protection.
-5. Enable commit-email privacy (protects future commits only — see decision 1
-   above for the ones already made).
-6. Disable Issues if unused.
+   `suite (py3.11)`, `suite (py3.12)`, `suite (py3.13)`, `dashboard builds`. — done.
+3. Block force-pushes; restrict branch deletion. — done, both in `main: checks`.
+4. Enable secret scanning and push protection. — done.
+5. Enable commit-email privacy — the owner had already set it on the account.
+6. Disable Issues if unused. — overruled; Issues are how work is claimed.
 
 ---
 
@@ -348,34 +348,34 @@ to 3**; an agent cannot create a GitHub organization.
    clean** — `docs/OwnerDecisions.md` Part 13a makes that the owner's own
    condition on publishing the findings register.
 
-### Make Belay public, then apply the ruleset the same day — ADDED 2026-09-20
+### Make Belay public, then apply the ruleset the same day — DONE 2026-09-20
 
-**The flip is the owner's own action and no agent performs it**
-(`docs/OwnerDecisions.md` Part 11d, re-confirmed in the build brief). Do it
-only after step 4 above reports clean and CI is green on Belay.
+**The owner flipped Belay public on 2026-09-20 and told the session, which ran
+`python scripts/public_settings.py --apply`.** Baseline after the flip was 5 of
+11 checks passing. After applying, 11 of 11.
 
-Immediately afterwards, tell a session the flip is done. It runs `python
-scripts/public_settings.py --apply` (rulesets from `.github/rulesets/`, secret
-scanning, push protection, vulnerability reporting, Issues on, wiki off, the
-Actions limits, Part 13c) and reads each back as PASS or FAIL. **`--apply` has
-never run, so its first run is its test: read the table, not the "ok".** The
-by-hand fallback is the last section of `docs/HANDOFF.md`.
+The table was read rather than the "ok", as this block demanded, and then the
+result was tested against GitHub's own behaviour rather than against the
+script's comparison of its own files: a pull request that now reports blocked,
+and a fresh CI run that stays green under the new Actions restriction. The
+account is the last section of this file. The by-hand fallback was not needed
+and is still the last section of `docs/HANDOFF.md`.
 
-### Close Atlas down as a workplace — ADDED 2026-09-20
+### Close Atlas down as a workplace — ADDED 2026-09-20, ONE ITEM LEFT
 
 After Belay is live and public:
 
-- Atlas's `README.md` gains one line saying development moved. The owner may
-  mark that repository **archived** (read-only) on GitHub. **It stays private
-  either way** — Part 12b makes that permanent.
+- Atlas's `README.md` now says development has moved to Belay — done
+  2026-09-20. **Marking that repository archived (read-only) on GitHub is
+  still the owner's, and it stays private either way** — Part 12b, permanent.
 - On the owner's machine, Belay is cloned into its own `Belay` folder (Part
   15c, overruling 14d). Done 2026-09-20, and the git-ignored market data store
   was moved across with it. The old folder stays, as the archive's clone.
-- **The scheduled review routine moves to Belay** (Part 14c), by editing the
-  existing routine in place. **Never retire and replace it** — the standing
-  note on how is the last entry in the Done section. A session can make this
-  edit with `RemoteTrigger`; it is listed here so it is not forgotten, not
-  because it needs the owner.
+- **The scheduled review routine moved to Belay on 2026-09-20** (Part 14c), by
+  partial-update in place — never retired and replaced. Same trigger id, same
+  next firing, `mcp_connections` not passed. What it points at now, and the
+  evidence that it carries no connectors at all, is in the last section of
+  this file and in Issue #3.
 
 
 ### Decide whether GitHub Discussions is enabled — ADDED 2026-09-20, UNASKED
@@ -490,3 +490,147 @@ The walkthrough this entry demanded was therefore never necessary.
 replace.** A rebuilt routine can come back without connector access, and this one
 uses a GitHub connector in its Step 4. Partial-update `job_config` alone; do not
 pass `mcp_connections` or `clear_mcp_connections`.
+
+---
+
+# The public flip, 2026-09-20 — appended here so that no line citation moves
+
+This section sits at the end, against this file's "newest block first" format,
+for the reason `docs/HANDOFF.md`'s own last section gives: lines above are cited
+by number from `docs/HANDOFF.md`, from `docs/OwnerDecisions.md` (which an agent
+may not edit), and from two frozen reports under `reports/review/`. Moving a
+block down to `## Done` would shift them. The three blocks this session finished
+are marked DONE in place instead, each kept at its original length.
+
+## What was applied
+
+The owner made Belay public. A session then ran `python
+scripts/public_settings.py --apply` — its first run ever. Read-only baseline
+immediately after the flip: 5 of 11. After applying: 11 of 11.
+
+Both rulesets from `.github/rulesets/` are active on the default branch:
+`main: checks` (a pull request, the five checks, no force-push, no deletion)
+with an **empty bypass list**, and `main: review` (one approving review,
+code-owner review, stale reviews dismissed on push) which an organization owner
+may bypass through a pull request.
+
+## What was checked against behaviour, rather than against the script
+
+`scripts/public_settings.py` compares its own tracked JSON to the API, which is
+the script certifying itself. Three things were checked independently of it:
+
+- `GET repos/belay-systems/Belay/rules/branches/main` lists both rulesets' rules
+  as applying to the default branch.
+- Pull request #7 now reports `mergeStateStatus: BLOCKED`, which is the test the
+  "Branch protection on `main`" block above asks for by name.
+- CI was re-run on `main` **after** the Actions restriction was applied, because
+  allowing only GitHub-owned actions could have broken it. All five jobs green,
+  and their names match the five required check names exactly — a mismatch there
+  would have wedged `main` permanently.
+
+## One inference is now proven; the other is not
+
+This session first wrote here that both were unproven. An independent pass
+settled the first, and this block supersedes that claim. GitHub reports it per
+ruleset, for the calling user:
+
+```
+$ gh api repos/belay-systems/Belay/rulesets/23744225 --jq '.current_user_can_bypass'
+never                # main: checks
+$ gh api repos/belay-systems/Belay/rulesets/23744226 --jq '.current_user_can_bypass'
+pull_requests_only   # main: review
+```
+
+One account, an organization admin, at one moment: `never` on the ruleset with
+an empty bypass list, `pull_requests_only` on the ruleset granting it a bypass.
+**A bypass applies only to the ruleset that grants it.** That is GitHub's own
+answer rather than a reading of its prose.
+
+**The second is still unproven:** that an author cannot approve their own pull
+request. Nothing here tested it. The next real pull request settles it.
+
+**Do not check the bypass design with `rules/branches/main` alone.** That
+endpoint lists rules the caller can bypass beside rules it cannot, without
+distinguishing them, so it cannot answer this question. Use
+`current_user_can_bypass` on each ruleset.
+
+## What the checks do not cover
+
+Found by the same pass. None of these is a live misconfiguration today; each is
+something the green table does not actually prove.
+
+- `_COMPARED` in `scripts/public_settings.py:95-100` compares four of the twelve
+  parameters GitHub returns for these rules, while line 134 prints "active and
+  matches `.github/rulesets/`". Three values the tracked files pin are outside
+  that comparison.
+- `.github/rulesets/main-review.json` declares `"actor_id": 1`; GitHub stores
+  `null`. `_shape()` compares only `actor_type` and `bypass_mode`.
+- `--apply` switches dependency alerts on at `:233`; `run_checks()` never reads
+  them back, so "11 of 11" does not cover that setting. It is on.
+- `main-checks.json:25` sets `strict_required_status_checks_policy: false`, so a
+  pull request cut from an older `main` can merge on checks that never ran
+  against the tree that lands. A tradeoff rather than an error, but it is the one
+  gap in an otherwise unbypassable ruleset.
+- **Nothing re-runs `scripts/public_settings.py` on a schedule or in CI.** If any
+  of these settings is changed later, nothing notices.
+
+## `.github/CODEOWNERS` is invalid while the invitation is pending
+
+```
+$ gh api repos/belay-systems/Belay/codeowners/errors
+line 11, "Unknown owner": make sure @eternalaether5 exists and has write access
+```
+
+`.github/CODEOWNERS:11` is the catch-all. Until the invitation is accepted it
+resolves to the owner alone — which `:6-7` already anticipates — but GitHub
+reports the file as containing an error, and on a public repository that report
+is visible to anyone. **It clears itself when the Write grant below is made.**
+Three of the five lenses in the 2026-09-20 pass reported this independently.
+
+## Open blocks above that the flip and the rebuild made false
+
+Listed rather than rewritten. Most of these blocks sit at line numbers that
+`docs/HANDOFF.md`, `docs/OwnerDecisions.md` and two frozen reports under
+`reports/review/` cite, so editing them in place would make those citations
+quote text that was never there. Whoever clears them should decide that
+question first — it is the same one Issue #9 raises.
+
+- `:44-97` "Branch protection on `main`" — says "Still unset" and gives by-hand
+  steps. Both rulesets are live. Following those steps would create a third,
+  overlapping one. Its preconditions name Atlas pull request numbers.
+- `:99-111` "Merge order — PR #12" — those pull requests do not exist on Belay;
+  the change was folded into the first commit.
+- `:113-153` "Before making the repository public" — the gate is behind us, and
+  four of its six decisions describe the Atlas archive rather than Belay. Its
+  counts (an email on 291 commits, a username in five files, two live
+  identifiers) are all zero here.
+- `:245-277` "Do not run a manual `/belay-review` yet" — its stated exit
+  condition is met on `main`, but its closing trigger ("when the pull request
+  merges") can never fire, because no such branch or pull request exists here.
+- `:279-329` item 9 tells the owner to give the second contributor a link to
+  fork from; Part 15b made them a Member with Write instead.
+
+## The scheduled review routine
+
+Moved to Belay the same day by `RemoteTrigger` partial update — `job_config` and
+`name` only, `mcp_connections` not passed, never retired and replaced. Same
+trigger id; `next_run_at` unchanged at 2026-09-25. It now names the Belay
+repository as its source, reads `.claude/skills/belay-review/`, and titles its
+pull request "Belay Review". The cadence gate answers correctly in this clone —
+SKIP at 10 days, next due 2026-09-23 — so the 2026-09-25 firing will be DUE.
+
+Reading it also produced evidence for Issue #3: `mcp_connections` and
+`mcp_servers` are both empty and `allowed_tools` is five built-ins, so the
+routine carries no connectors at all, and the clause at `:490-491` saying "this
+one uses a GitHub connector in its Step 4" is false as the routine is
+configured. That evidence is posted on Issue #3 rather than resolving it, since
+the other document's claim is about creation and was not tested.
+
+## Open — grant the second contributor Write access
+
+**Added 2026-09-20.** `eternalaether5`'s organization invitation is still
+**pending** (sent 2026-09-20, role Member, which is what Part 15b rules). Write
+access cannot be granted until they accept. Until then `main: review` binds
+nobody but the owner, because GitHub counts a code owner only if they have write
+access. The owner's part is getting the invitation accepted; a session grants
+the Write once it has been.

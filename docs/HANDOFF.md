@@ -5476,3 +5476,120 @@ bypass list. Then Settings, Code security: secret scanning, push protection and
 private vulnerability reporting on. Then Settings, Actions, General: allow only
 actions created by GitHub; require approval for first-time contributors;
 workflow permissions read-only.
+
+---
+
+# Belay Is Public (2026-09-20) — appended here so that no line citation moves
+
+Written by the session the owner told immediately after flipping visibility. It
+is at the end of the file for the reason the section above gives: every line
+above it is cited by number somewhere, and an insertion would move them.
+
+**The section above is now partly superseded.** Its "Not verified, and said so"
+paragraph at `:5465-5469` says `scripts/public_settings.py --apply` has never
+run. It has. Of the two inferences it names, one is now proven and one is not.
+Both corrections are below. That paragraph is left as written — Law VII.
+
+## What was done
+
+The owner merged pull requests #8 and #10 and made `belay-systems/Belay` public.
+This session ran the flip-day steps in `docs/OperatorChecklist.md`.
+
+**The first check was the irreversible one.** A personal address on a commit
+cannot be withdrawn once a repository is public:
+
+```
+$ git log --all --format='%ae%n%ce' | sort -u
+294590525+pewpewpressco-ux@users.noreply.github.com
+noreply@github.com
+```
+
+Two addresses, both intended. Nothing personal is exposed.
+
+**`scripts/public_settings.py --apply` ran for the first time.** Read-only
+baseline immediately after the flip: 5 of 11. After applying: 11 of 11. What it
+set, and what it does not cover, is recorded in the last section of
+`docs/OperatorChecklist.md` rather than repeated here.
+
+**The scheduled review routine moved to Belay** by partial update in place —
+`job_config` and `name` only, `mcp_connections` not passed, never retired and
+replaced. Same trigger id, `next_run_at` unchanged at 2026-09-25. The cadence
+gate answers `SKIP — last review was 10 days ago`, so that firing will be DUE.
+
+**Atlas's `README.md` now says development has moved.** The archive stays
+private; marking it archived is still the owner's.
+
+## What was tested, rather than asserted
+
+`scripts/public_settings.py` compares its own tracked files to the API, which is
+the script certifying itself. Four things were checked independently:
+
+- Pull request #7 reports `mergeStateStatus: BLOCKED`, which is the test
+  `docs/OperatorChecklist.md` asks for by name.
+- CI was re-run on `main` **after** the Actions restriction was applied, since
+  allowing only GitHub-owned actions could have broken it. Five jobs green, and
+  their names match the five required check names exactly — a mismatch there
+  would have wedged `main` permanently.
+- `current_user_can_bypass` is `never` on `main: checks` and
+  `pull_requests_only` on `main: review`, for one organization admin at one
+  moment. **This settles the first of the two inferences above:** a bypass
+  applies only to the ruleset granting it. The second — that an author cannot
+  approve their own pull request — remains untested.
+- The suite passes locally: 659 passed, 1 skipped, 5 xfailed.
+
+## The independent pass, and what survived it
+
+Five lenses — the settings, what is now world-readable, documents the flip made
+false, the routine, and what a stranger can now do — then two refutation angles
+on every finding. 81 agents. **38 raw findings, 11 survived both angles, 27 were
+refuted or narrowed.** The session's own review of the same work had found one
+thing. The Working Agreement records four earlier sessions with that shape at
+`docs/HANDOFF.md:5417-5418` (4, 6, 6, then 19), and the pre-public pass of
+2026-09-20 was another. This is the next. No running total is given here,
+because the earlier counts were graded by different passes against different
+definitions of "defect-grade" and adding them would invent a series.
+
+It corrected this session as well as the repository: the claim that both bypass
+inferences were unproven was written into `docs/OperatorChecklist.md` by this
+session and is wrong, per the third bullet above.
+
+### Open findings, for whoever picks them up
+
+None is an emergency, and none was fixed here.
+
+1. **`.github/CODEOWNERS:11` is invalid on the live repository.** `gh api
+   repos/belay-systems/Belay/codeowners/errors` returns "Unknown owner" for
+   `@eternalaether5`, who has no write access because the organization
+   invitation is still pending. Three of the five lenses found this
+   independently. It clears itself when the Write grant is made.
+2. **ADR-013's privacy premise has a third occurrence that was never
+   annotated.** `docs/DECISIONS.md:2978` carries the same sentence that
+   `framework/data/dolthub.py:16-17` carries *with* an annotation. Part 14h
+   named only two sites. **Issue #1's scope should widen to this line.** The ADR
+   itself is the owner's and must not be amended by a session.
+3. **Five Open blocks in `docs/OperatorChecklist.md` went false**, listed with
+   line numbers in that file's last section. They were listed rather than
+   rewritten, because the blocks sit at lines that two frozen reports cite —
+   the same tension Issue #9 raises.
+4. **The SKIP branch of `scripts/review_due.py` has no test**, and it is the
+   branch running in production right now.
+5. **Nothing re-checks the GitHub settings after today.** No CI step or schedule
+   runs `scripts/public_settings.py`, and `_COMPARED` compares four of the
+   twelve parameters GitHub returns.
+6. **The untrusted-outside-text rule exists in exactly one place**,
+   `AGENTS.md:345`, and the review skill never routes a reader to it. A
+   Claude-run review reaches it through `CLAUDE.md`; an agent from another
+   provider would not. On a public repository the fortnightly unattended review
+   now reads Issues that strangers can open. `AGENTS.md:347`'s remedy, "report
+   it to the person directing you", also names no addressee for an unattended
+   run.
+
+## Highest priority next task
+
+**Nothing in the build advances until the owner acts on two things**, neither of
+which a session may do: getting the organization invitation accepted, which
+unblocks the Write grant and clears finding 1; and the ADR-013 amendment,
+Issue #1, now widened by finding 2.
+
+After that, the open Issues are the queue, and `python scripts/status.py`
+outranks this prose.
