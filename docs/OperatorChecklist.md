@@ -338,8 +338,8 @@ to 3**; an agent cannot create a GitHub organization.
    organization; you will find out at creation.
 2. **Invite the second contributor**, `Eternalaether5` (canonical login
    `eternalaether5`), as an
-   organization **Owner** — that is what Part 14a's selection means by both
-   owners being owners in GitHub's eyes.
+   organization **Member**, and give them Write access to Belay once they
+   accept. Ruled in Part 15b, which overrules the "Owner" this entry once said.
 3. **Create the repository** `Belay` inside it, **PRIVATE**, with no README, no
    `.gitignore` and no licence. The snapshot supplies all three, and any file
    GitHub adds at creation would break the single-commit requirement.
@@ -354,12 +354,12 @@ to 3**; an agent cannot create a GitHub organization.
 (`docs/OwnerDecisions.md` Part 11d, re-confirmed in the build brief). Do it
 only after step 4 above reports clean and CI is green on Belay.
 
-Immediately afterwards, on `main`: require a pull request; require the five
-checks by name — `governance conformance`, `suite (py3.11)`, `suite (py3.12)`,
-`suite (py3.13)`, `dashboard builds`; require review from Code Owners; block
-force-pushes and deletion; secret scanning and push protection on; private
-vulnerability reporting on; Issues on; Actions set to require approval for
-first-time contributors (Part 13c).
+Immediately afterwards, tell a session the flip is done. It runs `python
+scripts/public_settings.py --apply` (rulesets from `.github/rulesets/`, secret
+scanning, push protection, vulnerability reporting, Issues on, wiki off, the
+Actions limits, Part 13c) and reads each back as PASS or FAIL. **`--apply` has
+never run, so its first run is its test: read the table, not the "ok".** The
+by-hand fallback is the last section of `docs/HANDOFF.md`.
 
 ### Close Atlas down as a workplace — ADDED 2026-09-20
 
@@ -368,9 +368,9 @@ After Belay is live and public:
 - Atlas's `README.md` gains one line saying development moved. The owner may
   mark that repository **archived** (read-only) on GitHub. **It stays private
   either way** — Part 12b makes that permanent.
-- On the owner's machine, rename the old folder and clone Belay into the path
-  the old one had, so tools that key their settings to a folder path keep
-  working.
+- On the owner's machine, Belay is cloned into its own `Belay` folder (Part
+  15c, overruling 14d). Done 2026-09-20, and the git-ignored market data store
+  was moved across with it. The old folder stays, as the archive's clone.
 - **The scheduled review routine moves to Belay** (Part 14c), by editing the
   existing routine in place. **Never retire and replace it** — the standing
   note on how is the last entry in the Done section. A session can make this

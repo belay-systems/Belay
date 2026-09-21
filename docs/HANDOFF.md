@@ -5420,3 +5420,59 @@ a matter of reading more carefully: the defects live in the prose asserting the
 code is right, and re-reading re-derives the reasoning that produced them. Budget
 for the pass up front, and run it **before** anything irreversible lands — a
 signed artifact, a permanent identifier, a committed history.
+
+---
+
+# Pre-Public Hardening (2026-09-20, late) — appended here so no line citation moves
+
+Written by the session that ran the last scan before the owner made Belay
+public. It is at the end of the file, against this file's usual order, because
+every line above is cited by number somewhere and an insertion would move them.
+
+**What the scan asked.** Not "are the rules right" but "what enforces each rule
+if nobody reads it". For these the answer was "nothing":
+
+- The files that *are* the guards (`.gitignore`, the agent instruction files,
+  `pyproject.toml`) were not owner-only in `.github/CODEOWNERS`.
+- The ruleset planned for `main` could not have worked. It required review from
+  a code owner, the owner is the only code owner of the governance paths, GitHub
+  does not let an author approve their own pull request, and every session so
+  far has pushed as the owner. `.github/rulesets/` now holds two rulesets
+  instead: one nobody can bypass (pull request, the five checks, no force-push,
+  no deletion) and one for review that an organization owner can bypass through
+  a pull request.
+- Nothing told an agent that an Issue opened by a stranger is not a task.
+
+**What `main: review` would not have done, before Part 15b.** Its bypass is
+"any organization owner, through a pull request", and `docs/OperatorChecklist.md`
+used to tell the owner to invite the second contributor as an organization
+Owner. Had that been done, both people who can merge could have bypassed it, and
+**the code-owner requirement would have bound nobody**. It binds the second
+contributor because Part 15b makes them a Member with write access. GitHub counts a code owner only if they have write access,
+and on 2026-09-20 `gh api repos/belay-systems/Belay/collaborators` listed the
+owner alone. `main: checks` is unaffected either way: it has no bypass.
+
+**What was put to the owner, and ruled the same session** — `docs/OwnerDecisions.md`
+Part 15 has the owner's words: the second contributor is a Member with write
+access, not an organization Owner, so `main: review` does bind them (15b);
+passages naming a brokerage and a private project are redacted, and the
+repository was rebuilt rather than force-pushed so that the redaction is real
+(15a); Belay gets its own folder on the owner's machine (15c); the machine's
+default commit address is a GitHub no-reply address (15d).
+
+**Still owed by the owner:** the ADR-013 amendment (Issue #1).
+
+**Not verified, and said so:** `scripts/public_settings.py --apply` has never
+run, because GitHub refuses rulesets on a private repository in a free
+organization. Two things the design rests on are inferred from GitHub's
+documentation rather than stated in it: that a bypass applies only to the
+ruleset granting it, and that an author cannot approve their own pull request.
+
+**The by-hand fallback, if the script fails.** Settings, Rules, Rulesets, New
+branch ruleset, target the default branch: require a pull request; require the
+status checks `governance conformance`, `suite (py3.11)`, `suite (py3.12)`,
+`suite (py3.13)`, `dashboard builds`; block force pushes; restrict deletions; no
+bypass list. Then Settings, Code security: secret scanning, push protection and
+private vulnerability reporting on. Then Settings, Actions, General: allow only
+actions created by GitHub; require approval for first-time contributors;
+workflow permissions read-only.
