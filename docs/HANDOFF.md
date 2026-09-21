@@ -5593,3 +5593,42 @@ Issue #1, now widened by finding 2.
 
 After that, the open Issues are the queue, and `python scripts/status.py`
 outranks this prose.
+
+## Session close, 2026-09-20
+
+State at close, verified rather than assumed:
+
+- **`main` is `0133748`, green.** Pull requests #11 and #12 both merged by the
+  owner. The settings read back 11 of 11; the suite is 659 passed, 1 skipped,
+  5 xfailed; the cadence gate answers `SKIP — last review was 10 days ago`,
+  next due 2026-09-23, and the routine next fires 2026-09-25.
+- **Nothing was merged unattended.** The owner merged both. A session does not
+  merge here, and under `main: review` a session merging its own work would be
+  exercising the owner's bypass — the one thing that rule exists to prevent.
+- **#12 carried no independent pass and said so in its own description.** The
+  owner merged it on that basis, which is theirs to decide; it is recorded
+  because the decision, not just the change, is the thing worth keeping.
+- The owner has asked the second contributor to accept the organization
+  invitation. It was still pending at close, so `.github/CODEOWNERS:11` remains
+  invalid on the live repository and the Write grant is still owed. **A session
+  can make that grant once the invitation is accepted; it needs no ruling.**
+- In the Atlas archive, the front-page notice saying development moved is on
+  pull request #18, still open and the owner's to merge. The three stale agent
+  worktrees there are unregistered and emptied; two empty directories survive a
+  process lock and go on the next restart.
+
+**A sequencing lesson, recorded because it cost a rewrite.** This block was
+first written while #12 was open, and said so. The owner merged #12 a few
+minutes later, which made the block false before it ever landed, and it had to
+be rebuilt against the new `main`. **A session-close record should be written
+against `origin/main` as fetched at the moment of writing, and re-checked
+immediately before it is pushed** — not composed against the branch it is
+travelling on, whose state someone else may change underneath it. That is the
+same hazard `AGENTS.md`'s synchronize-first rule names, arriving inside a single
+session rather than between two.
+
+The next session starts the way `AGENTS.md` step 1 says, not from this
+paragraph: fetch, read what moved, and list the open pull requests and Issues.
+Two of this file's own older sections are superseded by the one above, which is
+the normal shape here — later entries stand in front of earlier ones without
+rewriting them.
