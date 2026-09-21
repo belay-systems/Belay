@@ -69,6 +69,14 @@ OWNER_ONLY = (
     "/tests/test_governance_conformance.py",
     "/tests/data/test_store.py",
     "/tests/data/test_dolt_clone.py",
+    "/tests/artifacts/test_repository.py",
+    "/docs/ENGINEERING_AGENT.md",
+    "/CONTRIBUTING.md",
+    "/SECURITY.md",
+    "/departments/",
+    "/workflows/",
+    "/Knowledge/",
+    "/strategies/",
 )
 
 
@@ -131,13 +139,28 @@ def test_no_tracked_file_is_large_enough_to_be_a_dataset():
 
 
 def test_the_guards_are_the_owners_alone_in_codeowners():
-    """CODEOWNERS is last-match-wins, so each guard must have its own line
-    naming the owner and nobody else."""
+    """CODEOWNERS is last-match-wins, so what counts is the last line that
+    matches each guard, not whether the guard has a line. The first version of
+    this test looked each pattern up by name, and an independent pass voided
+    every owner-only line by moving the catch-all to the end, suite green.
+
+    Only the three pattern shapes this file uses are resolved: `*`, an exact
+    path, and a directory ending in `/`."""
     lines = [
         line.split()
         for line in (REPO / ".github" / "CODEOWNERS").read_text(encoding="utf-8").splitlines()
         if line.strip() and not line.startswith("#")
     ]
-    last = {parts[0]: parts[1:] for parts in lines}
-    wrong = {path: last.get(path) for path in OWNER_ONLY if last.get(path) != [OWNER]}
+    def owners_for(path: str) -> list[str] | None:
+        winner = None
+        for pattern, *owners in lines:
+            if pattern == "*" or pattern == path or (
+                pattern.endswith("/") and path.startswith(pattern)
+            ):
+                winner = owners
+        return winner
+
+    shapes = [p for p, *_ in lines if p != "*" and not p.startswith("/")]
+    assert not shapes, f"patterns this test cannot resolve, so cannot vouch for: {shapes}"
+    wrong = {p: owners_for(p) for p in OWNER_ONLY if owners_for(p) != [OWNER]}
     assert not wrong, f"not owner-only in .github/CODEOWNERS: {wrong}"

@@ -5443,13 +5443,12 @@ if nobody reads it". For these the answer was "nothing":
   a pull request.
 - Nothing told an agent that an Issue opened by a stranger is not a task.
 
-**What `main: review` does not do, found by the independent pass.** Its bypass
-is "any organization owner, through a pull request". `docs/OperatorChecklist.md`
-until Part 15b told the owner to invite the second contributor as an organization Owner. If
-that is done, both people who can merge can bypass it, and **the code-owner
-requirement binds nobody**; `.github/CODEOWNERS` then only decides whose review
-GitHub asks for. It binds the second contributor only if they are a Member with
-write access. GitHub also counts a code owner only if they have write access,
+**What `main: review` would not have done, before Part 15b.** Its bypass is
+"any organization owner, through a pull request", and `docs/OperatorChecklist.md`
+used to tell the owner to invite the second contributor as an organization
+Owner. Had that been done, both people who can merge could have bypassed it, and
+**the code-owner requirement would have bound nobody**. It binds the second
+contributor because Part 15b makes them a Member with write access. GitHub counts a code owner only if they have write access,
 and on 2026-09-20 `gh api repos/belay-systems/Belay/collaborators` listed the
 owner alone. `main: checks` is unaffected either way: it has no bypass.
 

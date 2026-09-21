@@ -369,8 +369,8 @@ After Belay is live and public:
   mark that repository **archived** (read-only) on GitHub. **It stays private
   either way** — Part 12b makes that permanent.
 - On the owner's machine, Belay is cloned into its own `Belay` folder (Part
-  15c, overruling 14d). The old folder stays where it is: it holds the only
-  copy of the fetched market data, which git ignores.
+  15c, overruling 14d). Done 2026-09-20, and the git-ignored market data store
+  was moved across with it. The old folder stays, as the archive's clone.
 - **The scheduled review routine moves to Belay** (Part 14c), by editing the
   existing routine in place. **Never retire and replace it** — the standing
   note on how is the last entry in the Done section. A session can make this

@@ -2479,8 +2479,8 @@ memory folder copied across so that 14d's reason no longer applies.
 
 ### What it does not settle
 
-**Whether the copied memory loads was not verified when this was written.** The
-first session in the new folder finds out.
+**Whether the copied memory loads.** That had not been verified when this was
+written. The first session in the new folder finds out.
 
 ## 15d. This machine's default commit address is a GitHub no-reply address
 
