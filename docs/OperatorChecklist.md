@@ -502,6 +502,48 @@ may not edit), and from two frozen reports under `reports/review/`. Moving a
 block down to `## Done` would shift them. The three blocks this session finished
 are marked DONE in place instead, each kept at its original length.
 
+## How the owner merges a pull request, now that `main` is ruled
+
+**Put first because it is the thing an owner needs at the moment they are
+stuck, and because it was not written down and cost two attempts on the day the
+rulesets went live.**
+
+A plain merge is refused:
+
+```
+> & "C:\Program Files\GitHub CLI\gh.exe" pr merge <N> --repo belay-systems/Belay --merge
+X Pull request belay-systems/Belay#<N> is not mergeable: the base branch policy prohibits the merge.
+```
+
+The merge that works adds `--admin`:
+
+```
+> & "C:\Program Files\GitHub CLI\gh.exe" pr merge <N> --repo belay-systems/Belay --merge --admin
+```
+
+**`--admin` does not skip the tests, and cannot.** It reaches exactly one rule.
+
+- `main: checks` — the five checks, no force-push, no deletion. Its bypass list
+  is empty and GitHub reports `current_user_can_bypass: never` for the owner.
+  `--admin` does not move it. It does not need to when the checks are green.
+- `main: review` — the review requirement. This one grants the owner
+  `pull_requests_only`, deliberately: the owner is the only code owner, GitHub
+  refuses a self-approval, and without the bypass nothing could ever merge.
+  `--admin` is how that bypass is exercised from the command line.
+
+So a refusal here is the unbypassable ruleset working, and `--admin` is the
+designed path rather than a way around it. **Do not use `--auto`**, which `gh`
+also offers: it queues the merge to happen later, unattended, which is not what
+an owner clicking merge means.
+
+**This stops being needed** once a second person has write access: a real
+reviewer satisfies `main: review` and the bypass goes unused. Until then, every
+merge takes `--admin`.
+
+The commands are given in PowerShell form on purpose. The Run button in the
+owner's desktop app opens PowerShell, and a bash-form command pasted there
+fails.
+
 ## What was applied
 
 The owner made Belay public. A session then ran `python
