@@ -676,3 +676,31 @@ access cannot be granted until they accept. Until then `main: review` binds
 nobody but the owner, because GitHub counts a code owner only if they have write
 access. The owner's part is getting the invitation accepted; a session grants
 the Write once it has been.
+
+**Attempted 2026-09-21, blocked — the session's GitHub credential cannot do
+this.** The owner reported the invitation accepted and asked a session to make
+the grant, which this checklist already says needs no further ruling. The
+session authenticated as `pewpewpressco-ux` (`get_me` confirmed this), then
+`GET /repos/belay-systems/Belay/collaborators` returned `403 Resource not
+accessible by integration`. That is a GitHub App permission gap, not a
+governance question: the installation backing this session's GitHub tool has
+no `members` or `administration` scope, so it cannot read collaborators, add
+one, or set a permission level, regardless of who is asking or what has been
+ruled. The session could not independently confirm the invitation shows as
+accepted for the same reason.
+
+**Owner's part, unchanged in kind but now including the grant itself:**
+1. Confirm on GitHub (`belay-systems` org → **People**) that `eternalaether5`
+   shows as an active Member, not pending.
+2. `https://github.com/belay-systems/Belay/settings/access` → find
+   `eternalaether5` → set role to **Write**.
+3. Tell the next session so it can confirm `.github/CODEOWNERS:11` now
+   resolves (`gh api repos/belay-systems/Belay/codeowners/errors` returns
+   nothing for that line) and close this item.
+
+Separately, worth the owner's attention: if a session granting collaborator
+permissions is meant to keep working, the GitHub App installation for this
+integration needs the `members` and/or `administration` permission added
+(GitHub App settings, not a repository setting) — that is itself a decision
+about widening what an unattended credential can do, so it is recorded here
+rather than acted on.
