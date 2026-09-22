@@ -2617,7 +2617,7 @@ be backed by evidence like any other.
   capital must meet the floor of the rung it sits on was offered as a
   separate question and not asked.
 
-## 18d. Paper-trading length is referred to the Investment Committee (condition pending)
+## 18d. Paper-trading length is referred to the Investment Committee, and `Micro Capital` is closed until it rules
 
 **Question put.** The proposal's question 4, "How much paper trading is
 enough?" A grade says what kind of evidence a record is, not how much of it
@@ -2630,17 +2630,24 @@ enter `Micro Capital`.**
 **Owner said: "2. Refer it to the Investment Committee - this will be part of
 the AI/agent the end user plugs in".**
 
+The owner's words quoted the option's label, which did not carry the
+condition, so the condition was put back as its own question.
+
+**Owner said: "Yes, closed until it's ruled".**
+
 ### What it settles
 
-The paper-trading length is not set by this ruling. It is referred.
+- **The paper-trading length is referred to the Investment Committee, not set
+  here.**
+- **Until the Committee rules a number, no strategy may enter
+  `Micro Capital`.** A blank number closes the rung. It never means "any
+  length".
 
 ### What it does not settle
 
-- **The closed-until-ruled condition.** The owner's words quote the option's
-  label, which did not carry the condition. The condition was put back to the
-  owner and is not yet answered. Until it is, this record does not say that
-  `Micro Capital` is closed while the number is blank.
-- What the Investment Committee is. See Part 19.
+- The number itself.
+- What the Investment Committee is, and whether a user's committee may set a
+  number of its own. See Part 19b, item 1.
 
 # Part 19 — Stated 2026-09-22: Belay is a product for others
 
