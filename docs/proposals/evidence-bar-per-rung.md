@@ -36,14 +36,18 @@ reading of what that honestly means downward.
 > and no winner declared. Section 10's questions are ordered to be asked one at a
 > time.
 
-**This document has now had one independent verification pass, not two.** Every ADR
-in `docs/DECISIONS.md` that has had a *second* reader lost claims to it, and ADR-015
-itself lost five blocking defects across two passes that its author had not found.
-One pass is better than none. It is not enough to read section 4's grades and
-section 9's two recommendations as checked fact.
+**This document has had two independent adversarial passes.** The first
+(2026-09-19) found 17 defects, 4 of them blocking; those are listed in Appendix B
+and were applied. **Issue #6 is the second independent falsification pass** against
+the proposal as carried by public PR #7 / `adr/015-stage-is-carried`; its
+disposition is Appendix C. Every ADR in `docs/DECISIONS.md` that has had a *second*
+reader lost claims to it, and ADR-015 itself lost five blocking defects across two
+passes that its author had not found. Two passes are better than one. They are
+still not enough to read section 4's grades and section 9's two recommendations as
+checked fact.
 
-ADR-015 is cited by description only. It lives on `origin/adr/015-stage-is-carried`
-and is not on `main`, so no line of it is cited by path.
+ADR-015 is cited by description only. It lives on public PR #7 /
+`adr/015-stage-is-carried` and is not on `main`, so no line of it is cited by path.
 
 ---
 
@@ -464,8 +468,10 @@ evidence record's supporting report is the identical shape one level down.
 
 > **Editor's note, added when this document was committed to the branch — not the
 > research author's text.** This section was written against an earlier revision of
-> ADR-015. Checked against revision `d734bcb` and it holds, with two refinements
-> worth stating so nobody re-derives them:
+> ADR-015. Checked against historical Atlas archive revision `d734bcb` (intentionally
+> not resolvable in public Belay; preserved for provenance) and it holds, with two
+> refinements worth stating so nobody re-derives them. For current navigation, read
+> ADR-015 on public PR #7 / `adr/015-stage-is-carried`:
 >
 > - The three-part reference is real but it is not the whole rung. A rung in rule 1
 >   is **five** strings — `from_stage`, `to_stage`, `review_id`, `review_version`,
@@ -833,16 +839,18 @@ ADR-015 explicitly does not answer this and says it is not the drafter's to answ
 
 - **ADR-015 is on a branch, not `main`.** Its rules are described, never cited by
   path:line; if the branch is amended before ratification, §7's descriptions may go
-  stale. **Editor's note:** §7 was re-checked against revision `d734bcb` when this
-  document was committed to that branch, and carries the result inline. Nothing else
-  in this document describes ADR-015's machinery in enough detail to go stale.
+  stale. **Editor's note:** §7 was re-checked against historical Atlas archive
+  revision `d734bcb` (intentionally not resolvable in public Belay) when this
+  document was committed to that branch, and carries the result inline. Current
+  navigation: public PR #7 / `adr/015-stage-is-carried`. Nothing else in this
+  document describes ADR-015's machinery in enough detail to go stale.
 - **Nothing in Belay calls `save()` for a STRATEGY or a REVIEW today**, so no bar here
   has ever been exercised against a real record. §3's claims about what is producible
   are read from the roadmap and the code, not observed in use.
 - **`docs/OwnerDecisions.md` and `docs/HANDOFF.md` changed on disk during the
   original session**, so neither is cited by line.
-- **This document has had one independent pass, not two.** Every ADR that had a
-  second reader lost claims to it.
+- **This document has now had two independent passes** (first pass Appendix B;
+  Issue #6 Appendix C). Every ADR that had a second reader lost claims to it.
 
 ---
 
@@ -930,3 +938,26 @@ before being applied; none was found to be wrong.
 **And the dissent, recorded and not resolved.** The reviewer's recommendation differs
 from the author's — §9 now carries both side by side with attribution, reasoning and
 cost, and declares no winner.
+
+---
+
+## Appendix C — Issue #6 second independent falsification pass
+
+Append-only. Does not erase Appendix B. Issue #6 is not a scheduled full-repository
+`/belay-review` and allocates no F-NNN numbers.
+
+**Confirmed corrections applied after that pass:**
+
+| Finding | Disposition | Correction |
+|---|---|---|
+| Owner-facing checklist said both "no independent verification pass" and "exactly one" | Accepted defect | `docs/OperatorChecklist.md` now records the 2026-09-19 first pass and Issue #6 as the second |
+| Checklist said "three candidate bars" | Accepted defect | Four options named: No floor / Hypothesis / Producible-grade / Criterion coverage |
+| ADR-015 claimed "The only file this branch changes is `docs/DECISIONS.md`" | Accepted defect | Replaced with: unratified; no framework/code implementation; public PR #7 also carries proposal and checklist/record material |
+| Current prose presented Atlas archive SHAs/PR numbers as live Belay locators | Accepted defect (narrowed) | Historical Atlas IDs preserved and labelled; live navigation points at PR #7 / `adr/015-stage-is-carried` |
+
+**Attacks attempted that were NOT accepted as redesign defects:**
+
+| Attack | Disposition | Why |
+|---|---|---|
+| Historical Atlas SHAs "dead" → delete them | Rejected | Repository provenance intentionally preserves former private Atlas commit/PR/Issue IDs even though they do not resolve in public Belay |
+| Grade-only floor does not enforce all seven `Promotion_Pipeline.md:75-81` criteria | Rejected as new defect | Already disclosed in §6; criterion coverage (option 4) and §7 artifact binding are the separate mechanisms; expanding the bar into full criteria enforcement is an owner choice, not a silent redesign |

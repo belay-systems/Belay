@@ -3642,13 +3642,16 @@ Date:
 > owner can answer, ordered to be asked one at a time. **Ratification of this ADR is
 > blocked on the owner's ruling on them.**
 >
-> **It has now had one independent pass**, which found 17 defects, 4 of them
-> blocking; the proposal was revised on 2026-09-19 and lists them in its own
-> appendix. **One of those blockers reached this ADR**, and rule 4's table is where
-> it landed: the table is keyed by destination alone, four destinations are both a
-> climb and a demotion destination, and a floor read off the destination would have
-> gated emergency demotions. Rule 4 now carries a direction clause. The table is
-> still empty.
+> **Independent passes on the evidence-bar proposal.** A first pass (2026-09-19)
+> found 17 defects, 4 of them blocking; the proposal was revised that day and lists
+> them in its own appendix. **One of those blockers reached this ADR**, and rule 4's
+> table is where it landed: the table is keyed by destination alone, four
+> destinations are both a climb and a demotion destination, and a floor read off
+> the destination would have gated emergency demotions. Rule 4 now carries a
+> direction clause. The table is still empty. **Issue #6 is a second independent
+> falsification pass** on the same proposal as carried by public PR #7; its defects
+> and the attacks it rejected are recorded in that proposal's Issue #6 appendix.
+> Neither pass ratifies this ADR.
 
 > **The owner has selected shape, six times. The owner has ratified no text.**
 >
@@ -3676,30 +3679,36 @@ Date:
 > No owner prose is quoted, because none was given.
 
 > **Revision history, kept because it is the honest measure of how much attacking
-> this needed.**
+> this needed.** Draft SHAs below are **historical Atlas archive revision IDs**;
+> Belay's public provenance intentionally preserves them and they will not resolve
+> in public Belay. They are not current `adr/015-stage-is-carried` / PR #7 HEADs.
 >
-> - **First draft (2717e76).** Reviewed independently: every citation and every
->   measurement correct; **three blocking defects in the rule text.** Rule 3 never
->   tied `strategy_stage` to the ladder, so one honest first rung bought a
->   dishonest Production; a rung named a review without its version, so the first
->   ADR-005 revision of any review would have made every citing strategy
->   unreadable; and one review could buy two rungs.
-> - **Second draft (13d188d).** Reviewed independently again: **two more blocking
->   defects, both demonstrated by execution.** `get()` did not resolve anything, so
->   a single hand-written re-signed YAML with a seven-rung ladder naming reviews
->   that do not exist was returned as `PRODUCTION`; and the Revision branch let a
->   version built on an older ancestor silently undo a demotion, or un-retire a
->   retired strategy. Five further weaknesses, including that scoping the
->   repository's validation by `artifact.type` let the *forger* choose the scope.
-> - **This draft.** All fixed below, each named where it was fixed.
+> - **First draft (historical Atlas archive revision `2717e76`).** Reviewed
+>   independently: every citation and every measurement correct; **three blocking
+>   defects in the rule text.** Rule 3 never tied `strategy_stage` to the ladder,
+>   so one honest first rung bought a dishonest Production; a rung named a review
+>   without its version, so the first ADR-005 revision of any review would have
+>   made every citing strategy unreadable; and one review could buy two rungs.
+> - **Second draft (historical Atlas archive revision `13d188d`).** Reviewed
+>   independently again: **two more blocking defects, both demonstrated by
+>   execution.** `get()` did not resolve anything, so a single hand-written
+>   re-signed YAML with a seven-rung ladder naming reviews that do not exist was
+>   returned as `PRODUCTION`; and the Revision branch let a version built on an
+>   older ancestor silently undo a demotion, or un-retire a retired strategy. Five
+>   further weaknesses, including that scoping the repository's validation by
+>   `artifact.type` let the *forger* choose the scope.
+> - **This draft.** All fixed below, each named where it was fixed. Live carrier
+>   for navigation: public PR #7 / `adr/015-stage-is-carried`.
 >
 > **Two independent passes, five blocking defects, none found by the author.** That
 > is the pattern this repository has recorded for four consecutive sessions, and it
 > is the reason the Required Follow-Up asks for a third pass rather than treating
 > this one as settled.
 
-> **Nothing here is ratified, and no code was written.** The only file this branch
-> changes is `docs/DECISIONS.md`.
+> **Nothing here is ratified.** No framework or other implementation code was
+> written for ADR-015. The public carrier PR #7 (`adr/015-stage-is-carried`) also
+> carries the evidence-bar proposal and associated checklist/record material; this
+> ADR text is not the only file on that branch.
 
 ---
 
@@ -4745,11 +4754,11 @@ in favour of declare-and-reconcile — rule 5.
 
 - **the per-rung minimum evidence grade must be ruled first.** Owner selection 4.
   **Ratification of this ADR is blocked on it.** The research is done and is on this
-  branch as `docs/proposals/evidence-bar-per-rung.md`; it has had **one** independent
-  pass (17 defects, 4 blocking, all applied), and what is owed now is the owner's
-  ruling on its seven questions. **A second independent pass on the proposal is still
-  worth having** — every ADR in this file that had a second reader lost claims to it,
-  and the first pass on this proposal found a blocker that reached rule 4's table
+  branch as `docs/proposals/evidence-bar-per-rung.md`; it has had **two** independent
+  falsification passes on the proposal (first: 17 defects, 4 blocking, all applied;
+  second: Issue #6). Draft PR #15 carries Issue #6 corrections and is itself under
+  independent check. What remains before ratification is the owner's ruling on its
+  seven questions after those corrections land
 - **ratify or amend**, after that ruling
 - **a third independent pass, BEFORE implementation.** Two passes have now found five
   blocking defects in drafts whose citations and measurements were each time correct —

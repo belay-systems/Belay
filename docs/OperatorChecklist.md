@@ -23,18 +23,18 @@ date. Never delete a done item; this file is a record as well as a queue.
 constitutional right, and no session may make it. Asked what ADR-015 should do about
 promotions into capital stages given that no Belay document states how good the
 evidence must be, you selected **"Research a bar first"**. That research is now on
-`adr/015-stage-is-carried` as `docs/proposals/evidence-bar-per-rung.md`.
+public PR #7 / `adr/015-stage-is-carried` as `docs/proposals/evidence-bar-per-rung.md`.
 
-Read it and answer its section 10 — seven questions, the first being which of three
-candidate bars to adopt. **ADR-015's Status block records that its ratification is
-blocked on this ruling**, and rule 4 of that ADR carries an empty table, one row per
-rung, that only your ruling may fill.
+Read it and answer its section 10 — seven questions, the first being which of **four**
+options: (1) No floor, (2) Hypothesis, (3) Producible-grade, (4) Criterion coverage.
+**ADR-015's Status block records that its ratification is blocked on this ruling**,
+and rule 4 of that ADR carries an empty table, one row per rung, that only you may fill.
 
-**Two cautions before you rule.** The proposal has had **no independent verification
-pass** — every ADR in this repository that has had a real second reader lost claims to
-it, and ADR-015 itself lost five blocking defects across two passes. And its
-recommended candidate would, by its own admission, close the capital rungs entirely
-until a paper-trading engine exists.
+**Two cautions before you rule.** First pass (2026-09-19): 17 defects, 4 blocking,
+applied (Appendix B). Issue #6 was the second falsification pass; corrections sit in
+draft PR #15 until merged — see EOF. Every ADR with a real second reader lost claims;
+ADR-015 lost five blocking defects across two passes. Its recommended candidate would,
+by its own admission, close the capital rungs entirely until a paper-trading engine exists.
 
 ---
 
@@ -511,3 +511,22 @@ The walkthrough this entry demanded was therefore never necessary.
 replace.** A rebuilt routine can come back without connector access, and this one
 uses a GitHub connector in its Step 4. Partial-update `job_config` alone; do not
 pass `mcp_connections` or `clear_mcp_connections`.
+
+---
+
+### Issue #6 public-carrier clarification — 2026-09-21
+
+The historical Atlas records above retain their original PR numbers and revision
+identifiers. In public Belay, the current ADR-015 carrier is PR #7 /
+`adr/015-stage-is-carried`.
+
+The evidence-bar proposal has had its original independent pass and the Issue #6
+second independent falsification pass. Issue #6 corrections are carried in draft
+PR #15 until reviewed and merged.
+
+Sample adequacy exists on `main`; Issue #6 corrections to that proposal are on the
+carrier branch in draft PR #15 and are not yet on `main`.
+
+Rulings owed: both proposals had a first adversarial pass (17/4 and 15/5). Issue #6
+was the second falsification pass on both; see each proposal's Appendix C. Do not
+treat either as settled because a first pass already happened.
