@@ -2806,3 +2806,31 @@ per-criterion requirement is written down and not enforced.
   `Remain` (18c) must also name a stored report is not ruled.
 - **Binding proves a report exists and is unedited, not that its contents are
   true.** It raises the cost of forging and does not remove it.
+
+## 18g. The evidence bar is its own decision record, ADR-016
+
+**Question put.** The proposal's question 7: write the bar inside ADR-015, or
+as a separate ADR-016 that fills ADR-015 rule 4's table from outside. The
+session recommended ADR-016: the ladder's mechanics should rarely change, the
+bar will (Belay's minimum paper-trading length, the trial-count rule, the
+report binding's open points), and 18a-18f grew well past the one table
+ADR-015 left room for. The independent reviewer recommended the same.
+
+**Owner said: "2. Separate ADR-016".**
+
+### What it settles
+
+- **Parts 18a-18f, and the product floors of 19c, are drafted as ADR-016.**
+  ADR-015 rule 4's table stays the interface and points at ADR-016.
+- **Changing the bar later means amending ADR-016, not reopening ADR-015.**
+
+### What it does not settle
+
+Both ADRs stay PROPOSED. Neither is ratified until it is drafted, a fresh
+independent pass has tried to break it, and the owner ratifies it.
+
+---
+
+**What Part 18 does not touch.** No ADR changes status, no finding is opened
+or closed, and no code changes. The seven questions of
+`docs/proposals/sample-adequacy-definition.md` are not yet put.
