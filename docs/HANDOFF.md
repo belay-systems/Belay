@@ -5661,8 +5661,14 @@ In brief:
   onboarding and can change them, directly or through their AI, only upward.
   Each human decision is recorded as evidence.
 
-**State at close.** `main` is unchanged by this session. Pull request #19 is
-draft, CI green on every push, and waits on the owner. Pull request #14 (Parts
+**State at close.** Pull request #19 carries this session's records, CI green
+on every push. **The owner authorized the session to merge it: "i approve you
+to merge btw".** The 2026-09-20 close record says a session does not merge
+here, because under `main: review` a session merging exercises the owner's
+bypass. This merge is that bypass, used on the owner's explicit instruction in
+this session, for this pull request only. It is not a standing permission. It
+carried no independent pass, which the pull request states. That pass belongs
+to ADR-016. Pull request #14 (Parts
 16-17) is still open. That is why Part 18 is numbered 18. The cadence gate
 said review due 2026-09-23. The routine fires 2026-09-25.
 
