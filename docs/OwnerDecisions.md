@@ -2767,3 +2767,42 @@ variants than a person would. The independent reviewer recommended the same.
   the cost of that.
 - What counts as one "variant", and whether variants a user's AI generated
   and discarded are counted.
+
+## 18f. Every evidence record names a stored, signed report, as part of this ruling
+
+**Question put.** The proposal's question 6. An evidence record's seal proves
+the record has not been edited, not that it is true. Its `provenance` is a
+free string (`framework/artifacts/evidence.py:12-18`). The proposal (its
+section 7) is that each qualifying record name a stored REPORT artifact by
+identifier, version and integrity hash, and that storage resolve it. Three
+options were put: rule it now as part of this ruling; rule the grades now and
+make this Required Follow-Up; do not require it. **The session recommended
+ruling it now, differing from both of the proposal's recommendations** (both
+said follow-up). The reason given was that after 18a it is also the only
+mechanism that can check what a record is about, so without it 18a's
+per-criterion requirement is written down and not enforced.
+
+**Owner said: "1. Rule it now, as part of this ruling".**
+
+### What it settles
+
+- **Every qualifying evidence record names a stored, signed report by
+  identifier, version and integrity hash, and Belay refuses a record whose
+  report does not resolve or whose hash does not match.** This is part of the
+  evidence-bar ruling, not a follow-up.
+- **It is the mechanism for 18a's one-record-per-criterion requirement**, and
+  what 18e's trial count and 19c's record of each human decision are tied to.
+
+### What it does not settle
+
+- **Where the binding lives.** `EvidenceRecord`'s hashed payload is pinned by
+  a literal digest (`tests/artifacts/test_evidence_hashing.py:18`), so a new
+  field would stop historical evidence verifying. The proposal names two
+  routes: a parsed format inside `provenance`, or the binding on the REVIEW
+  artifact's content. That is an engineering choice for the change that
+  implements this.
+- **Which records qualify.** The proposal applies it from destination `Paper
+  Trading` upward. Whether the records on downward moves (18b) and on
+  `Remain` (18c) must also name a stored report is not ruled.
+- **Binding proves a report exists and is unedited, not that its contents are
+  true.** It raises the cost of forging and does not remove it.
