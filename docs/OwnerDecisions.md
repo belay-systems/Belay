@@ -2834,3 +2834,33 @@ independent pass has tried to break it, and the owner ratifies it.
 **What Part 18 does not touch.** No ADR changes status, no finding is opened
 or closed, and no code changes. The seven questions of
 `docs/proposals/sample-adequacy-definition.md` are not yet put.
+
+# Part 20 — Ruled 2026-09-22: every merge gets a second review
+
+## 20a. Always a second review, on every branch
+
+**Question put.** The second contributor's three pull requests of 2026-09-22
+(#15, #17, #18) were merged into ADR-015's carrier branch by their author with
+no review. That was allowed: both rulesets in `.github/rulesets/` cover the
+default branch only. The session asked whether branches other than `main`
+should also require a second person's review before anything merges into them.
+
+**Owner said: "2 - yes - always second review".**
+
+### What it settles
+
+- **No change merges into any shared branch without a review by someone other
+  than its author.** That includes `main`, carrier branches such as
+  `adr/015-stage-is-carried`, and any branch another pull request targets.
+
+### What it does not settle
+
+- **The owner bypass on `main: review`.** `.github/rulesets/main-review.json`
+  lets an organization Owner merge without a review, and both contributors are
+  Owners (Part 17, Issue #16). A session merged #19 that way on 2026-09-22, on
+  the owner's instruction, before this ruling. "Always" and that bypass cannot
+  both hold. Put to the owner as its own question.
+- **How it is enforced on other branches.** A review rule on a branch also
+  blocks direct pushes to it, so it cannot cover the branches people work on,
+  only the ones pull requests merge into. The ruleset change is a repository
+  setting, and applying it is the owner's.
