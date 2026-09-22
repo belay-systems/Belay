@@ -2494,3 +2494,60 @@ it. One pushed commit would have published it permanently.
 
 **What Part 15 does not touch.** Parts 1 through 14 stand except where 15b and
 15c say otherwise. No finding is opened or closed and no ADR changes status.
+
+# Part 18 — Ruled 2026-09-22: the evidence floor for each rung of the ladder
+
+Put one question at a time, each with a recommendation and its reasons, from
+section 10 of the evidence-bar proposal (evidence-bar-per-rung.md under
+docs/proposals/, on public pull request #7's branch `adr/015-stage-is-carried`
+and not on `main`, so named without backticks). Part 18 is numbered after
+Parts 16 and 17, which are on pull request #14 and not yet on `main`. The owner
+answered by letter. Their words are quoted exactly.
+
+## 18a. Criterion coverage: the strictest of the four floors
+
+**Question put.** The proposal's question 1, "Which floor?" A promotion under
+ADR-015 must carry an evidence record but no minimum grade, so one Level D
+note (a hypothesis) is enough to enter `Micro Capital`, the first stage that
+spends real money. Four options were put: A, no floor; B, the hypothesis floor
+(nothing above `Validation` on Level D alone); C, the producible-grade floor
+(C, then B, B, A, A up the ladder); D, criterion coverage (C's floor, plus one
+record per promotion criterion on the three capital rungs). **The session
+recommended C**, as the only option that makes a paper track record a
+precondition of real money, and named D's cost: four of the seven criteria
+cannot be measured today, so it closes capital for years.
+
+**Owner said: "D".** The owner overruled the recommendation for a stricter
+option.
+
+### What it settles
+
+- **Upward moves carry option 3's grade floor:** destination `Research` D,
+  `Validation` D, `Paper Trading` C, `Promotion Review` B, `Micro Capital` B,
+  `Limited Capital` A, `Production` A.
+- **On the three capital destinations — `Micro Capital`, `Limited Capital`,
+  `Production` — a promotion also carries one evidence record per promotion
+  criterion, each at or above that rung's grade.** The list is the canonical
+  one, `constitution/Promotion_Pipeline.md:75-81` (ADR-006 rule 1): statistical
+  performance, risk-adjusted returns, drawdown behavior, regime robustness,
+  execution quality, liquidity, operational consistency. The naming conflicts
+  in `strategies/PromotionCriteria.md` and `Validation/CapitalReview.md` do not
+  change the list.
+- **Real money is closed until all seven can be measured.** Today three can
+  (`python scripts/status.py`: "promotion criteria 3 of 7 computable").
+  Regime robustness, execution quality, liquidity and operational consistency
+  have no working module (`scripts/status.py:48-56`). The owner chose that
+  cost knowingly.
+
+### What it does not settle
+
+- **The mechanism.** As ADR-015 rule 4 is written, the gate reads only the
+  single strongest grade on a promotion. It cannot count records or see what
+  a record is about, so "one record per criterion" has nothing to enforce it
+  yet. The proposal's question 6 (bind each record to a stored report) is
+  where that is decided. Until it is, this ruling is written into ADR-015 and
+  not enforced by code.
+- **Downward moves** (question 2), and every number: how many records, and
+  how much paper trading (question 4).
+- ADR-015's status. It stays PROPOSED until all seven questions are ruled and
+  a fresh independent pass has read the filled table.
