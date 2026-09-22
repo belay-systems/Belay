@@ -2738,3 +2738,32 @@ from the owners.
 - **The licence terms themselves.** `LICENSE` still forbids running Belay.
   Changing it is the owner's alone.
 - **Item 5, legal obligations**, was not answered.
+
+## 18e. Every promotion states how many strategy variants were tried
+
+**Question put.** The proposal's question 5. Keeping the best of many variants
+makes the winner look good partly by luck, and the statistical correction for
+that needs one input: how many variants were tried. ADR-012 rule 10
+(`docs/DECISIONS.md:2244-2250`) rules such corrections out of scope because
+"Belay records that nowhere", and every significance report says so
+(`framework/metrics/statistics.py:61-62`). The session recommended requiring
+the count, and noted that under Part 19 a user's connected AI can try far more
+variants than a person would. The independent reviewer recommended the same.
+
+**Owner said: "1. Require it".**
+
+### What it settles
+
+- **Every promotion states how many strategy variants were tried.** A
+  promotion that leaves it blank is refused.
+- **The count corrects nothing and claims nothing.** It records the input a
+  future correction needs. ADR-012 rule 10 is unchanged: no correction is
+  applied until one is ruled.
+
+### What it does not settle
+
+- **The count is self-reported**, like the grade letter, and can be
+  understated. Question 6 (binding records to stored reports) is what raises
+  the cost of that.
+- What counts as one "variant", and whether variants a user's AI generated
+  and discarded are counted.
