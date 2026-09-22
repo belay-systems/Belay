@@ -2562,7 +2562,7 @@ a demotion. Under 18a that would mean a demotion from `Production` into
 `Limited Capital` carrying seven Level A records before capital could be
 withdrawn. **The session recommended upward only**, citing ADR-004 rule 4
 (`docs/DECISIONS.md:396-400`) and "Capital preservation wins. Always."
-(`constitution/Capital_Authority.md:22-27`). Both of the proposal's
+(`constitution/Capital_Authority.md:22-28`). Both of the proposal's
 recommendations agreed.
 
 **Owner said: "1. Upward only".**
