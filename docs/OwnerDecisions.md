@@ -2551,3 +2551,39 @@ option.
   how much paper trading (question 4).
 - ADR-015's status. It stays PROPOSED until all seven questions are ruled and
   a fresh independent pass has read the filled table.
+
+## 18b. The floor applies to upward moves only
+
+**Question put.** The proposal's question 2. ADR-015 rule 4's table is keyed
+by destination. Four destinations (`Paper Trading`, `Promotion Review`,
+`Micro Capital`, `Limited Capital`) are reached both by climbing and by
+falling, so without a direction clause the floor ruled in 18a would also bind
+a demotion. Under 18a that would mean a demotion from `Production` into
+`Limited Capital` carrying seven Level A records before capital could be
+withdrawn. **The session recommended upward only**, citing ADR-004 rule 4
+(`docs/DECISIONS.md:396-400`) and "Capital preservation wins. Always."
+(`constitution/Capital_Authority.md:22-27`). Both of the proposal's
+recommendations agreed.
+
+**Owner said: "1. Upward only".**
+
+### What it settles
+
+- **18a's grade floor and its per-criterion requirement bind only upward
+  moves.** Direction is computed as ADR-015 rule 4 already drafts it on
+  pull request #7's branch: a move to `Retired` is a retirement and never
+  upward; otherwise a move is upward when the destination's position in
+  `STRATEGY_LADDER` (`framework/artifacts/enums.py:107-109`) is greater than
+  the origin's.
+- **A demotion or retirement still carries at least one evidence record: the
+  record of the observed condition that triggered it, at the grade that
+  observation was made.** A live breach is A, a paper breach B, a falsified
+  backtest assumption C, a reasoned structural argument D. **No minimum grade,
+  and none may be added.** This is section 5's rule, which satisfies the
+  owner's earlier "Evidence for everything" without slowing an act that
+  preserves capital.
+
+### What it does not settle
+
+Whether a review that leaves a strategy where it is needs evidence
+(question 3).
