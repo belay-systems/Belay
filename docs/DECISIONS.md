@@ -4754,11 +4754,11 @@ in favour of declare-and-reconcile — rule 5.
 
 - **the per-rung minimum evidence grade must be ruled first.** Owner selection 4.
   **Ratification of this ADR is blocked on it.** The research is done and is on this
-  branch as `docs/proposals/evidence-bar-per-rung.md`; it has had **one** independent
-  pass (17 defects, 4 blocking, all applied), and what is owed now is the owner's
-  ruling on its seven questions. **A second independent pass on the proposal is still
-  worth having** — every ADR in this file that had a second reader lost claims to it,
-  and the first pass on this proposal found a blocker that reached rule 4's table
+  branch as `docs/proposals/evidence-bar-per-rung.md`; it has had **two** independent
+  falsification passes on the proposal (first: 17 defects, 4 blocking, all applied;
+  second: Issue #6). Draft PR #15 carries Issue #6 corrections and is itself under
+  independent check. What remains before ratification is the owner's ruling on its
+  seven questions after those corrections land
 - **ratify or amend**, after that ruling
 - **a third independent pass, BEFORE implementation.** Two passes have now found five
   blocking defects in drafts whose citations and measurements were each time correct —

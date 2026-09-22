@@ -36,7 +36,7 @@ reading of what that honestly means downward.
 > and no winner declared. Section 10's questions are ordered to be asked one at a
 > time.
 
-**This document has had two independent verification passes.** The first
+**This document has had two independent adversarial passes.** The first
 (2026-09-19) found 17 defects, 4 of them blocking; those are listed in Appendix B
 and were applied. **Issue #6 is the second independent falsification pass** against
 the proposal as carried by public PR #7 / `adr/015-stage-is-carried`; its

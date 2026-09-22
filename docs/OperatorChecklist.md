@@ -26,29 +26,15 @@ evidence must be, you selected **"Research a bar first"**. That research is now 
 public PR #7 / `adr/015-stage-is-carried` as `docs/proposals/evidence-bar-per-rung.md`.
 
 Read it and answer its section 10 — seven questions, the first being which of **four**
-options to adopt: (1) No floor, (2) Hypothesis floor, (3) Producible-grade floor,
-(4) Criterion coverage. **ADR-015's Status block records that its ratification is
-blocked on this ruling**, and rule 4 of that ADR carries an empty table, one row per
-rung, that only your ruling may fill.
+options: (1) No floor, (2) Hypothesis, (3) Producible-grade, (4) Criterion coverage.
+**ADR-015's Status block records that its ratification is blocked on this ruling**,
+and rule 4 of that ADR carries an empty table, one row per rung, that only you may fill.
 
-**Independent passes before you rule (keep both facts):**
-
-1. **First pass (2026-09-19).** An independent adversarial pass found 17 defects,
-   4 of them blocking; those were applied and are listed in the proposal's
-   Appendix B. That first pass is not erased by what follows.
-2. **Second pass — Issue #6.** A second independent falsification pass ran against
-   the proposal as carried by PR #7. It found further defects in the owner-facing
-   packaging and locator prose (contradictory verification status; a stale "three
-   candidates" count; a false "only file this branch changes" claim in ADR-015;
-   Atlas-archive SHAs presented as live locators). Those corrections are on the
-   Issue #6 correction branch before this ruling. It did **not** treat the already
-   disclosed limitation that a grade-only floor does not enforce all seven
-   promotion criteria as a new redesign defect.
-
-Every ADR in this repository that has had a real second reader lost claims to it,
-and ADR-015 itself lost five blocking defects across two earlier passes on its own
-text. The recommended candidate would, by its own admission, close the capital
-rungs entirely until a paper-trading engine exists.
+**Two cautions before you rule.** First pass (2026-09-19): 17 defects, 4 blocking,
+applied (Appendix B). Issue #6 was the second falsification pass; corrections sit in
+draft PR #15 until merged — see EOF. Every ADR with a real second reader lost claims;
+ADR-015 lost five blocking defects across two passes. Its recommended candidate would,
+by its own admission, close the capital rungs entirely until a paper-trading engine exists.
 
 ---
 
@@ -137,9 +123,8 @@ rulings there.
 `## Done` below rather than editing it.** In order: merge PR #12
 (`fix/review-skill-numbering`) to `main`; retarget the records pull request
 (`records/2026-09-19-rulings`) from `fix/review-skill-numbering` to `main` and
-merge it. **The ADR-015 carrier stays a draft** until ADR-015 is ratified,
-unaffected by either merge (public Belay: PR #7 / `adr/015-stage-is-carried`;
-historical Atlas archive numbered that draft PR #10). `docs/OwnerDecisions.md:1385` (Part 10d) and `:1589` (Part 10j —
+merge it. **PR #10 stays a draft** until ADR-015 is ratified, unaffected by
+either merge. `docs/OwnerDecisions.md:1385` (Part 10d) and `:1589` (Part 10j —
 why this is an owner action rather than something the session did itself:
 an unattended merge of PR #12 was refused by Claude Code's own permission
 control).
@@ -220,17 +205,12 @@ below.** What is still waiting on the owner, not on a session:
   F-006's wide question until they are ruled.**
 - **Two research proposals, seven questions each, await the owner — ask one
   at a time, with a recommendation and the reasons, the format the owner
-  asked for.** The evidence-bar proposal (`docs/proposals/evidence-bar-per-rung.md`,
-  section 10, on public PR #7 / `adr/015-stage-is-carried`) and
-  `docs/proposals/sample-adequacy-definition.md` (section 10; also on that
-  carrier, and identical on `main`). **First independent passes** found 17
-  defects/4 blockers (evidence-bar) and 15/5 (sample-adequacy); those records
-  stay. **Issue #6 is the second independent falsification pass** on both; it
-  found further defects corrected before this ruling (see each proposal's
-  Issue #6 appendix). Do not treat either proposal as settled merely because a
-  first pass already happened. [Historical note: private Atlas archive referred
-  to the evidence-bar carrier as draft PR #10; that number does not resolve as
-  the current public locator.]
+  asked for.** The evidence-bar proposal (section 10, evidence-bar-per-rung.md
+  under `docs/proposals/` **on PR #10's branch only** — not a resolvable path
+  on this branch, so named without backticks) and
+  `docs/proposals/sample-adequacy-definition.md` (section 10, this branch).
+  Both have had exactly one independent adversarial pass (17 defects/4
+  blockers, and 15/5, respectively) and neither has had a second.
 - **F-014's fix is unruled beyond Part 9e's shape selections.** F-014 is
   `docs/HANDOFF.md:4017`. `docs/OwnerDecisions.md:1215` (Part 9e) selects a
   *shape* for ADR-015, which covers F-014 together with F-007, and says
@@ -238,10 +218,8 @@ below.** What is still waiting on the owner, not on a session:
 - **Whether an explicit owner instruction may override the review gate's SKIP
   verdict is unruled.** See "Owner glance items" below, item (d).
 - **ADR-015 itself is unratified**, and ratification is blocked on the
-  evidence-bar ruling above — see the Open item at the top of this file
-  ("Rule on the evidence bar per rung") and public PR #7 /
-  `adr/015-stage-is-carried`. [Historical Atlas archive referred to that
-  draft as PR #10.]
+  evidence-bar ruling above — see PR #10's own Open item on that branch,
+  which this item does not duplicate: that ruling arrives with PR #10.
 
 ---
 
@@ -443,10 +421,8 @@ public repository it is also a place strangers can post.
 as `2f44c19`; PR #11, retargeted from `register/2026-08-21-corrected` to
 `main`, merged as `3080848`; PR #4 (`register/2026-08-21-findings`) closed as
 superseded by #9 — closed, not deleted, per Immutable Law VII. All three
-verified this session via `gh pr list --state all`. **The ADR-015 draft stayed
-a draft throughout**, as this item required (historical Atlas archive numbered
-it PR #10; public Belay carrier is PR #7 / `adr/015-stage-is-carried`).
-`docs/OwnerDecisions.md:1300` (Part 10a)
+verified this session via `gh pr list --state all`. **PR #10 stayed a draft
+throughout**, as this item required. `docs/OwnerDecisions.md:1300` (Part 10a)
 and `:1360` (Part 10c) are the owner's selections that authorised this.
 
 **Superseded by, not the same item as, "Merge order — PR #12, then the
@@ -535,3 +511,22 @@ The walkthrough this entry demanded was therefore never necessary.
 replace.** A rebuilt routine can come back without connector access, and this one
 uses a GitHub connector in its Step 4. Partial-update `job_config` alone; do not
 pass `mcp_connections` or `clear_mcp_connections`.
+
+---
+
+### Issue #6 public-carrier clarification — 2026-09-21
+
+The historical Atlas records above retain their original PR numbers and revision
+identifiers. In public Belay, the current ADR-015 carrier is PR #7 /
+`adr/015-stage-is-carried`.
+
+The evidence-bar proposal has had its original independent pass and the Issue #6
+second independent falsification pass. Issue #6 corrections are carried in draft
+PR #15 until reviewed and merged.
+
+Sample adequacy exists on `main`; Issue #6 corrections to that proposal are on the
+carrier branch in draft PR #15 and are not yet on `main`.
+
+Rulings owed: both proposals had a first adversarial pass (17/4 and 15/5). Issue #6
+was the second falsification pass on both; see each proposal's Appendix C. Do not
+treat either as settled because a first pass already happened.
