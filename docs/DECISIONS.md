@@ -4756,9 +4756,9 @@ in favour of declare-and-reconcile — rule 5.
   **Ratification of this ADR is blocked on it.** The research is done and is on this
   branch as `docs/proposals/evidence-bar-per-rung.md`; it has had **two** independent
   falsification passes on the proposal (first: 17 defects, 4 blocking, all applied;
-  second: Issue #6). Draft PR #15 carries Issue #6 corrections and is itself under
-  independent check. What remains before ratification is the owner's ruling on its
-  seven questions after those corrections land
+  second: Issue #6). PR #15 corrections merged into this carrier after CI and an
+  independent regression check. What remains before ratification is the owner's
+  ruling on its seven questions
 - **ratify or amend**, after that ruling
 - **a third independent pass, BEFORE implementation.** Two passes have now found five
   blocking defects in drafts whose citations and measurements were each time correct —

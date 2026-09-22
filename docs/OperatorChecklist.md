@@ -31,10 +31,10 @@ options: (1) No floor, (2) Hypothesis, (3) Producible-grade, (4) Criterion cover
 and rule 4 of that ADR carries an empty table, one row per rung, that only you may fill.
 
 **Two cautions before you rule.** First pass (2026-09-19): 17 defects, 4 blocking,
-applied (Appendix B). Issue #6 was the second falsification pass; corrections sit in
-draft PR #15 until merged — see EOF. Every ADR with a real second reader lost claims;
-ADR-015 lost five blocking defects across two passes. Its recommended candidate would,
-by its own admission, close the capital rungs entirely until a paper-trading engine exists.
+applied (Appendix B). Issue #6 was the second falsification pass; PR #15 merged into
+this carrier after the correction/regression cycle — see EOF. Every ADR with a real
+second reader lost claims; ADR-015 lost five blocking defects across two passes. Its
+recommended candidate would, by its own admission, close the capital rungs entirely until a paper-trading engine exists.
 
 ---
 
@@ -521,11 +521,11 @@ identifiers. In public Belay, the current ADR-015 carrier is PR #7 /
 `adr/015-stage-is-carried`.
 
 The evidence-bar proposal has had its original independent pass and the Issue #6
-second independent falsification pass. Issue #6 corrections are carried in draft
-PR #15 until reviewed and merged.
+second independent falsification pass. Issue #6 corrections were merged into this
+carrier through PR #15 after CI and independent regression verification.
 
-Sample adequacy exists on `main`; Issue #6 corrections to that proposal are on the
-carrier branch in draft PR #15 and are not yet on `main`.
+Sample adequacy exists on `main`; Issue #6 corrections to that proposal are now on
+this carrier branch after PR #15 merged and are not yet on `main`.
 
 Rulings owed: both proposals had a first adversarial pass (17/4 and 15/5). Issue #6
 was the second falsification pass on both; see each proposal's Appendix C. Do not
