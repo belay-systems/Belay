@@ -1,4 +1,4 @@
-"""Is a Belay review due, and what number does its first finding take?
+"""Is an Belay review due, and what number does its first finding take?
 
     python scripts/review_due.py
 
@@ -21,6 +21,10 @@ headings are what one pass called its findings; they are not the durable series.
 own correction block renumbers them F-014..F-018 — so scanning headings returns
 015 and would collide, and so would scanning `docs/HANDOFF.md`, which carries
 only what has been registered so far.
+
+**When git's output cannot be obtained or read, the gate stops: exit 2, a reason
+on stderr, nothing on stdout.** It does not skip the file and answer anyway. A
+skipped file is a lower number, and a lower number is the collision above.
 """
 
 from __future__ import annotations
@@ -39,12 +43,44 @@ REPORT = re.compile(r"(\d{4}-\d{2}-\d{2})-review\.md")
 FINDING = re.compile(r"\bF-(\d{3})\b")
 
 
-def git(*args: str) -> str:
-    """Return stdout, or "" if git failed. A missing ref is not an error here."""
-    done = subprocess.run(
-        ["git", *args], capture_output=True, text=True, check=False
-    )
-    return done.stdout if done.returncode == 0 else ""
+class GateCannotAnswer(RuntimeError):
+    """Git's output could not be obtained or read, so no number is safe to print."""
+
+
+def git(*args: str, may_fail: bool = False) -> str:
+    """Return git's stdout decoded as UTF-8, or raise. Never a guess.
+
+    **Bytes are captured and decoded here, not by `subprocess`.** With
+    `text=True` the locale picks the codec — cp1252 on Windows — and there the
+    decode runs in a reader thread, so an undecodable byte does not raise:
+    `stdout` silently comes back `None`. That was the 2026-09-19 crash, and
+    `encoding="utf-8"` alone keeps the `None` for any file that is not UTF-8.
+
+    **Strict, and a NUL is refused too.** A lenient decode turns UTF-16 (what
+    PowerShell's `>` writes) into `F`, NUL, `-`…, matching nothing; without a
+    byte-order mark that is even *valid* UTF-8. The gate would print a number
+    already taken, and a wrong number is worse than none — so it stops instead.
+
+    **A failed command raises for the same reason**: "" is what an empty file
+    looks like. `may_fail` is for `rev-parse` alone, whose every failure is
+    reported as "not a git repository" — a stop, whatever the real cause.
+    """
+    command = "git " + " ".join(args)
+    done = subprocess.run(["git", *args], capture_output=True, check=False)
+    if done.returncode != 0:
+        if may_fail:
+            return ""
+        detail = done.stderr.decode("utf-8", "replace").strip()
+        raise GateCannotAnswer(f"`{command}` exited {done.returncode}: {detail}")
+    try:
+        text = done.stdout.decode("utf-8")
+    except UnicodeDecodeError as error:
+        problem = f"bytes that are not UTF-8 ({error})"
+    else:
+        problem = "a NUL byte, so UTF-16 or not text at all" if "\0" in text else ""
+    if problem:
+        raise GateCannotAnswer(f"`{command}` printed {problem}. Re-save it as UTF-8.")
+    return text
 
 
 def remote_refs() -> list[str]:
@@ -104,7 +140,25 @@ def highest_finding() -> int:
 
 
 def main() -> int:
-    if not git("rev-parse", "--git-dir").strip():
+    # The verdict carries an em dash and whatever a branch happens to be called.
+    # Left to the machine, a piped stdout on Windows is cp1252: the dash arrives
+    # as a byte no UTF-8 reader can decode, and a name outside cp1252 raises.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="backslashreplace")
+
+    try:
+        return verdict()
+    except GateCannotAnswer as error:
+        # Neither DUE nor SKIP, so neither 0 nor 1 — and nothing on stdout, where
+        # a verdict would be. Every number is computed before any line is
+        # printed, so no `first finding:` can have escaped ahead of this.
+        print(f"the gate cannot answer: {error}", file=sys.stderr)
+        return 2
+
+
+def verdict() -> int:
+    if not git("rev-parse", "--git-dir", may_fail=True).strip():
         print("not a git repository; cannot answer across refs")
         return 1
 
