@@ -2627,3 +2627,62 @@ upgrade is the prerequisite; nothing here rules it in or out.
 
 **What Part 16 does not touch.** Parts 1 through 15 stand except where 16
 says otherwise. No finding is opened or closed and no ADR changes status.
+
+---
+
+# Part 17 — Ruled 2026-09-22 (same session, minutes later): `eternalaether5` becomes an organization Owner, overruling 15b and 16b
+
+**Owner said:** "git recommends atleast 2 owners... so im giving him owner
+status again. sorry. the fix can be a new issue. log it." Confirmed live:
+`list_repository_collaborators` now reports `eternalaether5`,
+`role_name: "admin"` — the repository-level effect of organization Owner,
+which grants implicit admin on every repository in the organization. This is
+not the same change as Part 16's repository-Admin grant, corrected back out
+in 16b; organization Owner is a different and larger thing, on a different
+axis than either Part 16 or 16b considered.
+
+**What this reopens, precisely, having learned from Part 16's first mistake
+not to guess:** organization Owner satisfies
+`bypass_actors: [{"actor_type": "OrganizationAdmin"}]` in both
+`.github/rulesets/main-review.json` and (empty list, so moot)
+`main-checks.json`. Unlike Part 16's repository Admin, this bypass is real:
+either owner's login can now skip `main: review`'s required approving
+review and code-owner check on any pull request. `.github/CODEOWNERS`'s own
+comment — "Nobody can approve their own pull request, so this still means a
+second pair of eyes on ordinary work" — no longer holds as a GitHub-enforced
+fact for either owner; it holds only as a convention both choose to follow.
+Organization Owner additionally grants: full organization administration
+(billing, removing or adding owners, deleting the organization), not merely
+repository administration.
+
+**Why the owner did it anyway:** GitHub itself recommends an organization
+carry more than one Owner, so that no single lost or locked account strands
+the organization permanently — the same risk Part 15b named as the cost of
+*not* doing this ("the owner's is then the only account that can recover
+the organization"), now resolved in the other direction. This is a real
+tradeoff between two risks, not a lapse: account-recovery risk against
+review-bypass risk. The owner chose to accept the second to remove the
+first, and asked for the remedy to be tracked as follow-up work rather than
+solved in this moment.
+
+### What it settles
+
+`eternalaether5` is an organization Owner. Parts 15b and 16b's Member-only
+position is overruled a second time, this time deliberately and with the
+bypass consequence named up front rather than discovered after the fact.
+
+### What it does not settle
+
+**How the review-bypass gap gets closed, if it does.** The owner asked for
+an Issue rather than a fix in this session. Filed as Issue (linked from
+`docs/OperatorChecklist.md`) rather than solved here, because the honest
+options need more than one message's thought: e.g. swapping
+`bypass_actors` from `OrganizationAdmin` to a specific team whose membership
+the owners control more granularly, accepting the bypass as a documented
+convention-only gate, or something not yet considered. Nothing here decides
+between them.
+
+---
+
+**What Part 17 does not touch.** Parts 1 through 16 stand except where 17
+says otherwise. No finding is opened or closed and no ADR changes status.

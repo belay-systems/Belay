@@ -441,6 +441,20 @@ Admin grant was corrected within the same session that made it.
 `.github/CODEOWNERS:11`'s "Unknown owner" condition clears on this grant —
 GitHub counts a code owner once the login has write access or above.
 
+**Overruled again, same session (Part 17).** Owner: "git recommends
+atleast 2 owners... so im giving him owner status again. sorry. the fix can
+be a new issue. log it." `eternalaether5` is now an organization Owner, not
+merely a repository collaborator — confirmed by `list_repository_collaborators`
+flipping back to `role_name: "admin"` (the repository-level effect of org
+Owner) and by the owner's own words. This is a different and larger change
+than Part 16's repository-Admin grant: organization Owner satisfies
+`main: review`'s `bypass_actors` for real, so either owner's login can now
+skip the required code-owner review on any pull request — the exact gap
+Part 15b was written to prevent, now accepted deliberately in exchange for
+not having account-recovery rest on one login. Tracked as **Issue #16**
+("main: review's code-owner bypass is now live for both organization
+Owners") rather than solved in this session, per the owner's instruction.
+
 ---
 
 ### Merge order for the three register/ADR pull requests — DONE 2026-09-19
