@@ -2494,3 +2494,343 @@ it. One pushed commit would have published it permanently.
 
 **What Part 15 does not touch.** Parts 1 through 14 stand except where 15b and
 15c say otherwise. No finding is opened or closed and no ADR changes status.
+
+# Part 18 — Ruled 2026-09-22: the evidence floor for each rung of the ladder
+
+Put one question at a time, each with a recommendation and its reasons, from
+section 10 of the evidence-bar proposal (evidence-bar-per-rung.md under
+docs/proposals/, on public pull request #7's branch `adr/015-stage-is-carried`
+and not on `main`, so named without backticks). Part 18 is numbered after
+Parts 16 and 17, which are on pull request #14 and not yet on `main`. The owner
+answered by letter. Their words are quoted exactly.
+
+## 18a. Criterion coverage: the strictest of the four floors
+
+**Question put.** The proposal's question 1, "Which floor?" A promotion under
+ADR-015 must carry an evidence record but no minimum grade, so one Level D
+note (a hypothesis) is enough to enter `Micro Capital`, the first stage that
+spends real money. Four options were put: A, no floor; B, the hypothesis floor
+(nothing above `Validation` on Level D alone); C, the producible-grade floor
+(C, then B, B, A, A up the ladder); D, criterion coverage (C's floor, plus one
+record per promotion criterion on the three capital rungs). **The session
+recommended C**, as the only option that makes a paper track record a
+precondition of real money, and named D's cost: four of the seven criteria
+cannot be measured today, so it closes capital for years.
+
+**Owner said: "D".** The owner overruled the recommendation for a stricter
+option.
+
+### What it settles
+
+- **Upward moves carry option 3's grade floor:** destination `Research` D,
+  `Validation` D, `Paper Trading` C, `Promotion Review` B, `Micro Capital` B,
+  `Limited Capital` A, `Production` A.
+- **On the three capital destinations — `Micro Capital`, `Limited Capital`,
+  `Production` — a promotion also carries one evidence record per promotion
+  criterion, each at or above that rung's grade.** The list is the canonical
+  one, `constitution/Promotion_Pipeline.md:75-81` (ADR-006 rule 1): statistical
+  performance, risk-adjusted returns, drawdown behavior, regime robustness,
+  execution quality, liquidity, operational consistency. The naming conflicts
+  in `strategies/PromotionCriteria.md` and `Validation/CapitalReview.md` do not
+  change the list.
+- **Real money is closed until all seven can be measured.** Today three can
+  (`python scripts/status.py`: "promotion criteria 3 of 7 computable").
+  Regime robustness, execution quality, liquidity and operational consistency
+  have no working module (`scripts/status.py:48-56`). The owner chose that
+  cost knowingly.
+
+### What it does not settle
+
+- **The mechanism.** As ADR-015 rule 4 is written, the gate reads only the
+  single strongest grade on a promotion. It cannot count records or see what
+  a record is about, so "one record per criterion" has nothing to enforce it
+  yet. The proposal's question 6 (bind each record to a stored report) is
+  where that is decided. Until it is, this ruling is written into ADR-015 and
+  not enforced by code.
+- **Downward moves** (question 2), and every number: how many records, and
+  how much paper trading (question 4).
+- ADR-015's status. It stays PROPOSED until all seven questions are ruled and
+  a fresh independent pass has read the filled table.
+
+## 18b. The floor applies to upward moves only
+
+**Question put.** The proposal's question 2. ADR-015 rule 4's table is keyed
+by destination. Four destinations (`Paper Trading`, `Promotion Review`,
+`Micro Capital`, `Limited Capital`) are reached both by climbing and by
+falling, so without a direction clause the floor ruled in 18a would also bind
+a demotion. Under 18a that would mean a demotion from `Production` into
+`Limited Capital` carrying seven Level A records before capital could be
+withdrawn. **The session recommended upward only**, citing ADR-004 rule 4
+(`docs/DECISIONS.md:396-400`) and "Capital preservation wins. Always."
+(`constitution/Capital_Authority.md:22-28`). Both of the proposal's
+recommendations agreed.
+
+**Owner said: "1. Upward only".**
+
+### What it settles
+
+- **18a's grade floor and its per-criterion requirement bind only upward
+  moves.** Direction is computed as ADR-015 rule 4 already drafts it on
+  pull request #7's branch: a move to `Retired` is a retirement and never
+  upward; otherwise a move is upward when the destination's position in
+  `STRATEGY_LADDER` (`framework/artifacts/enums.py:107-109`) is greater than
+  the origin's.
+- **A demotion or retirement still carries at least one evidence record: the
+  record of the observed condition that triggered it, at the grade that
+  observation was made.** A live breach is A, a paper breach B, a falsified
+  backtest assumption C, a reasoned structural argument D. **No minimum grade,
+  and none may be added.** This is section 5's rule, which satisfies the
+  owner's earlier "Evidence for everything" without slowing an act that
+  preserves capital.
+
+### What it does not settle
+
+Whether a review that leaves a strategy where it is needs evidence
+(question 3).
+
+## 18c. A review that leaves a strategy where it is always carries evidence
+
+**Question put.** The proposal's question 3. `Remain Current Stage` is two
+events under one name (ADR-008 rule 4): a promotion request rejected, and a
+strategy already on real capital reviewed and kept there. ADR-015 as drafted
+leaves evidence optional for `Remain` and marks that as the drafter's
+judgement. Three options were put: optional; always required; or split
+(none for a rejected promotion, required when the strategy holds real
+capital). **The session recommended the split**, on the reasoning that
+saying no to capital should cost nothing.
+
+**Owner said: "2. Always required - rejecting a promotion also protects from
+real money going into play".** The owner overruled the recommendation. In
+the owner's reading, a rejection is itself a protective decision and should
+be backed by evidence like any other.
+
+### What it settles
+
+- **Every review outcome carries at least one evidence record: `Promote`,
+  `Demote`, `Retire` and `Remain Current Stage`, in both of `Remain`'s
+  senses.** ADR-015's "optional for `Remain`" is replaced by this.
+
+### What it does not settle
+
+- **The grade of a `Remain` record.** 18a's floor binds upward moves and 18b
+  keeps downward moves free of a minimum. Whether keeping a strategy on
+  capital must meet the floor of the rung it sits on was offered as a
+  separate question and not asked.
+
+## 18d. Paper-trading length is referred to the Investment Committee, and `Micro Capital` is closed until it rules
+
+**Question put.** The proposal's question 4, "How much paper trading is
+enough?" A grade says what kind of evidence a record is, not how much of it
+there is: one day of paper trading and two years are both Level B. No Belay
+document gives a number. **The session recommended referring it to the
+Investment Committee** (`strategies/PromotionCriteria.md:29`) **with a
+condition the session added: until the Committee rules a number, nothing may
+enter `Micro Capital`.**
+
+**Owner said: "2. Refer it to the Investment Committee - this will be part of
+the AI/agent the end user plugs in".**
+
+The owner's words quoted the option's label, which did not carry the
+condition, so the condition was put back as its own question.
+
+**Owner said: "Yes, closed until it's ruled".**
+
+### What it settles
+
+- **The paper-trading length is referred to the Investment Committee, not set
+  here.**
+- **Until the Committee rules a number, no strategy may enter
+  `Micro Capital`.** A blank number closes the rung. It never means "any
+  length".
+
+### What it does not settle
+
+- The number itself.
+- What the Investment Committee is, and whether a user's committee may set a
+  number of its own. See Part 19b, item 1.
+
+# Part 19 — Stated 2026-09-22: Belay is a product for others
+
+Stated by the owner while answering 18d, after the session named three
+things in the repository that an AI-run Investment Committee would run into.
+Their words are quoted exactly.
+
+**Owner said: "Belay is a product for others, that they download and plug
+their AI into. Human will say yes on on on the recommendations spelled out by
+their AI. if theres contradiction on that - we need to address it."**
+
+## 19a. What it settles
+
+- **`docs/EndState.md` row 1, "Is Belay single-operator, family, or a product
+  for others?", is answered: a product for others.**
+- **The shape:** each user runs Belay, connects an AI of their own choosing,
+  and that AI spells out recommendations. **A human says yes or no to each
+  one.** The AI recommends; the human authorizes. That matches
+  `constitution/Operational_Constraints.md:31-35` ("Belay advises. Humans
+  authorize.") and the provider-independence rule in `AGENTS.md`.
+
+## 19b. What it does not settle — the contradictions the owner asked to have addressed
+
+None of these is ruled. Each is to be put to the owner one at a time.
+
+1. **Who sets the gates: Belay, or each user's AI and human?** If a user's
+   committee can set the evidence floor or the paper-trading length, then
+   "Every strategy begins with zero capital. No exceptions."
+   (`constitution/Paper_First_Capital_Doctrine.md:5-7`) and Part 18 become
+   defaults a user can weaken, not laws. Every other item depends on this one.
+2. **A yes given to every recommendation is not oversight.** "Humans
+   authorize" is met on paper by a human who approves without reading. What
+   Belay must record about what the human was shown and approved is
+   unanswered.
+3. **The AI's recommendation has to be recorded, not re-asked.** `AGENTS.md`
+   (Determinism) says a model "may not sit inside Belay's decision path as a
+   live call". The owner's shape fits that rule only if each recommendation is
+   captured, frozen and attributed like any other evidence, and the human's
+   yes or no is the recorded decision.
+4. **`LICENSE` forbids running Belay without written permission.** A product
+   people download needs different terms. The licence is the owner's alone.
+5. **Software that recommends investments to other people may carry legal
+   obligations.** No session can assess that. It is recorded so that it is
+   not discovered late.
+
+## 19c. The owner's answers to 19b, given together
+
+The five items in 19b were put in chat, with item 1 asked as its own question
+and a recommendation (Belay sets the minimums; users may only be stricter).
+The owner answered four of them in one reply. Their words are quoted exactly,
+each beside the item it answers.
+
+**Item 1 — who sets the gates.** **Owner said: "user sets the gates through
+belays onboarding. always adjustable by the user through the GUI/settings or
+on behalf of the user through their connected AI." and "1. Belay sets the
+minimums; users can only be stricter".**
+
+- **Belay's constitution and Part 18 are fixed minimums in the product.** No
+  user setting, and no recommendation from a user's AI, can go below them.
+- **Each user sets their own gates during onboarding**, and can change them at
+  any time in the settings, or have their connected AI change them on their
+  behalf, always at or above Belay's minimums.
+- **The user's Investment Committee (the user and their AI) sets any number
+  Belay leaves open**, such as 18d's paper-trading length, on the strict side
+  of Belay's floor.
+
+**Item 2 — oversight.** **Owner said: "yes, record human interraction evidence
+there".** Every yes or no a human gives is recorded as evidence: what they were
+shown, and what they decided.
+
+**Item 3 — the AI's recommendation.** **Owner said: "Recommendations can
+remain as long as the thesis remains valid. perhaps a periodic review...".** A
+recorded recommendation stands while the thesis behind it holds. Re-checking
+it on a schedule is the owner's stated direction ("perhaps"), not a ruling.
+
+**Item 4 — `LICENSE`.** **Owner said: "well they download it, after they
+purchase it from me us".** Belay is sold. Users download it after buying it
+from the owners.
+
+### What it does not settle
+
+- **Whether a change the connected AI makes to a user's gates needs that
+  user's recorded yes.** Loosening a gate the user had tightened, while still
+  above Belay's minimum, is a weaker gate that no human approved.
+- **Belay's own minimum paper-trading length**, below which no user's
+  committee may go. Until it exists, 18d keeps `Micro Capital` closed.
+- **What makes a thesis "no longer valid"**, and how often it is reviewed.
+- **The licence terms themselves.** `LICENSE` still forbids running Belay.
+  Changing it is the owner's alone.
+- **Item 5, legal obligations**, was not answered.
+
+## 18e. Every promotion states how many strategy variants were tried
+
+**Question put.** The proposal's question 5. Keeping the best of many variants
+makes the winner look good partly by luck, and the statistical correction for
+that needs one input: how many variants were tried. ADR-012 rule 10
+(`docs/DECISIONS.md:2244-2250`) rules such corrections out of scope because
+"Belay records that nowhere", and every significance report says so
+(`framework/metrics/statistics.py:61-62`). The session recommended requiring
+the count, and noted that under Part 19 a user's connected AI can try far more
+variants than a person would. The independent reviewer recommended the same.
+
+**Owner said: "1. Require it".**
+
+### What it settles
+
+- **Every promotion states how many strategy variants were tried.** A
+  promotion that leaves it blank is refused.
+- **The count corrects nothing and claims nothing.** It records the input a
+  future correction needs. ADR-012 rule 10 is unchanged: no correction is
+  applied until one is ruled.
+
+### What it does not settle
+
+- **The count is self-reported**, like the grade letter, and can be
+  understated. Question 6 (binding records to stored reports) is what raises
+  the cost of that.
+- What counts as one "variant", and whether variants a user's AI generated
+  and discarded are counted.
+
+## 18f. Every evidence record names a stored, signed report, as part of this ruling
+
+**Question put.** The proposal's question 6. An evidence record's seal proves
+the record has not been edited, not that it is true. Its `provenance` is a
+free string (`framework/artifacts/evidence.py:12-18`). The proposal (its
+section 7) is that each qualifying record name a stored REPORT artifact by
+identifier, version and integrity hash, and that storage resolve it. Three
+options were put: rule it now as part of this ruling; rule the grades now and
+make this Required Follow-Up; do not require it. **The session recommended
+ruling it now, differing from both of the proposal's recommendations** (both
+said follow-up). The reason given was that after 18a it is also the only
+mechanism that can check what a record is about, so without it 18a's
+per-criterion requirement is written down and not enforced.
+
+**Owner said: "1. Rule it now, as part of this ruling".**
+
+### What it settles
+
+- **Every qualifying evidence record names a stored, signed report by
+  identifier, version and integrity hash, and Belay refuses a record whose
+  report does not resolve or whose hash does not match.** This is part of the
+  evidence-bar ruling, not a follow-up.
+- **It is the mechanism for 18a's one-record-per-criterion requirement**, and
+  what 18e's trial count and 19c's record of each human decision are tied to.
+
+### What it does not settle
+
+- **Where the binding lives.** `EvidenceRecord`'s hashed payload is pinned by
+  a literal digest (`tests/artifacts/test_evidence_hashing.py:18`), so a new
+  field would stop historical evidence verifying. The proposal names two
+  routes: a parsed format inside `provenance`, or the binding on the REVIEW
+  artifact's content. That is an engineering choice for the change that
+  implements this.
+- **Which records qualify.** The proposal applies it from destination `Paper
+  Trading` upward. Whether the records on downward moves (18b) and on
+  `Remain` (18c) must also name a stored report is not ruled.
+- **Binding proves a report exists and is unedited, not that its contents are
+  true.** It raises the cost of forging and does not remove it.
+
+## 18g. The evidence bar is its own decision record, ADR-016
+
+**Question put.** The proposal's question 7: write the bar inside ADR-015, or
+as a separate ADR-016 that fills ADR-015 rule 4's table from outside. The
+session recommended ADR-016: the ladder's mechanics should rarely change, the
+bar will (Belay's minimum paper-trading length, the trial-count rule, the
+report binding's open points), and 18a-18f grew well past the one table
+ADR-015 left room for. The independent reviewer recommended the same.
+
+**Owner said: "2. Separate ADR-016".**
+
+### What it settles
+
+- **Parts 18a-18f, and the product floors of 19c, are drafted as ADR-016.**
+  ADR-015 rule 4's table stays the interface and points at ADR-016.
+- **Changing the bar later means amending ADR-016, not reopening ADR-015.**
+
+### What it does not settle
+
+Both ADRs stay PROPOSED. Neither is ratified until it is drafted, a fresh
+independent pass has tried to break it, and the owner ratifies it.
+
+---
+
+**What Part 18 does not touch.** No ADR changes status, no finding is opened
+or closed, and no code changes. The seven questions of
+`docs/proposals/sample-adequacy-definition.md` are not yet put.
