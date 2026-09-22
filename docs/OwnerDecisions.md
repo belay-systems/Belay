@@ -2616,3 +2616,72 @@ be backed by evidence like any other.
   keeps downward moves free of a minimum. Whether keeping a strategy on
   capital must meet the floor of the rung it sits on was offered as a
   separate question and not asked.
+
+## 18d. Paper-trading length is referred to the Investment Committee (condition pending)
+
+**Question put.** The proposal's question 4, "How much paper trading is
+enough?" A grade says what kind of evidence a record is, not how much of it
+there is: one day of paper trading and two years are both Level B. No Belay
+document gives a number. **The session recommended referring it to the
+Investment Committee** (`strategies/PromotionCriteria.md:29`) **with a
+condition the session added: until the Committee rules a number, nothing may
+enter `Micro Capital`.**
+
+**Owner said: "2. Refer it to the Investment Committee - this will be part of
+the AI/agent the end user plugs in".**
+
+### What it settles
+
+The paper-trading length is not set by this ruling. It is referred.
+
+### What it does not settle
+
+- **The closed-until-ruled condition.** The owner's words quote the option's
+  label, which did not carry the condition. The condition was put back to the
+  owner and is not yet answered. Until it is, this record does not say that
+  `Micro Capital` is closed while the number is blank.
+- What the Investment Committee is. See Part 19.
+
+# Part 19 — Stated 2026-09-22: Belay is a product for others
+
+Stated by the owner while answering 18d, after the session named three
+things in the repository that an AI-run Investment Committee would run into.
+Their words are quoted exactly.
+
+**Owner said: "Belay is a product for others, that they download and plug
+their AI into. Human will say yes on on on the recommendations spelled out by
+their AI. if theres contradiction on that - we need to address it."**
+
+## 19a. What it settles
+
+- **`docs/EndState.md` row 1, "Is Belay single-operator, family, or a product
+  for others?", is answered: a product for others.**
+- **The shape:** each user runs Belay, connects an AI of their own choosing,
+  and that AI spells out recommendations. **A human says yes or no to each
+  one.** The AI recommends; the human authorizes. That matches
+  `constitution/Operational_Constraints.md:31-35` ("Belay advises. Humans
+  authorize.") and the provider-independence rule in `AGENTS.md`.
+
+## 19b. What it does not settle — the contradictions the owner asked to have addressed
+
+None of these is ruled. Each is to be put to the owner one at a time.
+
+1. **Who sets the gates: Belay, or each user's AI and human?** If a user's
+   committee can set the evidence floor or the paper-trading length, then
+   "Every strategy begins with zero capital. No exceptions."
+   (`constitution/Paper_First_Capital_Doctrine.md:5-7`) and Part 18 become
+   defaults a user can weaken, not laws. Every other item depends on this one.
+2. **A yes given to every recommendation is not oversight.** "Humans
+   authorize" is met on paper by a human who approves without reading. What
+   Belay must record about what the human was shown and approved is
+   unanswered.
+3. **The AI's recommendation has to be recorded, not re-asked.** `AGENTS.md`
+   (Determinism) says a model "may not sit inside Belay's decision path as a
+   live call". The owner's shape fits that rule only if each recommendation is
+   captured, frozen and attributed like any other evidence, and the human's
+   yes or no is the recorded decision.
+4. **`LICENSE` forbids running Belay without written permission.** A product
+   people download needs different terms. The licence is the owner's alone.
+5. **Software that recommends investments to other people may carry legal
+   obligations.** No session can assess that. It is recorded so that it is
+   not discovered late.
