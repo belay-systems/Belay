@@ -676,3 +676,29 @@ access cannot be granted until they accept. Until then `main: review` binds
 nobody but the owner, because GitHub counts a code owner only if they have write
 access. The owner's part is getting the invitation accepted; a session grants
 the Write once it has been.
+
+# 2026-09-22 — owner items from the evidence-bar rulings (`docs/OwnerDecisions.md` Parts 18-19)
+
+Appended so that no line citation moves.
+
+## Open — merge pull request #19
+
+It records Parts 18a-18g and 19 in the owner's words. It changes no code and no
+ADR status. No independent pass was run on it: it records rulings, and the pass
+that counts is on ADR-016 once it is drafted.
+
+## Open — Belay's licence terms (Part 19c, item 4)
+
+Belay is sold and then downloaded. `LICENSE` still forbids running it. The
+terms a buyer receives are the owner's to write or commission. No session may
+change `LICENSE`.
+
+## Open — legal advice on selling investment recommendations (Part 19b, item 5)
+
+Software that recommends investments to other people may carry legal
+obligations. No session can assess that. It needs a lawyer.
+
+## Later — ratify ADR-015 and ADR-016
+
+Neither is ready yet. Each needs drafting from Part 18, then a fresh
+independent pass, before it is put to the owner.

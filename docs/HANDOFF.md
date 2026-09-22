@@ -5632,3 +5632,52 @@ paragraph: fetch, read what moved, and list the open pull requests and Issues.
 Two of this file's own older sections are superseded by the one above, which is
 the normal shape here — later entries stand in front of earlier ones without
 rewriting them.
+
+## Session close, 2026-09-22
+
+**The owner ruled all seven evidence-bar questions**, one at a time and each
+with a recommendation, recorded as `docs/OwnerDecisions.md` Part 18 (18a-18g)
+on pull request #19. While answering, **the owner stated that Belay is a product
+for others**. Users buy it, download it and connect their own AI, and a human
+says yes or no to each recommendation. That is recorded as Part 19, with the
+contradictions it raised and the owner's answers (19c).
+
+In brief:
+
+- **18a** criterion coverage: option 3's grade per rung, plus one record per
+  canonical promotion criterion on the three capital rungs. **The owner chose
+  stricter than recommended.** Real money is closed until all seven criteria
+  are computable (`python scripts/status.py`: 3 of 7 today).
+- **18b** the floor binds upward moves only.
+- **18c** every review outcome carries evidence, including every `Remain`.
+  **Stricter than recommended.**
+- **18d** paper-trading length is referred to the Investment Committee, and
+  `Micro Capital` is closed until a number is ruled.
+- **18e** every promotion states how many variants were tried.
+- **18f** every qualifying record names a stored, signed report, as part of
+  this ruling and not as follow-up.
+- **18g** the bar is written as a separate ADR-016.
+- **19c** Belay's rules are fixed minimums. Each user sets their own gates at
+  onboarding and can change them, directly or through their AI, only upward.
+  Each human decision is recorded as evidence.
+
+**State at close.** `main` is unchanged by this session. Pull request #19 is
+draft, CI green on every push, and waits on the owner. Pull request #14 (Parts
+16-17) is still open. That is why Part 18 is numbered 18. The cadence gate
+said review due 2026-09-23. The routine fires 2026-09-25.
+
+## Highest priority next task
+
+1. **Draft ADR-016 (PROPOSED) from Part 18 and 19c**, and point ADR-015
+   rule 4's table at it on pull request #7's branch. Carry every "What it does
+   not settle" item from Parts 18 and 19c as an open item in the ADR, not as a
+   decision.
+2. **A fresh independent pass on ADR-015 and ADR-016 together**, told to
+   falsify them, before either is put to the owner for ratification.
+3. **Then the seven questions in `docs/proposals/sample-adequacy-definition.md`**,
+   one at a time. Its question 7 (one ruling or two for backtest adequacy and
+   paper length) is partly answered by 18d, which referred paper length to the
+   Investment Committee. Put it with that stated.
+4. **Part 19's open questions**, one at a time: whether an AI-made change to a
+   user's gates needs that user's recorded yes; Belay's own minimum
+   paper-trading length; what makes a thesis "no longer valid".
