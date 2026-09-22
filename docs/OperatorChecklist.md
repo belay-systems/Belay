@@ -702,3 +702,51 @@ obligations. No session can assess that. It needs a lawyer.
 
 Neither is ready yet. Each needs drafting from Part 18, then a fresh
 independent pass, before it is put to the owner.
+
+# 2026-09-22 — no one merges alone (`docs/OwnerDecisions.md` Part 20)
+
+Appended so that no line citation moves. **This supersedes "How the owner
+merges a pull request, now that `main` is ruled" above, once the steps below
+are done.** Until then, that section still describes the live settings.
+
+## What changes
+
+- **`--admin` stops working, deliberately.** `main: review` has no bypass
+  (Part 20b). Every pull request into `main` merges only after the *other*
+  owner approves it. That includes pull requests a session opens under the
+  owner's login.
+- **Both owners are code owners on the governance paths** (Part 20c). The
+  second contributor's approval there means the change was checked, never that
+  it was ruled. Rulings are still the owner's alone.
+- **Carrier branches** (`adr/**`, which other pull requests merge into) get the
+  same review rule as `main` (Part 20a). Working branches are not covered,
+  because a review rule would also stop anyone pushing to them.
+
+## Open — the order to apply it in
+
+The order matters, because each step changes what the next one needs.
+
+1. **The second contributor reviews and approves the pull request that
+   carries this change.** That is the rule working before it is enforced.
+2. **The owner merges it with `--admin`, the last time that is possible.** It
+   has to be `--admin`: the pull request touches `.github/`, whose only code
+   owner on `main` is still the owner, who cannot approve their own pull
+   request.
+3. **Bring `main` into `adr/015-stage-is-carried` before step 4.** A review
+   rule reads `CODEOWNERS` from the branch being merged into, and that branch
+   still has the old one, where only the owner is named on governance paths.
+   Without this step, an owner-authored change to that branch has no one who
+   can approve it.
+4. **The owner runs `python scripts/public_settings.py --apply`** as an
+   organization Owner. It updates `main: review` and creates
+   `carriers: review` from `.github/rulesets/`.
+5. **Check it.** Run `python scripts/public_settings.py`. Every ruleset row
+   should read PASS. Then confirm GitHub now answers `never` for
+   `current_user_can_bypass` on `main: review`, as it already does for
+   `main: checks`.
+
+## In an emergency
+
+If one owner is unavailable and something must merge, the way through is for
+an organization Owner to edit the ruleset. GitHub logs that. Record the reason
+in `docs/OwnerDecisions.md` the same day, and restore the rule afterwards.

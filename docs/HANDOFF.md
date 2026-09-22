@@ -5687,3 +5687,17 @@ said review due 2026-09-23. The routine fires 2026-09-25.
 4. **Part 19's open questions**, one at a time: whether an AI-made change to a
    user's gates needs that user's recorded yes; Belay's own minimum
    paper-trading length; what makes a thesis "no longer valid".
+
+## Added 2026-09-22 (late) — no one merges alone
+
+The owner ruled Part 20 (`docs/OwnerDecisions.md`): every merge gets a second
+review (20a); the Owner bypass on `main: review` is removed (20b); and, to
+avoid the deadlock that would have caused, the second contributor is a second
+code owner on the governance paths, **as a reviewer, not an authority** (20c).
+
+The files are changed on this branch: `.github/CODEOWNERS`,
+`.github/rulesets/main-review.json`, a new `.github/rulesets/carriers-review.json`
+(`adr/**`), and the tests that guard them. **None of it is live until the owner
+applies it.** `docs/OperatorChecklist.md`'s last section gives the five steps in
+order. Step 3, bringing `main` into ADR-015's branch before applying, is easy to
+miss and would lock that branch.

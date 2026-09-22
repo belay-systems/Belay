@@ -1,47 +1,48 @@
-# Every change is reviewed before it merges. With "require review from Code
-# Owners" switched on in the ruleset for main, GitHub enforces this rather than
-# relying on anyone remembering it.
+# Every change is reviewed before it merges, by someone other than its author.
+# docs/OwnerDecisions.md Part 20 made that "always": the review ruleset has no
+# bypass, and GitHub refuses a self-approval, so no one merges alone.
 #
 # Both owners review ordinary work, so neither is a bottleneck on the other.
 # GitHub counts a code owner only if they have write access to the repository.
-# Until the second contributor has it, the catch-all names one eligible person.
-# Nobody can approve their own pull request, so this still means a second pair
-# of eyes on ordinary work. On the owner-only paths below there is no second
-# code owner, so an owner-authored change there has no eligible reviewer.
 *                         @pewpewpressco-ux @eternalaether5
 
-# The governance records are the owner's alone. docs/OwnerDecisions.md Part 11a
-# grants the second contributor no authority over them. Most of these paths are
-# in AGENTS.md under "What only the owner may change"; AGENTS.md reserves only
-# ADR *statuses* in docs/DECISIONS.md, and does not name AGENTS.md or .github/
-# at all, so those three are this file being stricter, not quoting it.
-/constitution/            @pewpewpressco-ux
-/departments/             @pewpewpressco-ux
-/workflows/               @pewpewpressco-ux
-/Knowledge/               @pewpewpressco-ux
-/strategies/              @pewpewpressco-ux
-/docs/OwnerDecisions.md   @pewpewpressco-ux
-/docs/DECISIONS.md        @pewpewpressco-ux
-/AGENTS.md                @pewpewpressco-ux
-/LICENSE                  @pewpewpressco-ux
-/.github/                 @pewpewpressco-ux
+# The governance records. Only the owner rules on them: docs/OwnerDecisions.md
+# Part 11a grants the second contributor no authority over them, and AGENTS.md
+# lists what only the owner may change. Part 20c names the second contributor
+# here as a REVIEWER, not an authority. His approval means a change was checked,
+# never that it was ruled. Without a second name on these lines, a change the
+# owner makes here would have no one who could approve it (Part 20b).
+# AGENTS.md reserves only ADR *statuses* in docs/DECISIONS.md, and does not name
+# AGENTS.md or .github/ at all, so those three are this file being stricter.
+/constitution/            @pewpewpressco-ux @eternalaether5
+/departments/             @pewpewpressco-ux @eternalaether5
+/workflows/               @pewpewpressco-ux @eternalaether5
+/Knowledge/               @pewpewpressco-ux @eternalaether5
+/strategies/              @pewpewpressco-ux @eternalaether5
+/docs/OwnerDecisions.md   @pewpewpressco-ux @eternalaether5
+/docs/DECISIONS.md        @pewpewpressco-ux @eternalaether5
+/AGENTS.md                @pewpewpressco-ux @eternalaether5
+/LICENSE                  @pewpewpressco-ux @eternalaether5
+/.github/                 @pewpewpressco-ux @eternalaether5
 
 # The guards themselves, added before the repository went public. A guard that
 # the person it restrains can approve removing is a convention. These decide
 # what gets published, what every contributor's agent is told to do, and what
 # code installs itself on a contributor's machine and in continuous integration.
-/.gitignore                            @pewpewpressco-ux
-/tests/test_publication_guard.py       @pewpewpressco-ux
-/tests/test_rulesets.py                @pewpewpressco-ux
-/tests/test_governance_conformance.py  @pewpewpressco-ux
-/tests/data/test_store.py              @pewpewpressco-ux
-/tests/data/test_dolt_clone.py         @pewpewpressco-ux
-/tests/artifacts/test_repository.py    @pewpewpressco-ux
-/scripts/public_settings.py            @pewpewpressco-ux
-/scripts/status.py                     @pewpewpressco-ux
-/docs/ENGINEERING_AGENT.md             @pewpewpressco-ux
-/pyproject.toml                        @pewpewpressco-ux
-/CLAUDE.md                             @pewpewpressco-ux
-/.claude/                              @pewpewpressco-ux
-/CONTRIBUTING.md                       @pewpewpressco-ux
-/SECURITY.md                           @pewpewpressco-ux
+# Both owners are named for the same reason as above (Part 20c): neither can
+# remove a guard alone.
+/.gitignore                            @pewpewpressco-ux @eternalaether5
+/tests/test_publication_guard.py       @pewpewpressco-ux @eternalaether5
+/tests/test_rulesets.py                @pewpewpressco-ux @eternalaether5
+/tests/test_governance_conformance.py  @pewpewpressco-ux @eternalaether5
+/tests/data/test_store.py              @pewpewpressco-ux @eternalaether5
+/tests/data/test_dolt_clone.py         @pewpewpressco-ux @eternalaether5
+/tests/artifacts/test_repository.py    @pewpewpressco-ux @eternalaether5
+/scripts/public_settings.py            @pewpewpressco-ux @eternalaether5
+/scripts/status.py                     @pewpewpressco-ux @eternalaether5
+/docs/ENGINEERING_AGENT.md             @pewpewpressco-ux @eternalaether5
+/pyproject.toml                        @pewpewpressco-ux @eternalaether5
+/CLAUDE.md                             @pewpewpressco-ux @eternalaether5
+/.claude/                              @pewpewpressco-ux @eternalaether5
+/CONTRIBUTING.md                       @pewpewpressco-ux @eternalaether5
+/SECURITY.md                           @pewpewpressco-ux @eternalaether5

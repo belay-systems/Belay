@@ -43,7 +43,9 @@ def _rules(ruleset: dict) -> dict:
 
 
 def test_there_are_rulesets_to_check():
-    assert len(RULESETS) == 2, [p.name for p in RULESETS]
+    assert [p.name for p in RULESETS] == [
+        "carriers-review.json", "main-checks.json", "main-review.json"
+    ]
 
 
 def test_required_checks_are_exactly_the_workflow_jobs():
@@ -55,13 +57,25 @@ def test_required_checks_are_exactly_the_workflow_jobs():
     assert required == _job_names()
 
 
-def test_every_ruleset_is_active_and_targets_the_default_branch():
+# Where each ruleset applies. `main` gets both. A carrier branch (one that other
+# pull requests merge into, such as `adr/015-stage-is-carried`) gets the review
+# requirement only: docs/OwnerDecisions.md Part 20a, "always second review".
+# Working branches are not covered, because a review rule also blocks pushing
+# to the branch it covers.
+TARGETS = {
+    "main-checks.json": ["~DEFAULT_BRANCH"],
+    "main-review.json": ["~DEFAULT_BRANCH"],
+    "carriers-review.json": ["refs/heads/adr/**"],
+}
+
+
+def test_every_ruleset_is_active_and_targets_what_it_should():
     for path in RULESETS:
         ruleset = _load(path)
         assert ruleset["enforcement"] == "active", path.name
         assert ruleset["target"] == "branch", path.name
         assert ruleset["conditions"] == {
-            "ref_name": {"include": ["~DEFAULT_BRANCH"], "exclude": []}
+            "ref_name": {"include": TARGETS[path.name], "exclude": []}
         }, path.name
 
 
@@ -82,17 +96,32 @@ def test_the_checks_ruleset_can_be_bypassed_by_nobody():
     assert {"deletion", "non_fast_forward", "pull_request", "required_status_checks"} <= set(_rules(ruleset))
 
 
-def test_the_review_ruleset_requires_a_code_owner():
-    params = _rules(_load(REPO / ".github" / "rulesets" / "main-review.json"))["pull_request"]
-    assert params["require_code_owner_review"] is True
-    assert params["required_approving_review_count"] >= 1
+REVIEW_RULESETS = ("main-review.json", "carriers-review.json")
 
 
-def test_the_review_ruleset_has_exactly_one_way_round_it():
-    """Both neighbours are worse. An empty list deadlocks every pull request
-    the sole code owner writes. "always" in place of "pull_request" lets an
-    organization owner push to `main` with no pull request at all."""
-    ruleset = _load(REPO / ".github" / "rulesets" / "main-review.json")
-    assert [(a["actor_type"], a["bypass_mode"]) for a in ruleset["bypass_actors"]] == [
-        ("OrganizationAdmin", "pull_request")
-    ]
+def test_the_review_rulesets_require_a_code_owner():
+    for name in REVIEW_RULESETS:
+        params = _rules(_load(REPO / ".github" / "rulesets" / name))["pull_request"]
+        assert params["require_code_owner_review"] is True, name
+        assert params["required_approving_review_count"] >= 1, name
+
+
+def test_no_review_ruleset_can_be_bypassed():
+    """docs/OwnerDecisions.md Part 20b. An organization Owner used to be able to
+    merge into `main` with no review, and on 2026-09-22 a session did. The
+    deadlock an empty list used to cause, every pull request the sole code
+    owner wrote having no eligible reviewer, is closed in `.github/CODEOWNERS`
+    instead (Part 20c), and `test_publication_guard.py` holds that side."""
+    for name in REVIEW_RULESETS:
+        assert _load(REPO / ".github" / "rulesets" / name)["bypass_actors"] == [], name
+
+
+def test_the_review_rulesets_differ_only_in_name_and_target():
+    """A carrier branch is reviewed exactly as `main` is. If one is tightened
+    and the other is not, a change can land on the weaker one and be merged on
+    from there."""
+    main, carriers = (_load(REPO / ".github" / "rulesets" / n) for n in REVIEW_RULESETS)
+    for ruleset in (main, carriers):
+        ruleset.pop("name")
+        ruleset.pop("conditions")
+    assert main == carriers

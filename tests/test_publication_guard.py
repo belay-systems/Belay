@@ -48,9 +48,14 @@ MARKDOWN_SIZE_LIMIT = 1024 * 1024
 # name and point at anything.
 ORDINARY_MODES = frozenset({"100644", "100755"})
 
-# The guards, which `.github/CODEOWNERS` must keep as the owner's alone. An
-# empty CODEOWNERS file fails nothing else in the suite.
+# The guards, which `.github/CODEOWNERS` must give to exactly the two owners.
+# docs/OwnerDecisions.md Part 20c: the second contributor reviews them and does
+# not rule on them. Both names are needed because the review ruleset has no
+# bypass (Part 20b), so a path with one code owner is a path that person can
+# never change. A third name would let someone else approve a guard's removal.
+# An empty CODEOWNERS file fails nothing else in the suite.
 OWNER = "@pewpewpressco-ux"
+REVIEWER = "@eternalaether5"
 OWNER_ONLY = (
     "/.github/",
     "/.gitignore",
@@ -138,7 +143,7 @@ def test_no_tracked_file_is_large_enough_to_be_a_dataset():
     )
 
 
-def test_the_guards_are_the_owners_alone_in_codeowners():
+def test_the_guards_need_both_owners_in_codeowners():
     """CODEOWNERS is last-match-wins, so what counts is the last line that
     matches each guard, not whether the guard has a line. The first version of
     this test looked each pattern up by name, and an independent pass voided
@@ -162,5 +167,5 @@ def test_the_guards_are_the_owners_alone_in_codeowners():
 
     shapes = [p for p, *_ in lines if p != "*" and not p.startswith("/")]
     assert not shapes, f"patterns this test cannot resolve, so cannot vouch for: {shapes}"
-    wrong = {p: owners_for(p) for p in OWNER_ONLY if owners_for(p) != [OWNER]}
-    assert not wrong, f"not owner-only in .github/CODEOWNERS: {wrong}"
+    wrong = {p: owners_for(p) for p in OWNER_ONLY if owners_for(p) != [OWNER, REVIEWER]}
+    assert not wrong, f"not owner-and-reviewer in .github/CODEOWNERS: {wrong}"
