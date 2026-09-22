@@ -5696,3 +5696,5 @@ DRAFTER choices the owner has not seen. **Next task 2 is now the next thing
 owed: a fresh independent pass told to falsify ADR-016 and ADR-015 together.**
 ADR-015's pointer to ADR-016 is not yet applied on pull request #7's branch.
 The draft lists the five changes it needs.
+**The owner chose the second contributor's agent for that pass** ("second
+contributors agens"), as a different AI. It is Issue #21, assigned to them.
