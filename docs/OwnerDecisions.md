@@ -2494,3 +2494,51 @@ it. One pushed commit would have published it permanently.
 
 **What Part 15 does not touch.** Parts 1 through 14 stand except where 15b and
 15c say otherwise. No finding is opened or closed and no ADR changes status.
+
+---
+
+# Part 16 — Ruled 2026-09-22: the second contributor gets Admin, overruling 15b
+
+**Question put.** The owner reported the second contributor's organization
+invitation accepted and asked a session to grant Write access — the mechanical
+step 15b already authorized. Before the session could act, the owner said: "i
+manually gave my brother Admin perms." `gh`-equivalent lookup
+(`list_repository_collaborators`) confirmed: `eternalaether5`, `role_name:
+"admin"`, on the live repository. That is beyond 15b's ruling and reopens the
+tradeoff 15b named: with Admin, `eternalaether5` can bypass the `main: review`
+ruleset (its bypass condition is "any organization owner, through a pull
+request" — `docs/HANDOFF.md:5446-5453`), so the code-owner review requirement
+binds nobody but whoever the two owners choose to have it bind; and the
+owner's account is no longer the only one that can recover the organization.
+The session put three options: dial back to Write (matching 15b), keep Admin
+and update the ruling, or leave it unrecorded. The owner selected the second.
+
+**Owner said: "Keep Admin, update the ruling".**
+
+### What it settles
+
+`eternalaether5` holds Admin on `belay-systems/Belay`, not Write. 15b's role
+choice is overruled; 15b's reasoning is not wrong, it is a cost the owner has
+now chosen to accept knowingly rather than one the owner needs re-explained.
+`.github/CODEOWNERS:11`'s "Unknown owner" condition (`docs/OperatorChecklist.md`,
+"`.github/CODEOWNERS` is invalid while the invitation is pending") clears on
+this grant regardless of role — GitHub counts a code owner once the login has
+write access or above, and Admin includes write.
+
+### What it does not settle
+
+- **The `main: review` bypass is now live, not hypothetical.** Any merge
+  either owner's login pushes through as an organization owner skips the
+  code-owner check. Nothing in the repository enforces the second pair of eyes
+  Part 11a and `.github/CODEOWNERS`'s own comment describe once both
+  logins can bypass it. Whether that is acceptable day to day, or worth a
+  ruleset change, is the owner's — the session did not weaken it before
+  being asked to stand down.
+- **Organization recovery is no longer sole-owner.** Unchanged from what 15b
+  named as the cost of *not* doing this; now it applies.
+- How Belay is owned between the two, per 15b, is still unwritten.
+
+---
+
+**What Part 16 does not touch.** Parts 1 through 15 stand except where 16
+says otherwise. No finding is opened or closed and no ADR changes status.

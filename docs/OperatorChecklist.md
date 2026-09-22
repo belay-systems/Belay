@@ -394,6 +394,36 @@ public repository it is also a place strangers can post.
 
 ## Done
 
+### Grant the second contributor collaborator access — DONE 2026-09-22, as Admin, not Write
+
+**Added 2026-09-20.** `eternalaether5`'s organization invitation was pending
+(sent 2026-09-20, role Member, which is what Part 15b ruled). Write access
+could not be granted until they accepted.
+
+**Attempted 2026-09-21, blocked.** A session tried to make the grant once the
+owner reported the invitation accepted. `GET
+/repos/belay-systems/Belay/collaborators` returned `403 Resource not
+accessible by integration` — the Claude GitHub App was not installed/linked
+for the `belay-systems` organization, so no GitHub write or collaborator-read
+call could succeed from any session, independent of what had been ruled.
+
+**Resolved 2026-09-22.** The owner reconnected the GitHub App
+(`https://github.com/apps/claude/installations/select_target`) and granted
+the permission manually rather than waiting on a session: `eternalaether5`
+holds **Admin**, not Write, confirmed via `list_repository_collaborators`
+(`role_name: "admin"`). That is beyond Part 15b's ruling, so the session put
+the mismatch to the owner rather than silently correcting it or silently
+accepting it. **Owner said: "Keep Admin, update the ruling"** —
+`docs/OwnerDecisions.md` Part 16 records this, overruling 15b's role choice
+and restating the cost 15b named (the `main: review` code-owner bypass is now
+live for both owners' logins; organization recovery is no longer sole-owner).
+
+`.github/CODEOWNERS:11`'s "Unknown owner" condition clears on this grant —
+GitHub counts a code owner once the login has write access or above, which
+Admin includes.
+
+---
+
 ### Merge order for the three register/ADR pull requests — DONE 2026-09-19
 
 **Added 2026-09-19, closed the same day (evening).** In order: PR #9 merged
@@ -668,39 +698,8 @@ one uses a GitHub connector in its Step 4" is false as the routine is
 configured. That evidence is posted on Issue #3 rather than resolving it, since
 the other document's claim is about creation and was not tested.
 
-## Open — grant the second contributor Write access
+## Grant the second contributor Write access — moved to `## Done`, resolved as Admin
 
-**Added 2026-09-20.** `eternalaether5`'s organization invitation is still
-**pending** (sent 2026-09-20, role Member, which is what Part 15b rules). Write
-access cannot be granted until they accept. Until then `main: review` binds
-nobody but the owner, because GitHub counts a code owner only if they have write
-access. The owner's part is getting the invitation accepted; a session grants
-the Write once it has been.
-
-**Attempted 2026-09-21, blocked — the session's GitHub credential cannot do
-this.** The owner reported the invitation accepted and asked a session to make
-the grant, which this checklist already says needs no further ruling. The
-session authenticated as `pewpewpressco-ux` (`get_me` confirmed this), then
-`GET /repos/belay-systems/Belay/collaborators` returned `403 Resource not
-accessible by integration`. That is a GitHub App permission gap, not a
-governance question: the installation backing this session's GitHub tool has
-no `members` or `administration` scope, so it cannot read collaborators, add
-one, or set a permission level, regardless of who is asking or what has been
-ruled. The session could not independently confirm the invitation shows as
-accepted for the same reason.
-
-**Owner's part, unchanged in kind but now including the grant itself:**
-1. Confirm on GitHub (`belay-systems` org → **People**) that `eternalaether5`
-   shows as an active Member, not pending.
-2. `https://github.com/belay-systems/Belay/settings/access` → find
-   `eternalaether5` → set role to **Write**.
-3. Tell the next session so it can confirm `.github/CODEOWNERS:11` now
-   resolves (`gh api repos/belay-systems/Belay/codeowners/errors` returns
-   nothing for that line) and close this item.
-
-Separately, worth the owner's attention: if a session granting collaborator
-permissions is meant to keep working, the GitHub App installation for this
-integration needs the `members` and/or `administration` permission added
-(GitHub App settings, not a repository setting) — that is itself a decision
-about widening what an unattended credential can do, so it is recorded here
-rather than acted on.
+See "Grant the second contributor collaborator access — DONE 2026-09-22, as
+Admin, not Write" under `## Done` above. Kept as a pointer here rather than
+deleted, since this is where the next session would look first.
