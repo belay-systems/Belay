@@ -5687,3 +5687,12 @@ said review due 2026-09-23. The routine fires 2026-09-25.
 4. **Part 19's open questions**, one at a time: whether an AI-made change to a
    user's gates needs that user's recorded yes; Belay's own minimum
    paper-trading length; what makes a thesis "no longer valid".
+
+**Added 2026-09-22, after #19 merged.** Pull request #19 was merged by the
+session on the owner's instruction (recorded above), as `1590b34`. Next task 1,
+drafting ADR-016, is started: `docs/proposals/ADR-016-evidence-bar-DRAFT.md`,
+PROPOSED and not ratified. It marks each rule RULED or DRAFTER, and lists seven
+DRAFTER choices the owner has not seen. **Next task 2 is now the next thing
+owed: a fresh independent pass told to falsify ADR-016 and ADR-015 together.**
+ADR-015's pointer to ADR-016 is not yet applied on pull request #7's branch.
+The draft lists the five changes it needs.
