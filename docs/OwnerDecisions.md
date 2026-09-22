@@ -2692,3 +2692,49 @@ None of these is ruled. Each is to be put to the owner one at a time.
 5. **Software that recommends investments to other people may carry legal
    obligations.** No session can assess that. It is recorded so that it is
    not discovered late.
+
+## 19c. The owner's answers to 19b, given together
+
+The five items in 19b were put in chat, with item 1 asked as its own question
+and a recommendation (Belay sets the minimums; users may only be stricter).
+The owner answered four of them in one reply. Their words are quoted exactly,
+each beside the item it answers.
+
+**Item 1 — who sets the gates.** **Owner said: "user sets the gates through
+belays onboarding. always adjustable by the user through the GUI/settings or
+on behalf of the user through their connected AI." and "1. Belay sets the
+minimums; users can only be stricter".**
+
+- **Belay's constitution and Part 18 are fixed minimums in the product.** No
+  user setting, and no recommendation from a user's AI, can go below them.
+- **Each user sets their own gates during onboarding**, and can change them at
+  any time in the settings, or have their connected AI change them on their
+  behalf, always at or above Belay's minimums.
+- **The user's Investment Committee (the user and their AI) sets any number
+  Belay leaves open**, such as 18d's paper-trading length, on the strict side
+  of Belay's floor.
+
+**Item 2 — oversight.** **Owner said: "yes, record human interraction evidence
+there".** Every yes or no a human gives is recorded as evidence: what they were
+shown, and what they decided.
+
+**Item 3 — the AI's recommendation.** **Owner said: "Recommendations can
+remain as long as the thesis remains valid. perhaps a periodic review...".** A
+recorded recommendation stands while the thesis behind it holds. Re-checking
+it on a schedule is the owner's stated direction ("perhaps"), not a ruling.
+
+**Item 4 — `LICENSE`.** **Owner said: "well they download it, after they
+purchase it from me us".** Belay is sold. Users download it after buying it
+from the owners.
+
+### What it does not settle
+
+- **Whether a change the connected AI makes to a user's gates needs that
+  user's recorded yes.** Loosening a gate the user had tightened, while still
+  above Belay's minimum, is a weaker gate that no human approved.
+- **Belay's own minimum paper-trading length**, below which no user's
+  committee may go. Until it exists, 18d keeps `Micro Capital` closed.
+- **What makes a thesis "no longer valid"**, and how often it is reviewed.
+- **The licence terms themselves.** `LICENSE` still forbids running Belay.
+  Changing it is the owner's alone.
+- **Item 5, legal obligations**, was not answered.
