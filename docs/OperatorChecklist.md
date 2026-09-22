@@ -702,3 +702,12 @@ obligations. No session can assess that. It needs a lawyer.
 
 Neither is ready yet. Each needs drafting from Part 18, then a fresh
 independent pass, before it is put to the owner.
+
+## Open — 2026-09-22 (final): what the owner needs to chase
+
+- **Ask the second contributor to review #23 before 2026-09-25**, then merge
+  it (with `--admin` until #22's settings are applied). It protects the
+  scheduled review that runs that day.
+- Then #22, and its five steps in the section "no one merges alone" once that
+  PR has merged.
+- #20 waits on his independent pass (Issue #21). #7 and #14 wait on his reply.

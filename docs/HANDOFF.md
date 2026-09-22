@@ -5702,3 +5702,62 @@ ADR-015's pointer to ADR-016 is not yet applied on pull request #7's branch.
 The draft lists the five changes it needs.
 **The owner chose the second contributor's agent for that pass** ("second
 contributors agens"), as a different AI. It is Issue #21, assigned to them.
+
+## Session close, 2026-09-22 (final) — supersedes the blocks above for today
+
+Written against `origin/main` at `1590b34`, fetched at close, and the open pull
+requests and Issues as listed at close. **Re-derive before trusting it:**
+`git log --oneline -3 origin/main`, the open pull requests, `python
+scripts/review_due.py`.
+
+**On `main`:** #19 only, with Parts 18 and 19 (the evidence bar; Belay is a
+product). Suite 659 passed, 1 skipped, 5 xfailed. `python scripts/status.py`:
+open findings 41, promotion criteria 3 of 7 computable. Review gate: `SKIP —
+last review was 11 days ago … Next due 2026-09-23`. The scheduled routine
+fires 2026-09-25.
+
+**Open, all from this session, all CI green, all waiting on the second
+contributor. Merge #23 first, because it has a deadline:**
+
+| PR | What | Needs | By |
+|---|---|---|---|
+| #23 (`claude/review-untrusted-input`) | The review treats outside text as data and records it under `## Outside text` | His approval, then the owner merges | **Before the 2026-09-25 run** |
+| #22 (`claude/second-review-settings`) | Part 20: no bypass on `main: review`; both owners are code owners on governance paths, him as reviewer only; `carriers: review` for `adr/**` | His approval; then the owner's five steps in `docs/OperatorChecklist.md` (merge with `--admin` one last time, sync `main` into `adr/015-stage-is-carried`, `--apply`, verify) | — |
+| #20 (`claude/pensive-hypatia-nu6j3j`) | ADR-016 draft, and this record | Issue #21, his independent pass | — |
+
+**Also waiting on him:** #7, where he is asked to support or remove the
+"independent regression check" claim his corrections make
+(`https://github.com/belay-systems/Belay/pull/7#issuecomment-5784292984`); and
+#14.
+
+**Expect merge conflicts in `docs/HANDOFF.md` and `docs/OperatorChecklist.md`**
+between #20 and #22, which both append to them. Resolve by keeping both
+appended blocks. Nothing in either is shared logic.
+
+**What this session found in the second contributor's recent work**, kept
+here because it was never on file. #15, #17 and #18 went into ADR-015's branch
+merged by their author with no review. That was allowed, because both rulesets
+covered `main` only; Part 20 closes it. The substance was correct: every
+figure was recomputed and every citation checked. One defect: a claim of an
+"independent regression check" with no record behind it, which now sits in
+ADR-015.
+
+**What a session did here that the rules otherwise forbid, and on whose
+word.** It merged #19 on the owner's explicit instruction, using the Owner
+bypass (recorded above). It pushed two branches beyond its designated one,
+also on the owner's explicit instruction ("yes - push approved", "yes close
+risk 1"). None of the three is a standing permission.
+
+## Highest priority next task — 2026-09-22 (final)
+
+1. **Get #23 merged before 2026-09-25.** If it cannot be, the 25th review runs
+   without the outside-text rule. Say so to the owner rather than let it pass
+   silently.
+2. **When the second contributor's pass on ADR-016 lands (Issue #21)**, verify
+   every finding, fix what is real on #20, and put the seven DRAFTER choices to
+   the owner one at a time.
+3. **After #22 is applied**, check with `python scripts/public_settings.py`
+   that every ruleset row reads PASS and that `current_user_can_bypass` is
+   `never` on `main: review`. Then close Issue #16 as fixed by Part 20.
+4. Then the list above from its item 3: the sample-adequacy questions, from
+   PR #7's branch, and Part 19's open questions.
