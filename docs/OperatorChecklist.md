@@ -414,9 +414,17 @@ holds **Admin**, not Write, confirmed via `list_repository_collaborators`
 (`role_name: "admin"`). That is beyond Part 15b's ruling, so the session put
 the mismatch to the owner rather than silently correcting it or silently
 accepting it. **Owner said: "Keep Admin, update the ruling"** —
-`docs/OwnerDecisions.md` Part 16 records this, overruling 15b's role choice
-and restating the cost 15b named (the `main: review` code-owner bypass is now
-live for both owners' logins; organization recovery is no longer sole-owner).
+`docs/OwnerDecisions.md` Part 16 records this, overruling 15b's role choice.
+
+**Part 16's first-written cost estimate was wrong and is corrected at 16a in
+the same file: repository Admin does not let `eternalaether5` bypass
+`main: review`'s PR-time review — that bypass is organization-Owner only,
+and 15b kept them a Member.** What repository Admin actually grants:
+`eternalaether5` can edit or delete the `main: review` / `main: checks`
+rulesets outright (repository-scoped rulesets are manageable by anyone with
+repository Admin, independent of the rulesets' own bypass lists), manage
+secrets and Actions settings, add or remove collaborators, and change
+visibility or delete the repository. See Part 16a for the full correction.
 
 `.github/CODEOWNERS:11`'s "Unknown owner" condition clears on this grant —
 GitHub counts a code owner once the login has write access or above, which

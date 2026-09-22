@@ -2538,6 +2538,53 @@ write access or above, and Admin includes write.
   named as the cost of *not* doing this; now it applies.
 - How Belay is owned between the two, per 15b, is still unwritten.
 
+## 16a. Correction to Part 16 above, made within the same pull request before merge
+
+**Part 16 as first written conflated two different GitHub permissions.**
+`.github/rulesets/main-review.json`'s `bypass_actors` names
+`"actor_type": "OrganizationAdmin"` — GitHub's organization **Owner** role.
+`eternalaether5` was made an organization **Member** (Part 15b), and nothing
+in this session changed that. The grant this Part records is a *repository*
+collaborator permission (`list_repository_collaborators` returns it as
+`role_name`, a repository-scoped field), a separate axis from organization
+role entirely. **`eternalaether5` cannot bypass `main: review`'s PR-time
+review requirement.** That bypass is exercised only by an organization
+owner — at the time of writing, the account that created the organization
+(Part 14a).
+
+**What repository Admin grants instead, and why it still matters:**
+`scripts/public_settings.py:216` manages `main: review` and `main: checks`
+through `repos/{repo}/rulesets` — a repository-scoped endpoint. GitHub's
+documented permission model for it: anyone with **admin access to the
+repository** may create, edit or delete a repository-level ruleset, a
+separate check from that ruleset's own bypass list. So `eternalaether5`, with
+repository Admin, can edit or delete `main: review` or `main: checks`
+directly (Settings → Rules → Rulesets) — no pull request, no bypass
+mechanism invoked, nothing for `bypass_actors` to gate. That is a different
+and structurally larger exposure than "skips one review": it is "can turn
+the requirement off". Repository Admin also grants managing repository
+secrets and Actions settings, adding or removing other collaborators,
+changing visibility, and deleting or transferring the repository — none of
+it exclusive to organization Owners.
+
+**Not independently verified live against this repository** — that would
+need `eternalaether5`'s own credentials or an organization-owner API check
+this session does not have. Stated from GitHub's documented, stable
+ruleset-permission model, not from a reproduced call, and flagged as such
+rather than counted as evidence.
+
+### What this settles
+
+Part 16's heading and its "What it settles" section stand: the owner holds
+knowingly to Admin. Its "What it does not settle" bypass claim above is
+superseded by this section wherever the two disagree.
+
+### What it does not settle
+
+Whether the owner still wants Admin now that the actual exposure is named
+correctly — put to the owner in the same session as a direct question, not
+assumed either way here.
+
 ---
 
 **What Part 16 does not touch.** Parts 1 through 15 stand except where 16
