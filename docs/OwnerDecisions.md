@@ -2585,6 +2585,44 @@ Whether the owner still wants Admin now that the actual exposure is named
 correctly — put to the owner in the same session as a direct question, not
 assumed either way here.
 
+## 16b. Resolved: `eternalaether5` is Write, not Admin — 15b restored
+
+**Question put.** Given 16a's corrected exposure, the session asked whether
+to keep Admin (and accept it), keep Admin and move the rulesets to
+organization level (closing the ruleset-edit/delete gap while keeping
+Admin's other grants), or dial back to Write. Before building anything for
+the organization-level option, the session checked whether it would even
+work: `https://github.com/organizations/belay-systems/settings/rules` →
+**New ruleset** shows the picker, but with a standing banner — **"Organization
+rulesets won't be enforced until you upgrade this organization account to
+GitHub Team."** Screenshotted by the owner. Free-organization rulesets can be
+created but do nothing; building them would have produced a false sense of
+protection, not a real one. That option was dropped without being built.
+
+**Owner said: "maybe i just give him write access"**, then, after the owner
+changed it on GitHub: **"done."** `list_repository_collaborators` confirms:
+`eternalaether5`, `role_name: "write"`.
+
+### What it settles
+
+`eternalaether5` holds Write on `belay-systems/Belay`. Part 15b's original
+role choice is restored — Part 16's Admin grant stood for under two hours,
+corrected once its actual cost was understood rather than the one first
+assumed. The `main: review` and `main: checks` rulesets, unmodified
+throughout, now bind `eternalaether5` exactly as they were designed to:
+no bypass, no ability to edit or delete either ruleset, no repository
+settings, secrets or Actions access, no ability to add or remove other
+collaborators.
+
+### What it does not settle
+
+**Upgrading `belay-systems` to GitHub Team, which is the only way an
+organization-level ruleset would actually enforce here**, was surfaced and
+not pursued — it costs money and creates a paid subscription, which is the
+owner's decision alone (`AGENTS.md`, "Decisions that are the owner's
+alone"). If the owner wants organization-level protection later, that
+upgrade is the prerequisite; nothing here rules it in or out.
+
 ---
 
 **What Part 16 does not touch.** Parts 1 through 15 stand except where 16

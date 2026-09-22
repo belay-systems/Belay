@@ -394,7 +394,7 @@ public repository it is also a place strangers can post.
 
 ## Done
 
-### Grant the second contributor collaborator access — DONE 2026-09-22, as Admin, not Write
+### Grant the second contributor collaborator access — DONE 2026-09-22, as Write, per Part 15b
 
 **Added 2026-09-20.** `eternalaether5`'s organization invitation was pending
 (sent 2026-09-20, role Member, which is what Part 15b ruled). Write access
@@ -426,9 +426,20 @@ repository Admin, independent of the rulesets' own bypass lists), manage
 secrets and Actions settings, add or remove collaborators, and change
 visibility or delete the repository. See Part 16a for the full correction.
 
+**Resolved further, same session (Part 16b).** Before building anything to
+close that gap, the session checked whether moving the rulesets to
+organization level would even work: it would not — `belay-systems` is a free
+organization, and GitHub will create organization rulesets there but not
+enforce them until the organization upgrades to GitHub Team (screenshotted
+by the owner from `.../organizations/belay-systems/settings/rules`). Rather
+than pay for that or accept the Admin exposure, the owner said "maybe i just
+give him write access", changed it on GitHub, and confirmed: **"done."**
+`list_repository_collaborators` now reports `eternalaether5`,
+`role_name: "write"`. Part 15b's original role choice stands; Part 16's
+Admin grant was corrected within the same session that made it.
+
 `.github/CODEOWNERS:11`'s "Unknown owner" condition clears on this grant —
-GitHub counts a code owner once the login has write access or above, which
-Admin includes.
+GitHub counts a code owner once the login has write access or above.
 
 ---
 
