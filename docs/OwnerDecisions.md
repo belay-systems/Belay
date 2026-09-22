@@ -2864,3 +2864,33 @@ should also require a second person's review before anything merges into them.
   blocks direct pushes to it, so it cannot cover the branches people work on,
   only the ones pull requests merge into. The ruleset change is a repository
   setting, and applying it is the owner's.
+
+## 20b. The Owner bypass on `main: review` is removed
+
+**Question put.** "Always" (20a) and the Owner bypass in
+`.github/rulesets/main-review.json` cannot both hold: while the bypass exists,
+either organization Owner, or a session running under an Owner's login, can
+merge into `main` without a review, which a session did on 2026-09-22. The
+session recommended removing it, which also closes Issue #16. It named the
+cost: if one of the two contributors is unavailable, nothing merges, and an
+emergency means editing the ruleset, which GitHub logs.
+
+**Owner said: "1. Remove the bypass".**
+
+### What it settles
+
+- **`main: review` has no bypass actors.** No person and no session merges
+  into `main` alone.
+
+### What it does not settle — a deadlock found before applying it
+
+`.github/CODEOWNERS` names only the owner on the governance paths
+(`docs/OwnerDecisions.md`, `docs/DECISIONS.md`, `AGENTS.md`, `.github/` and
+others), and `main: review` requires a code owner's approval. GitHub does not
+let an author approve their own pull request. **With the bypass gone, a change
+the owner makes to those paths has no one who can approve it**, and that
+includes every record of an owner ruling and this ruleset change itself. The
+file's own comment says so: "an owner-authored change there has no eligible
+reviewer". Part 11a gives the second contributor no authority over those
+records. How to resolve that is put to the owner as its own question, and the
+bypass is not removed until it is answered.
