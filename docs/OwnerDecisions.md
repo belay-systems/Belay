@@ -2587,3 +2587,32 @@ recommendations agreed.
 
 Whether a review that leaves a strategy where it is needs evidence
 (question 3).
+
+## 18c. A review that leaves a strategy where it is always carries evidence
+
+**Question put.** The proposal's question 3. `Remain Current Stage` is two
+events under one name (ADR-008 rule 4): a promotion request rejected, and a
+strategy already on real capital reviewed and kept there. ADR-015 as drafted
+leaves evidence optional for `Remain` and marks that as the drafter's
+judgement. Three options were put: optional; always required; or split
+(none for a rejected promotion, required when the strategy holds real
+capital). **The session recommended the split**, on the reasoning that
+saying no to capital should cost nothing.
+
+**Owner said: "2. Always required - rejecting a promotion also protects from
+real money going into play".** The owner overruled the recommendation. In
+the owner's reading, a rejection is itself a protective decision and should
+be backed by evidence like any other.
+
+### What it settles
+
+- **Every review outcome carries at least one evidence record: `Promote`,
+  `Demote`, `Retire` and `Remain Current Stage`, in both of `Remain`'s
+  senses.** ADR-015's "optional for `Remain`" is replaced by this.
+
+### What it does not settle
+
+- **The grade of a `Remain` record.** 18a's floor binds upward moves and 18b
+  keeps downward moves free of a minimum. Whether keeping a strategy on
+  capital must meet the floor of the rung it sits on was offered as a
+  separate question and not asked.
