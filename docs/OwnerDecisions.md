@@ -2091,7 +2091,7 @@ The routine is updated in place and never retired and replaced.
 
 **The repository contradicts itself about why recreating the routine is
 dangerous, and neither claim has been verified.**
-`docs/OperatorChecklist.md:511` says a rebuilt routine **can** come back
+`docs/OperatorChecklist.md:490` says a rebuilt routine **can** come back
 *without* connector access. `docs/proposals/fresh-public-repository-brief.md:35-36` says it
 attaches *every* connector on the account, once including one able to place
 orders. The two sit badly together, and at least one is wrong. Both point at
@@ -2405,3 +2405,92 @@ Nothing about Belay's contents. It is a ruling about when the session may stop.
 or closed and no ADR changes status. Framework code is touched only by the
 rename ruled in 14b, one repointed citation, and one annotation in
 `framework/data/dolthub.py` recorded in 14h.
+
+---
+
+# Part 15 — Ruled 2026-09-20 (late): four rulings before the repository is made public
+
+Put by the session that ran the last scan before publication (`docs/HANDOFF.md`,
+final section). The owner answered by number. Their words are quoted exactly.
+
+## 15a. Two passages are redacted, and the repository is rebuilt so that the redaction is real
+
+**Question put.** Part 5 and Part 11e of this file, and one line of
+`docs/HANDOFF.md`, named a brokerage, its order-placing tools, and the owner's
+separate private project. None is a credential. Published, they would tie the
+owner's public handle to both, permanently. The session recommended redacting
+them the way Part 14f removed a first name.
+
+**Owner said: "1 - redact/rewrite".**
+
+**A second question followed.** The session had proposed rewriting the single
+snapshot commit and force-pushing. It then found that this does not work: GitHub
+keeps the commits a pull request used to point at and links to them from the
+pull request's timeline, and a pull request cannot be deleted. Three were open.
+
+**Owner selected: "Fresh repo, same name (Recommended)".**
+
+### What it settles
+
+The names are replaced by generic or bracketed wording, with every line count
+unchanged. Part 5's rule is untouched. The earlier repository is renamed
+`Belay-old` and stays private; nothing is deleted. Issues and pull requests are
+recreated in their original order so that every number cited in these documents
+still resolves, and they carry the rebuild's date rather than their own.
+
+**Two searches missed one of the passages**, because the phrase was wrapped
+across two lines. It was found by searching for each half separately.
+
+### What it does not settle
+
+Whether `Belay-old` is ever deleted. That is the owner's, and nothing depends on it.
+
+## 15b. The second contributor is a Member with write access, not an organization Owner
+
+**Question put.** `docs/OperatorChecklist.md` said to invite the second
+contributor as an organization Owner; GitHub showed a pending invitation as a
+Member. As an Owner they could bypass the `main: review` ruleset, so its
+code-owner requirement would bind nobody, and any agent running under their
+login could change any setting. The session recommended Member with write
+access, and stated the cost: the owner's is then the only account that can
+recover the organization.
+
+**Owner said: "2 - aligned to recommendation".**
+
+### What it settles
+
+The checklist entry is corrected. Write access is given once the invitation is
+accepted; until then GitHub does not count them as a code owner.
+
+### What it does not settle
+
+How Belay is owned between the two. `docs/OperatorChecklist.md` still asks the
+owner to write that down privately, and nothing in a GitHub role decides it.
+
+## 15c. Belay gets its own folder on the owner's machine, overruling 14d
+
+**Question put.** Part 14d put Belay inside the folder named after the archive,
+and named the cost at the time: "a folder named `Atlas` containing Belay". The
+owner then looked for Belay and could not find it — "i dont see a Belay folder
+in .claude". The session recommended a folder named `Belay`, with the AI tool's
+memory folder copied across so that 14d's reason no longer applies.
+
+**Owner said: "3 - aligned to recommendation".**
+
+### What it does not settle
+
+**Whether the copied memory loads.** That had not been verified when this was
+written. The first session in the new folder finds out.
+
+## 15d. This machine's default commit address is a GitHub no-reply address
+
+**Question put.** A fresh clone of Belay on the owner's machine inherited the
+owner's personal email address as its commit identity. No commit was made with
+it. One pushed commit would have published it permanently.
+
+**Owner said: "4 - aligned to recommendation".** Set the same session.
+
+---
+
+**What Part 15 does not touch.** Parts 1 through 14 stand except where 15b and
+15c say otherwise. No finding is opened or closed and no ADR changes status.
