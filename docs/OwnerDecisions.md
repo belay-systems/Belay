@@ -3092,3 +3092,37 @@ The session recommended yes.
 - **The formula's reference is the significance test's own null**, converted
   to the same per-period units, so the two checks cannot disagree about what
   "no edge" means.
+
+## 22j. The rules are written as an amendment to ADR-012
+
+**Question put.** The proposal's question 6. Options: (1) amend ADR-012, the
+statistical review decision, whose rule 8 already defines sample adequacy as
+its own question and whose rule 3 22h already changes; (2) a new ADR-017
+(the proposal said "ADR-016", which 18g has since given to the evidence bar).
+The session recommended (1), as both of the proposal's reviewers had.
+
+**Owner said: "1".**
+
+### What it settles
+
+- **22a–22i are drafted as an amendment to ADR-012**: rule 8 gains the
+  adequacy definition and rule 3 gains the 3.0 minimum. The draft marks each
+  line RULED or DRAFTER, and it is not ratified until an independent pass has
+  tried to break it.
+
+---
+
+**What Part 22 settles, in one place.** For backtest data only (22a): a
+review is adequate when its data spans at least 10 years (22b); holds at least
+as many observations as the minimum track record length formula requires for
+the target declared before the test, whichever is longer (22c); has no flat
+minimum count (22d); is at least 95% complete (22e, 22f); has no gap longer
+than 7 calendar days in daily data (22g); and is tested against a critical
+value of at least 3.0 (22h). If the formula has no valid answer, the record is
+not adequate, and the formula's reference is the test's own null (22i).
+Paper-trading length stays with the Investment Committee (18d).
+
+**What Part 22 does not touch.** No ADR changes status. F-004 is not closed.
+Its numbers are now ruled, and it closes when the ADR-012 amendment is
+ratified and implemented, together with F-027 (the proposal's §9). No code
+changes.

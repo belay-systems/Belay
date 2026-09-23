@@ -5761,3 +5761,19 @@ risk 1"). None of the three is a standing permission.
    `never` on `main: review`. Then close Issue #16 as fixed by Part 20.
 4. Then the list above from its item 3: the sample-adequacy questions, from
    PR #7's branch, and Part 19's open questions.
+
+## Added 2026-09-23 — the sample-adequacy numbers are ruled (Part 22)
+
+The owner answered ten questions, the proposal's seven plus three its answers
+opened, as `docs/OwnerDecisions.md` Part 22 (22a–22j), on pull request #20.
+In brief: backtest only; a 10-year span; the longer of that and the declared
+target's minimum track record length; no flat count; 95% complete; no gap over
+7 calendar days; a minimum hurdle of 3.0 in both significance and adequacy
+(an amendment to ADR-012 rule 3); fail closed when the formula has no answer.
+Part 22's closing paragraph states it in full.
+
+**Next, in order:** draft the ADR-012 amendment (rules 3 and 8) from Part 22,
+each line marked RULED or DRAFTER, the same way ADR-016 was drafted; then an
+independent pass on it; then the owner ratifies. Step 4 of the Stage 3 order
+(F-004 with F-006's narrow fix) and step 5's F-027 build from it, and F-027
+lands in the same change as F-004's numbers (the proposal's §9).
