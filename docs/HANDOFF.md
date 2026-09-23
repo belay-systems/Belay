@@ -5777,3 +5777,7 @@ each line marked RULED or DRAFTER, the same way ADR-016 was drafted; then an
 independent pass on it; then the owner ratifies. Step 4 of the Stage 3 order
 (F-004 with F-006's narrow fix) and step 5's F-027 build from it, and F-027
 lands in the same change as F-004's numbers (the proposal's §9).
+**Started 2026-09-23:** the ADR-012 amendment draft is
+`docs/proposals/ADR-012-amendment-sample-adequacy-DRAFT.md`, PROPOSED, with
+each rule marked RULED or DRAFTER and eight DRAFTER choices listed for the
+owner. The next step is its independent pass.
