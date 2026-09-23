@@ -2834,3 +2834,43 @@ independent pass has tried to break it, and the owner ratifies it.
 **What Part 18 does not touch.** No ADR changes status, no finding is opened
 or closed, and no code changes. The seven questions of
 `docs/proposals/sample-adequacy-definition.md` are not yet put.
+
+# Part 22 — Ruled 2026-09-23: sample adequacy, "how much data is enough" (F-004's numbers)
+
+The seven questions of the sample-adequacy proposal, as corrected on pull
+request #7's branch after Issue #6 (not the uncorrected copy on `main`). Put
+one at a time, each with a recommendation. Parts 20 and 21 are on pull
+requests #22 and #24 and not yet on `main`; this Part is numbered after them.
+The owner's words are quoted exactly.
+
+**Two facts established before the first question, by the session:**
+
+- **The proposal's recession-containment figures reproduce exactly.** They
+  were marked unverified after Issue #6. Recomputed from NBER's post-1945
+  peak and trough months (contraction months counted from the month after
+  the peak through the trough, windows inside Nov 1945 to Apr 2020), they
+  give 27.7% at 1 year, 55.3% at 3, 73.2% at 5, 81.2% at 74 months, 98.7% at
+  10, and a longest run of 128 months with no contraction. The dates were
+  typed from NBER's published table, not fetched.
+- **Belay's data begins 2011-01-03** (`framework/data/dolthub.py:23`). The only
+  contraction since then is March–April 2020, so a backtest window ending in
+  2026 contains no downturn unless it reaches back past mid-2020.
+
+## 22a. Backtest adequacy and paper-trading length are two rulings, not one
+
+**Question put.** The proposal's question 7, asked first because it changes
+what every other answer costs. Backtest data costs seconds to fetch, and a
+paper track record costs the same span in real time. Part 18d already
+referred paper-trading length to the Investment Committee. Options: (1) two
+rulings, where these questions set the backtest requirement only; (2) one
+ruling, where the span chosen here also sets paper length, overriding 18d.
+The session recommended (1). The proposal's independent reviewer recommended
+the same, and its author had preferred one ruling before 18d existed.
+
+**Owner said: "1".**
+
+### What it settles
+
+- **These questions set the requirement for historical (backtest) data only.**
+- **Paper-trading length stays where 18d put it**, with the Investment
+  Committee, and `Micro Capital` stays closed until it is set.
