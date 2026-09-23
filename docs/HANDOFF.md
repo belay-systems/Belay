@@ -5787,6 +5787,6 @@ as scoped in a comment on that Issue.
 
 **Parked by the owner, 2026-09-23, for a later conversation, with no action
 now:** the owner is concerned that the start-up reading (`AGENTS.md` plus
-`docs/HANDOFF.md`, which has grown past 5,800 lines because nothing in it is
+`docs/HANDOFF.md`, which is nearly 5,800 lines long because nothing in it is
 ever deleted) has become too large. Raise it with the owner when there is time
 to hash it out. Do not restructure these files before then.
