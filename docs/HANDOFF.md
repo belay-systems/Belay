@@ -5790,3 +5790,17 @@ now:** the owner is concerned that the start-up reading (`AGENTS.md` plus
 `docs/HANDOFF.md`, which is nearly 5,800 lines long because nothing in it is
 ever deleted) has become too large. Raise it with the owner when there is time
 to hash it out. Do not restructure these files before then.
+
+**#23 goes through on the owner's own authority, 2026-09-23.** Asked whether a
+fresh session can act as the independent reviewer, the session answered: yes
+for the independent pass (`AGENTS.md` point 4 allows "a different session"),
+no for the merge approval, because every session here runs under the owner's
+GitHub login, which is also #23's author, and 20a (on pull request #22) asks
+for "a review by someone other than its author". The owner answered: **"lets
+get passed these gates. ill approve myself after i run this"**, meaning: run
+the fresh-session falsification pass on #23, then merge it on the owner's own login. GitHub
+refuses self-approval, so the merge is the owner's bypass on `main: review`,
+which exists until #22 is applied. **This is a one-off exception to 20a, for
+#23 only, taken so the outside-text rule is on `main` before the unattended
+review of 2026-09-25.** It is not a standing permission, and the second
+contributor's review of #22 and #24 is still required.
