@@ -2962,3 +2962,27 @@ is 120 monthly observations). The session recommended (1).
 - **Thin records.** 22d is safe only with a completeness rule, which is the
   next question. Until one is ruled, a 10-year series that is mostly holes is
   not caught by anything in this Part.
+
+## 22e. A permanent completeness rule
+
+**Question put.** The proposal's question 4. After 22d there is no flat
+count, and Part 10g's refusal of unexplained gaps waits on a trading calendar
+that does not exist. Options: (a) no completeness rule; (b) a rule only until
+the calendar exists; (c) a permanent rule, which also catches a record whose
+gaps are all explained (a halt, a delisting) but which is still too thin to
+conclude from. The session recommended (c) as the only option that keeps 22d
+safe. The proposal's author had leaned (b) before 22d removed the flat count.
+
+**Owner said: "c".**
+
+### What it settles
+
+- **Every backtest review checks completeness, permanently**: the share of
+  the observations that should exist in the window which actually do.
+  Explained gaps count as missing for this purpose; 10g decides whether a gap
+  is allowed, and this rule decides whether what remains is enough.
+
+### What it does not settle
+
+- **The threshold.** Put to the owner as the next question.
+- **How the expected count is known before a calendar exists.**
