@@ -2874,3 +2874,32 @@ the same, and its author had preferred one ruling before 18d existed.
 - **These questions set the requirement for historical (backtest) data only.**
 - **Paper-trading length stays where 18d put it**, with the Investment
   Committee, and `Micro Capital` stays closed until it is set.
+
+## 22b. A backtest must span at least 10 years
+
+**Question put.** The proposal's question 1, the span floor, now for backtest
+data only (22a). Options: (a) 3 years, (b) 5, (c) 6.2, (d) no span floor, and
+(e) 10 years, which the session added from the same table. The session showed
+that on Belay's data, which begins 2011-01-03, a window ending in 2026 of 3, 5
+or 6.2 years contains no downturn at all, while 10 years includes the 2020
+contraction and covered 98.7% of post-1945 windows. The session recommended
+(e). The proposal's reviewers had recommended 3 years on the assumption that
+the span would also set paper-trading time, which 22a removed.
+
+**Owner said: "e".**
+
+### What it settles
+
+- **A backtest is not adequate unless its data spans at least 10 calendar
+  years, first observation to last.**
+- **The cost is accepted:** an instrument with less than 10 years of history
+  cannot be judged adequate yet.
+
+### What it does not settle
+
+- **Regime coverage.** A span is a probabilistic stand-in for having faced a
+  downturn, not a measurement of it. The longest post-1945 stretch with no
+  contraction was 128 months, longer than 10 years. Regime classification
+  stays an open gap (`framework/services/regime.py`).
+- **Which window.** Nothing yet pins where the 10 years sit. An author could
+  choose one. Not asked.
