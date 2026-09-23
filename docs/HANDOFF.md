@@ -2687,7 +2687,7 @@ is kept because a reader who has only ever seen `main` will still find the old
 instruction there.** The skill is edited by *this* commit, on the owner's chat
 selection of the same date — two choices, the numbering instruction and F-025's
 hardcoded counts, and nothing wider. What that paragraph describes is now
-`.claude/skills/belay-review/SKILL.md:279-299`, and it says the opposite: the
+`.claude/skills/belay-review/SKILL.md:285-305`, and it says the opposite: the
 first finding takes the number `python scripts/review_due.py` printed on its
 `first finding: F-NNN` line, the gate is the only authority on the next number,
 and the number is never derived from where a previous report's headings ended.
@@ -2707,7 +2707,7 @@ prose, on any ref". It does not: `scripts/review_due.py:97` lists only
 `reports/` and `docs/`, and `:99` keeps only `.md` files — so an `F-NNN` in
 `CHANGELOG.md`, under `.claude/`, or in a test is invisible to the gate. The
 skill now states the real scope
-(`.claude/skills/belay-review/SKILL.md:283-288`), and the docstring is left
+(`.claude/skills/belay-review/SKILL.md:289-294`), and the docstring is left
 alone because **editing the gate is outside what the owner selected for this
 change**, and because whether the scope should be widened or the sentence
 narrowed is a question for whoever runs the next review. Recorded here rather

@@ -262,7 +262,7 @@ same file. **The approval itself is not yet on file in `docs/OwnerDecisions.md`
 — a records pull request follows this one.** Until that lands, the record of
 the authority is this block, the closing entry in `docs/HANDOFF.md` and the
 `CHANGELOG.md` entry, and nothing in the register where the other Parts are. The instruction the paragraph above quotes is gone;
-`.claude/skills/belay-review/SKILL.md:279-299` now says the first finding takes
+`.claude/skills/belay-review/SKILL.md:285-305` now says the first finding takes
 the number `python scripts/review_due.py` prints and that the number is never
 derived from where a previous report's headings ended, and
 `tests/test_session_handoff.py:287-445` holds both halves of that.
