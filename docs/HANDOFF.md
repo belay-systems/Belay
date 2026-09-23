@@ -5781,3 +5781,6 @@ lands in the same change as F-004's numbers (the proposal's §9).
 `docs/proposals/ADR-012-amendment-sample-adequacy-DRAFT.md`, PROPOSED, with
 each rule marked RULED or DRAFTER and eight DRAFTER choices listed for the
 owner. The next step is its independent pass.
+**The owner added it to Issue #21** ("add it"): the second contributor's
+independent pass now covers ADR-016 and the ADR-012 amendment draft together,
+as scoped in a comment on that Issue.
