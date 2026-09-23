@@ -2986,3 +2986,26 @@ safe. The proposal's author had leaned (b) before 22d removed the flat count.
 
 - **The threshold.** Put to the owner as the next question.
 - **How the expected count is known before a calendar exists.**
+
+## 22f. Completeness threshold: 95%
+
+**Question put.** The threshold for 22e. Over a 10-year daily window about
+2,520 trading days are expected: 99% allows about 25 missing, 95% about 126
+(half a year), 90% about 252 (a full year), 80% about 504. Until a trading
+calendar exists the expected count is an estimate of about 252 a year, and
+the true count differs by a day or two a year, so 99% would sometimes refuse
+sound data. The session recommended 95%.
+
+**Owner said: "95".**
+
+### What it settles
+
+- **A backtest's data must contain at least 95% of the observations expected
+  in its window.**
+
+### What it does not settle
+
+- **Where the missing 5% falls.** Completeness counts the total, not the
+  place. March 2020 is under 1% of a 10-year window, so a record missing
+  exactly the one downturn in Belay's data passes 95%. Put to the owner as its
+  own question: a limit on the longest single gap.
