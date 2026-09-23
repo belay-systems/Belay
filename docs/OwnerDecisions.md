@@ -3035,3 +3035,36 @@ recommended 1 week.
 
 - **Other frequencies.** Belay holds daily data only. The equivalent rule for
   weekly or monthly data is settled when Belay has any.
+
+## 22h. Belay's minimum hurdle is 3.0, for significance and adequacy alike
+
+**Question put.** The proposal's question 5, reopened by Part 19. ADR-012
+rule 3 (`docs/DECISIONS.md:2190-2194`) leaves the significance level to the
+caller and sets no minimum. Under Part 19 the caller is a user's AI, and 19c
+rules that Belay sets minimums users may only raise. Harvey, Liu and Zhu
+(NBER Working Paper 20592, 2014) argue that a newly found factor needs a
+t-ratio above 3.0, because so many are tried. Options: (1) the caller supplies
+it with no Belay minimum, which was the proposal's recommendation, written
+before Part 19; (2) a Belay minimum of 3.0 for the adequacy formula only; (3)
+a Belay minimum of 3.0 for both the significance test and the adequacy
+formula, callers stricter and never looser. The session recommended (3). At
+3.0 the formula requires more than 10 years for any declared annual target
+below about 0.95, against about 0.62 at 1.96.
+
+**Owner said: "3".**
+
+### What it settles
+
+- **The critical value Belay tests against is never below 3.0**, in the
+  significance test and in the adequacy formula alike. A caller may require
+  more, never less. It is stated as a critical value rather than as an alpha,
+  because the t critical value for a given alpha depends on the sample size.
+- **This amends ADR-012 rule 3.** A caller still supplies the level, and it
+  is now bounded below.
+
+### What it does not settle
+
+- **The text of the ADR-012 amendment.** It is drafted and put to the owner,
+  as any ADR change is. It is not written here.
+- **The reference point `c`** ("better than what?"). The proposal's position
+  is the caller's own null (ADR-012 rule 2). It has not been put as a question.
