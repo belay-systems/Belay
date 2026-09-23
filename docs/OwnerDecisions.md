@@ -2903,3 +2903,39 @@ the span would also set paper-trading time, which 22a removed.
   stays an open gap (`framework/services/regime.py`).
 - **Which window.** Nothing yet pins where the 10 years sit. An author could
   choose one. Not asked.
+
+## 22c. A declared target can only add to the 10-year span
+
+**Question put.** The proposal's question 2: may the observation requirement
+depend on a target the strategy declares in advance, through the minimum
+track record length formula (Bailey and López de Prado)? Under 22b, the
+formula can only add to the 10 years. The session computed that it requires
+more than 10 years for any declared annual target below about 0.62, at daily
+and at monthly frequency alike: target 0.5 needs 3,875 daily observations
+(15.4 years), or 187 monthly (15.6 years), at z = 1.96, with no skew, normal
+tails and a zero reference. Options: (1) yes, with the requirement being
+whichever is longer, the span or the formula's answer; (2) no, 10 years for
+every strategy. The session recommended (1) and noted that the proposal's
+gaming concern, a high target declared to shrink the requirement, buys
+nothing under a 10-year floor.
+
+**Owner said: "1".**
+
+### What it settles
+
+- **Required data = the longer of 10 years and the formula's answer at the
+  series' own frequency**, computed from a target declared before the test and
+  sealed into the artifact.
+- **No declaration can lower the requirement below 22b.**
+- **This replaces the proposal's Candidate 2H with a 756-observation floor**,
+  which would have required 63 years of monthly data.
+
+### What it does not settle
+
+- **The formula's other inputs:** the hurdle (the proposal's question 5), the
+  reference `c` (proposed: the caller's own null), and declared skew and
+  kurtosis.
+- **What happens when the formula has no valid answer** (the proposal's §5g:
+  target equal to the reference, or a non-positive leading factor).
+- **Nothing holds a strategy to its declared target afterwards.** An author
+  who declares high faces only the span. Recorded, not solved.
