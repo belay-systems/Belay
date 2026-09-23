@@ -3068,3 +3068,27 @@ below about 0.95, against about 0.62 at 1.96.
   as any ADR change is. It is not written here.
 - **The reference point `c`** ("better than what?"). The proposal's position
   is the caller's own null (ADR-012 rule 2). It has not been put as a question.
+
+## 22i. When the formula has no answer, adequacy fails closed; the reference is the test's own null
+
+**Question put.** Two parts. First, the proposal's §5g: the formula in 22c has
+no valid answer when a declared target equals the reference, or when declared
+skew and kurtosis make its leading factor zero or negative. Options: (1) fail
+closed, recording that adequacy could not be established and treating the
+record as not adequate; (2) fall back to the 10-year span alone, which would
+let a deliberately extreme declaration remove 22c's requirement. The session
+recommended (1). Second, the reference point `c`: the same null the
+significance test already uses, supplied by the caller under ADR-012 rule 2.
+The session recommended yes.
+
+**Owner said: "1 - ywa".** Read as "1 - yes", "ywa" being a typing slip for
+"yes"; recorded as written.
+
+### What it settles
+
+- **Inputs outside the formula's range make a record not adequate**, with the
+  reason recorded. They are never turned into a number, and never fall back
+  to the span alone.
+- **The formula's reference is the significance test's own null**, converted
+  to the same per-period units, so the two checks cannot disagree about what
+  "no edge" means.
