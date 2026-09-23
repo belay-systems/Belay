@@ -2939,3 +2939,26 @@ nothing under a 10-year floor.
   target equal to the reference, or a non-positive leading factor).
 - **Nothing holds a strategy to its declared target afterwards.** An author
   who declares high faces only the span. Recorded, not solved.
+
+## 22d. No flat minimum count; a thin record is caught by completeness instead
+
+**Question put.** The proposal's question 3, the flat observation count:
+(1) no flat count, with thin records caught by a completeness rule (the next
+question), on the condition that a completeness rule is then adopted;
+(2) 756 observations; (3) 1,260; (4) refer it to the Investment Committee.
+Under 22b and 22c, a flat count is inert for dense daily data (10 years is
+about 2,520 observations) and rules out monthly strategies entirely (10 years
+is 120 monthly observations). The session recommended (1).
+
+**Owner said: "1".**
+
+### What it settles
+
+- **There is no flat minimum number of observations.** The requirement is
+  22b's span and 22c's formula, at the series' own frequency.
+
+### What it does not settle
+
+- **Thin records.** 22d is safe only with a completeness rule, which is the
+  next question. Until one is ruled, a 10-year series that is mostly holes is
+  not caught by anything in this Part.
