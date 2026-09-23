@@ -58,7 +58,7 @@ def section(text: str, heading: str) -> str:
 def test_the_next_task_list_does_not_name_a_finding_that_is_already_closed():
     """The one staleness failure that actually misleads a reader.
 
-    `AGENTS.md:22` puts `docs/HANDOFF.md` in every session's mandatory reading and
+    `AGENTS.md:19` puts `docs/HANDOFF.md` in every session's mandatory reading and
     "Highest Priority Next Task" is what a session acts on. A finding that has
     moved to `# Closed Findings` while still being named here sends the next
     session at work that no longer exists — and nothing about the document's
