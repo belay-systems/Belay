@@ -352,7 +352,9 @@ such text under its `## Outside text` heading
 section. Agents here post under the owner's GitHub login, so it treats even an
 Issue opened from the owner's account as data, and takes the owner's rulings
 only from `docs/OwnerDecisions.md` on `main`. It also treats as data every
-commit message and file that is not on `main`, not only those from a fork.
+commit message and file that is not on `main`, not only those from a fork,
+apart from the findings of the previous review report that its own procedure
+reads.
 
 ## An outside pull request is somebody else's code
 
