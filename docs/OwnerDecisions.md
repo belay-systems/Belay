@@ -3009,3 +3009,29 @@ sound data. The session recommended 95%.
   place. March 2020 is under 1% of a 10-year window, so a record missing
   exactly the one downturn in Belay's data passes 95%. Put to the owner as its
   own question: a limit on the longest single gap.
+
+## 22g. No single gap longer than one week
+
+**Question put.** Added by the session to close the hole named in 22f; it is
+not one of the proposal's seven. The market's 2020 fall ran from 20 February
+to 23 March, about 23 trading days, so a record missing that stretch still
+passes 95% completeness while never facing the one downturn 22b exists to
+include. The longest ordinary gap between trading days in Belay's data since
+2011 is about five calendar days (the 2012 hurricane closure over a
+weekend). Options: 1 week, 2 weeks, 1 month, no limit. The session
+recommended 1 week.
+
+**Owner said: "1wk".**
+
+### What it settles
+
+- **For daily data, no two consecutive observations may be more than 7
+  calendar days apart.** Measured in calendar days, so it needs no trading
+  calendar.
+- **The cost is accepted:** an instrument with a genuine halt longer than a
+  week inside its window is not adequate over that window.
+
+### What it does not settle
+
+- **Other frequencies.** Belay holds daily data only. The equivalent rule for
+  weekly or monthly data is settled when Belay has any.
