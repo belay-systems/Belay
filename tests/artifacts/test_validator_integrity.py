@@ -66,3 +66,43 @@ def test_replace_does_not_resign_an_artifact():
     forged = replace(artifact, content=(("value", 999),))
 
     assert forged.integrity_hash == artifact.integrity_hash
+
+
+# --------------------------------------- F-019: the stage checks, each on its own
+#
+# `reports/review/2026-09-04-review.md:89` (F-019). Disabling either check below
+# left the whole suite green, because every STRATEGY and REPORT the suite builds
+# goes through `ArtifactFactory`, which refuses the same mistakes first. These
+# build the artifact directly and sign it, so the validator is the only thing
+# that can refuse it. Owner ruling: `docs/OwnerDecisions.md` Part 21.
+
+
+def _signed(**fields) -> Artifact:
+    from framework.artifacts.integrity import ArtifactIntegrity
+
+    return ArtifactIntegrity.sign(Artifact(**fields))
+
+
+def test_a_signed_strategy_with_no_stage_fails_validation():
+    """`strategies/Registry.md`: every strategy exists in exactly one lifecycle
+    stage. A strategy with none cannot be placed on the ladder at all."""
+    artifact = _signed(id="STRAT-0001", title="Test", type=ArtifactType.STRATEGY)
+
+    with pytest.raises(ValueError, match="must carry a strategy_stage"):
+        ArtifactValidator().validate(artifact)
+
+
+def test_a_signed_report_claiming_a_capital_stage_fails_validation():
+    """A report has no capital stage. One claiming `PRODUCTION` asserts something
+    untrue of itself, and it would be signed and storable."""
+    from framework.artifacts.enums import StrategyLifecycle
+
+    artifact = _signed(
+        id="RPT-0001",
+        title="Test",
+        type=ArtifactType.REPORT,
+        strategy_stage=StrategyLifecycle.PRODUCTION,
+    )
+
+    with pytest.raises(ValueError, match="Only STRATEGY artifacts carry a strategy_stage"):
+        ArtifactValidator().validate(artifact)
