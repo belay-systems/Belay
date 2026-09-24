@@ -282,6 +282,7 @@ def test_the_cadence_gate_counts_findings_from_prose_not_only_headings():
     assert finding.findall("### F-007 — a heading") == ["007"]
     assert finding.findall("| F-008 | — | **F-014** |") == ["008", "014"]
     assert not finding.findall("F-12"), "three digits, so F-12 is not a finding"
+    assert not finding.findall("F-９９９"), "ASCII digits only; `int()` reads the rest"
 
 
 # ------------------------------------------------------- the review skill's numbering
@@ -318,7 +319,7 @@ STARTS_AT = re.compile(r"\bstarts?\b[^.!?]{0,60}?\bat\s+F-\d{3}", re.I)
 #: whole thing, which is most of how the rewordings above survived.
 NEGATION = re.compile(r"\b(?:never|not|no|neither|nor)\b", re.I)
 
-#: The gate can also answer neither DUE nor SKIP — `scripts/review_due.py:107-109`
+#: The gate can also answer neither DUE nor SKIP — `scripts/review_due.py:236-238`
 #: prints "not a git repository" and exits 1 with no finding number — and it can
 #: be absent or raise. The skill has to send the reviewer to a stop rather than
 #: back to listing `reports/review/` by hand, which is the bug the gate replaced.
@@ -355,7 +356,7 @@ def test_the_review_skill_takes_its_finding_numbers_from_the_gate():
     """`scripts/review_due.py` is the only thing that may assign a number.
 
     It reads every `F-NNN` under `reports/` and `docs/` on every `origin/*` ref
-    (`scripts/review_due.py:97-99`), which is a wider view than any other reader
+    (`scripts/review_due.py:201-203`), which is a wider view than any other reader
     here has. A report's headings, this register, a number someone remembers:
     each sees a subset, and a subset is how 2026-08-21 reused seven numbers that
     were already ruled on.
@@ -422,7 +423,7 @@ def test_the_review_skill_never_numbers_from_the_previous_reports_headings():
 def test_the_review_skill_says_what_to_do_when_the_gate_does_not_answer():
     """DUE and SKIP are not the only things that can happen.
 
-    `scripts/review_due.py:107-109` prints "not a git repository; cannot answer
+    `scripts/review_due.py:236-238` prints "not a git repository; cannot answer
     across refs" and exits 1 without a finding number, and the script can also
     be absent or raise. None of those is a verdict, and the one thing a reviewer
     must not do is what the gate was built to stop: list `reports/review/` by

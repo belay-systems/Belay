@@ -40,11 +40,29 @@ from datetime import date, datetime, timezone
 MINIMUM_AGE_DAYS = 12
 
 REPORT = re.compile(r"(\d{4}-\d{2}-\d{2})-review\.md")
-FINDING = re.compile(r"\bF-(\d{3})\b")
+#: ASCII only. Without the flag `\d` matches any Unicode digit and `int()` reads
+#: it, so a quoted fullwidth `F-９９９` counted as 999.
+FINDING = re.compile(r"\bF-(\d{3})\b", re.ASCII)
+
+#: The highest number `FINDING` can read back. The gate stops rather than issue
+#: the one after it; see `highest_finding()`.
+LAST_READABLE = 999
+
+#: Lines of a Markdown file, split where CommonMark splits them.
+LINE_BREAK = re.compile(r"\r\n|\r|\n")
+#: The heading of a report's `## Outside text` section, which records text
+#: strangers wrote. Its body is not counted; see `counted_text()`.
+OUTSIDE_TEXT = re.compile(r" {0,3}##[ \t]+Outside text(?:[ \t]+#*)?[ \t]*", re.I)
+#: Any level-1 or level-2 heading, which ends that section.
+SECTION_END = re.compile(r" {0,3}#{1,2}(?:[ \t]|$)")
+#: A level-3 or deeper heading: how a report heads a finding.
+SUBHEADING = re.compile(r" {0,3}#{3,6}(?:[ \t]|$)")
+#: A code fence's opening or closing line: its character and length.
+FENCE = re.compile(r" {0,3}(`{3,}|~{3,})(.*)")
 
 
 class GateCannotAnswer(RuntimeError):
-    """Git's output could not be obtained or read, so no number is safe to print."""
+    """No number is safe to print: git's output is unreadable, or cannot be counted."""
 
 
 def git(*args: str, may_fail: bool = False) -> str:
@@ -122,20 +140,77 @@ def newest_report() -> tuple[date, str, str] | None:
     return when, name, where
 
 
+def counted_text(ref: str, path: str, text: str) -> str:
+    """Return the text of a file whose finding numbers count.
+
+    Everything, except in a review report under `reports/review/`: there the
+    body of an `## Outside text` section is left out, up to the next level-1 or
+    level-2 heading. That section records what strangers wrote, and the review
+    skill tells the run to write their numbers as `F-[NNN]`. The gate does not
+    rely on a model having obeyed.
+
+    **Every ambiguity errs toward counting**, because a number counted wrongly
+    leaves a gap and a number missed is a collision. Only a real heading opens
+    the section: one inside a code fence does not. Anything shaped like a
+    level-1 or level-2 heading closes it, fence or not.
+
+    **A finding heading inside the section stops the gate.** The skill allows
+    outside text to reveal a real finding. Counted, a copied heading moves the
+    series; ignored, a real finding's number is issued again. Neither is safe.
+    """
+    if not path.startswith("reports/review/"):
+        return text
+
+    kept: list[str] = []
+    fence: tuple[str, int] | None = None
+    outside = False
+    for line in LINE_BREAK.split(text):
+        if outside and SECTION_END.match(line):
+            outside = False
+        if outside and SUBHEADING.match(line) and FINDING.search(line):
+            raise GateCannotAnswer(
+                f"`{ref}:{path}` has a finding heading inside `## Outside text`: "
+                f"{line.strip()!r}. Move a real finding under `## Findings`."
+            )
+        if not outside and fence is None and OUTSIDE_TEXT.fullmatch(line):
+            outside = True
+        elif not outside:
+            kept.append(line)
+
+        if found := FENCE.match(line):
+            marks, rest = found.groups()
+            closes = fence and marks[0] == fence[0] and len(marks) >= fence[1]
+            if fence is None and not (marks[0] == "`" and "`" in rest):
+                fence = (marks[0], len(marks))
+            elif closes and not rest.strip():
+                fence = None
+    return "\n".join(kept)
+
+
 def highest_finding() -> int:
     """Return the highest F-NNN mentioned in any tracked prose, on any ref.
 
     Zero when none exists. Read from `reports/` and `docs/` together rather than
     from either alone — see the module docstring for why each is insufficient.
+
+    **At F-999 the gate stops.** The next number, F-1000, is one `FINDING`
+    cannot read back, so every later run would be told F-1000 again.
     """
-    highest = 0
+    highest, source = 0, ""
     for ref in remote_refs():
         listing = git("ls-tree", "-r", "--name-only", ref, "reports/", "docs/")
         for path in listing.split():
             if not path.endswith(".md"):
                 continue
-            for number in FINDING.findall(git("show", f"{ref}:{path}")):
-                highest = max(highest, int(number))
+            text = counted_text(ref, path, git("show", f"{ref}:{path}"))
+            for number in FINDING.findall(text):
+                if int(number) > highest:
+                    highest, source = int(number), f"{ref}:{path}"
+    if highest >= LAST_READABLE:
+        raise GateCannotAnswer(
+            f"`{source}` mentions F-{highest:03d}, so the next number would be "
+            f"F-{highest + 1:03d}, which this gate cannot read back."
+        )
     return highest
 
 
