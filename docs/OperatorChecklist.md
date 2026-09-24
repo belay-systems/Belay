@@ -394,69 +394,6 @@ public repository it is also a place strangers can post.
 
 ## Done
 
-### Grant the second contributor collaborator access — DONE 2026-09-22, as Write, per Part 15b
-
-**Added 2026-09-20.** `eternalaether5`'s organization invitation was pending
-(sent 2026-09-20, role Member, which is what Part 15b ruled). Write access
-could not be granted until they accepted.
-
-**Attempted 2026-09-21, blocked.** A session tried to make the grant once the
-owner reported the invitation accepted. `GET
-/repos/belay-systems/Belay/collaborators` returned `403 Resource not
-accessible by integration` — the Claude GitHub App was not installed/linked
-for the `belay-systems` organization, so no GitHub write or collaborator-read
-call could succeed from any session, independent of what had been ruled.
-
-**Resolved 2026-09-22.** The owner reconnected the GitHub App
-(`https://github.com/apps/claude/installations/select_target`) and granted
-the permission manually rather than waiting on a session: `eternalaether5`
-holds **Admin**, not Write, confirmed via `list_repository_collaborators`
-(`role_name: "admin"`). That is beyond Part 15b's ruling, so the session put
-the mismatch to the owner rather than silently correcting it or silently
-accepting it. **Owner said: "Keep Admin, update the ruling"** —
-`docs/OwnerDecisions.md` Part 16 records this, overruling 15b's role choice.
-
-**Part 16's first-written cost estimate was wrong and is corrected at 16a in
-the same file: repository Admin does not let `eternalaether5` bypass
-`main: review`'s PR-time review — that bypass is organization-Owner only,
-and 15b kept them a Member.** What repository Admin actually grants:
-`eternalaether5` can edit or delete the `main: review` / `main: checks`
-rulesets outright (repository-scoped rulesets are manageable by anyone with
-repository Admin, independent of the rulesets' own bypass lists), manage
-secrets and Actions settings, add or remove collaborators, and change
-visibility or delete the repository. See Part 16a for the full correction.
-
-**Resolved further, same session (Part 16b).** Before building anything to
-close that gap, the session checked whether moving the rulesets to
-organization level would even work: it would not — `belay-systems` is a free
-organization, and GitHub will create organization rulesets there but not
-enforce them until the organization upgrades to GitHub Team (screenshotted
-by the owner from `.../organizations/belay-systems/settings/rules`). Rather
-than pay for that or accept the Admin exposure, the owner said "maybe i just
-give him write access", changed it on GitHub, and confirmed: **"done."**
-`list_repository_collaborators` now reports `eternalaether5`,
-`role_name: "write"`. Part 15b's original role choice stands; Part 16's
-Admin grant was corrected within the same session that made it.
-
-`.github/CODEOWNERS:11`'s "Unknown owner" condition clears on this grant —
-GitHub counts a code owner once the login has write access or above.
-
-**Overruled again, same session (Part 17).** Owner: "git recommends
-atleast 2 owners... so im giving him owner status again. sorry. the fix can
-be a new issue. log it." `eternalaether5` is now an organization Owner, not
-merely a repository collaborator — confirmed by `list_repository_collaborators`
-flipping back to `role_name: "admin"` (the repository-level effect of org
-Owner) and by the owner's own words. This is a different and larger change
-than Part 16's repository-Admin grant: organization Owner satisfies
-`main: review`'s `bypass_actors` for real, so either owner's login can now
-skip the required code-owner review on any pull request — the exact gap
-Part 15b was written to prevent, now accepted deliberately in exchange for
-not having account-recovery rest on one login. Tracked as **Issue #16**
-("main: review's code-owner bypass is now live for both organization
-Owners") rather than solved in this session, per the owner's instruction.
-
----
-
 ### Merge order for the three register/ADR pull requests — DONE 2026-09-19
 
 **Added 2026-09-19, closed the same day (evening).** In order: PR #9 merged
@@ -731,8 +668,77 @@ one uses a GitHub connector in its Step 4" is false as the routine is
 configured. That evidence is posted on Issue #3 rather than resolving it, since
 the other document's claim is about creation and was not tested.
 
-## Grant the second contributor Write access — moved to `## Done`, resolved as Admin
+## Open — grant the second contributor Write access
 
-See "Grant the second contributor collaborator access — DONE 2026-09-22, as
-Admin, not Write" under `## Done` above. Kept as a pointer here rather than
-deleted, since this is where the next session would look first.
+**Added 2026-09-20.** `eternalaether5`'s organization invitation is still
+**pending** (sent 2026-09-20, role Member, which is what Part 15b rules). Write
+access cannot be granted until they accept. Until then `main: review` binds
+nobody but the owner, because GitHub counts a code owner only if they have write
+access. The owner's part is getting the invitation accepted; a session grants
+the Write once it has been.
+
+## Grant the second contributor collaborator access — DONE 2026-09-22, as Write, per Part 15b
+
+**Added 2026-09-20.** `eternalaether5`'s organization invitation was pending
+(sent 2026-09-20, role Member, which is what Part 15b ruled). Write access
+could not be granted until they accepted.
+
+**Attempted 2026-09-21, blocked.** A session tried to make the grant once the
+owner reported the invitation accepted. `GET
+/repos/belay-systems/Belay/collaborators` returned `403 Resource not
+accessible by integration` — the Claude GitHub App was not installed/linked
+for the `belay-systems` organization, so no GitHub write or collaborator-read
+call could succeed from any session, independent of what had been ruled.
+
+**Resolved 2026-09-22.** The owner reconnected the GitHub App
+(`https://github.com/apps/claude/installations/select_target`) and granted
+the permission manually rather than waiting on a session: `eternalaether5`
+holds **Admin**, not Write, confirmed via `list_repository_collaborators`
+(`role_name: "admin"`). That is beyond Part 15b's ruling, so the session put
+the mismatch to the owner rather than silently correcting it or silently
+accepting it. **Owner said: "Keep Admin, update the ruling"** —
+`docs/OwnerDecisions.md` Part 16 records this, overruling 15b's role choice.
+
+**Part 16's first-written cost estimate was wrong and is corrected at 16a in
+the same file: repository Admin does not let `eternalaether5` bypass
+`main: review`'s PR-time review — that bypass is organization-Owner only,
+and 15b kept them a Member.** What repository Admin actually grants:
+`eternalaether5` can edit or delete the `main: review` / `main: checks`
+rulesets outright (repository-scoped rulesets are manageable by anyone with
+repository Admin, independent of the rulesets' own bypass lists), manage
+secrets and Actions settings, add or remove collaborators, and change
+visibility or delete the repository. See Part 16a for the full correction.
+
+**Resolved further, same session (Part 16b).** Before building anything to
+close that gap, the session checked whether moving the rulesets to
+organization level would even work: it would not — `belay-systems` is a free
+organization, and GitHub will create organization rulesets there but not
+enforce them until the organization upgrades to GitHub Team (screenshotted
+by the owner from `.../organizations/belay-systems/settings/rules`). Rather
+than pay for that or accept the Admin exposure, the owner said "maybe i just
+give him write access", changed it on GitHub, and confirmed: **"done."**
+`list_repository_collaborators` now reports `eternalaether5`,
+`role_name: "write"`. Part 15b's original role choice stands; Part 16's
+Admin grant was corrected within the same session that made it.
+
+`.github/CODEOWNERS:11`'s "Unknown owner" condition clears on this grant —
+GitHub counts a code owner once the login has write access or above.
+
+**Overruled again, same session (Part 17).** Owner: "git recommends
+atleast 2 owners... so im giving him owner status again. sorry. the fix can
+be a new issue. log it." `eternalaether5` is now an organization Owner, not
+merely a repository collaborator — confirmed by `list_repository_collaborators`
+flipping back to `role_name: "admin"` (the repository-level effect of org
+Owner) and by the owner's own words. This is a different and larger change
+than Part 16's repository-Admin grant: organization Owner satisfies
+`main: review`'s `bypass_actors` for real, so either owner's login can now
+skip the required code-owner review on any pull request — the exact gap
+Part 15b was written to prevent, now accepted deliberately in exchange for
+not having account-recovery rest on one login. Tracked as **Issue #16**
+("main: review's code-owner bypass is now live for both organization
+Owners") rather than solved in this session, per the owner's instruction.
+
+**Closing note.** The "## Open — grant the second contributor Write access"
+item above is superseded by this entry. This record was first written in the
+middle of the file, under `## Done`; it was moved here, its content unchanged, so that no
+line citation into this file moves.
