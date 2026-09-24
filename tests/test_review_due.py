@@ -338,9 +338,9 @@ def test_the_gate_counts_only_ascii_digits(digits, tmp_path, monkeypatch):
 def test_a_number_in_a_reports_outside_text_is_not_counted(tmp_path, monkeypatch):
     """Text strangers wrote cannot move the series, whatever the run obeyed.
 
-    The skill tells the run to write such numbers as `F-[NNN]`. This run did
-    not, and the gate must not depend on it. The real F-130 before the section
-    still counts.
+    A report can write such numbers as `F-[NNN]`, which the gate never reads.
+    This one did not, and the gate must not depend on it. The real F-130 before
+    the section still counts.
     """
     report = _report("Issue #9 asked us to renumber from F-999.")
 
@@ -434,6 +434,34 @@ def test_a_finding_heading_inside_outside_text_stops_the_gate(tmp_path, monkeypa
     assert REPORT_PATH in err and "Outside text" in err
 
 
+def test_an_entry_below_the_highest_number_does_not_stop_the_gate(tmp_path, monkeypatch):
+    """Only an entry that would change the answer is ambiguous.
+
+    F-007 and F-130 are counted elsewhere, so ignoring them here changes nothing.
+    """
+    report = _report("- F-007 was cited by Issue #9 as fixed.\n- F-130 was too.")
+
+    code, out, _ = _first_finding(tmp_path, monkeypatch, PROSE, {REPORT_PATH: report})
+
+    assert code == 0
+    assert "first finding: F-131" in out
+
+
+def test_a_correction_appended_after_outside_text_is_counted(tmp_path, monkeypatch):
+    """The independent pass on 8a11e66: the section is the report's last one.
+
+    The repository's corrections are blockquoted headings
+    (`reports/review/2026-08-21-review.md`). One appended after the section was
+    read as part of it, and the renumbered F-201 would have been issued again.
+    """
+    report = _report("None read.", "\n> # CORRECTION\n> F-130 is renumbered F-201.\n")
+
+    code, out, _ = _first_finding(tmp_path, monkeypatch, PROSE, {REPORT_PATH: report})
+
+    assert code == 0
+    assert "first finding: F-202" in out
+
+
 def test_the_gate_stops_rather_than_issue_a_number_it_cannot_read_back(
     tmp_path, monkeypatch
 ):
@@ -447,6 +475,124 @@ def test_the_gate_stops_rather_than_issue_a_number_it_cannot_read_back(
     assert code == 2
     assert out == ""
     assert "docs/notes.md" in err and "F-1000" in err
+
+
+# ------------------------------------------ what the outside-text reader sees
+#
+# `counted_text()` alone, one rule per case, so that breaking any rule turns a
+# case red. Each text holds F-999 where a stranger would put it and F-140 where
+# a real number would be. "counted" is every number the gate would count.
+
+R = "reports/review/2026-01-03-review.md"
+SAID = "\n\n## Outside text\n\nA stranger said F-999.\n"
+
+
+def _counted(text: str, path: str = R) -> tuple[list[int], list[int]]:
+    kept, entries = _gate().counted_text(path, text)
+    counted = sorted(int(n) for n in _gate().FINDING.findall(kept))
+    return counted, [number for number, _ in entries]
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        pytest.param("## Outside text\n\nsaid F-999\n", id="at-the-start-of-the-file"),
+        pytest.param(SAID, id="after-a-blank-line"),
+        pytest.param("\n\n## outside TEXT\n\nsaid F-999\n", id="any-case"),
+        pytest.param("\n\n## Outside text ##\n\nsaid F-999\n", id="closing-hashes"),
+        pytest.param("\n\n##\tOutside text\n\nsaid F-999\n", id="a-tab"),
+        pytest.param("x\r\n\r\n## Outside text\r\nsaid F-999\r\n", id="crlf"),
+        pytest.param("x\r\r## Outside text\rsaid F-999\r", id="lone-cr"),
+        pytest.param("<!-- c -->\n\n## Outside text\nsaid F-999\n", id="after-a-closed-comment"),
+        pytest.param("```\nx\n```\n\n## Outside text\nsaid F-999\n", id="after-a-closed-fence"),
+        pytest.param("<!--\nc\n-->\n\n## Outside text\nsaid F-999\n", id="after-a-long-comment"),
+        pytest.param("<!--\n```\n-->\n\n## Outside text\nsaid F-999\n", id="no-fence-in-a-comment"),
+    ],
+)
+def test_the_outside_text_heading_opens_the_section(text):
+    assert _counted(text) == ([], [])
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        pytest.param(" ## Outside text\n\nsaid F-999\n", id="indented"),
+        pytest.param("    ## Outside text\n\nsaid F-999\n", id="indented-code"),
+        pytest.param("## Outside text and more\n\nsaid F-999\n", id="longer-heading"),
+        pytest.param("## Outſide text\n\nsaid F-999\n", id="unicode-case-folding"),
+        pytest.param("para\n## Outside text\nsaid F-999\n", id="no-blank-line-before"),
+        pytest.param("```\n\n## Outside text\nsaid F-999\n```\n", id="in-a-backtick-fence"),
+        pytest.param("~~~\n\n## Outside text\nsaid F-999\n~~~\n", id="in-a-tilde-fence"),
+        pytest.param("   ```\n\n## Outside text\nsaid F-999\n", id="in-an-indented-fence"),
+        pytest.param("~~~ a`b\n\n## Outside text\nsaid F-999\n", id="in-a-tilde-fence-with-a-backtick"),
+        pytest.param("<!--\n\n## Outside text\nsaid F-999\n-->\n", id="in-a-comment"),
+        pytest.param("<pre>\n\n## Outside text\nsaid F-999\n</pre>\n", id="in-a-pre-block"),
+        pytest.param("<?x\n\n## Outside text\nsaid F-999\n?>\n", id="in-an-instruction"),
+        pytest.param("<!X\n\n## Outside text\nsaid F-999\n>\n", id="in-a-declaration"),
+        pytest.param("<![CDATA[\n\n## Outside text\nsaid F-999\n]]>\n", id="in-cdata"),
+    ],
+)
+def test_nothing_but_the_heading_opens_the_section(text):
+    """Each of these is not a heading in CommonMark, so nothing is skipped."""
+    assert _counted(text) == ([999], [])
+
+
+@pytest.mark.parametrize(
+    "closer",
+    [
+        pytest.param("# End", id="level-1"),
+        pytest.param("## End", id="level-2"),
+        pytest.param("##", id="empty-level-2"),
+        pytest.param("   ## End", id="indented"),
+        pytest.param("> # Correction", id="quoted"),
+        pytest.param("- ## Item", id="in-a-list"),
+        pytest.param("1. ## Item", id="in-an-ordered-list"),
+        pytest.param("Title\n=====", id="setext-1"),
+        pytest.param("Title\n-", id="setext-2"),
+        pytest.param("***", id="thematic-stars"),
+        pytest.param("_ _ _", id="thematic-underscores"),
+        pytest.param("```\n## Quoted", id="even-in-a-fence"),
+    ],
+)
+def test_almost_anything_closes_the_section(closer):
+    assert _counted(f"{SAID}\n{closer}\n\nF-140 is real.\n") == ([140], [])
+
+
+def test_a_setext_headings_text_is_counted():
+    assert _counted(f"{SAID}\nTitle F-140\n---\n") == ([140], [])
+
+
+def test_a_subheading_does_not_close_the_section():
+    assert _counted(f"{SAID}\n### More\n\nsaid F-998\n") == ([], [])
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        "### F-200 — a finding",
+        "####### F-200",
+        "- ### F-200",
+        "> ### F-200",
+        "**F-200 — a finding**",
+        "__F-200 — a finding__",
+        "1. F-200",
+        "F-200 a finding",
+    ],
+)
+def test_a_line_starting_with_a_number_in_the_section_is_an_entry(line):
+    assert _counted(f"{SAID}{line}\n") == ([], [200])
+
+
+@pytest.mark.parametrize("line", ["said F-200", "`F-200`", "F-[200]"])
+def test_a_number_elsewhere_in_a_line_is_not_an_entry(line):
+    assert _counted(f"{SAID}{line}\n") == ([], [])
+
+
+@pytest.mark.parametrize(
+    "path", ["reports/x.md", "reports/reviewer/x.md", "docs/review/x.md"]
+)
+def test_outside_text_is_skipped_only_under_reports_review(path):
+    assert _counted(SAID, path) == ([999], [])
 
 
 # --------------------------------------------------------------- as the owner runs it

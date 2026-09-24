@@ -22,9 +22,9 @@ own correction block renumbers them F-014..F-018 — so scanning headings return
 015 and would collide, and so would scanning `docs/HANDOFF.md`, which carries
 only what has been registered so far.
 
-**When git's output cannot be obtained or read, the gate stops: exit 2, a reason
-on stderr, nothing on stdout.** It does not skip the file and answer anyway. A
-skipped file is a lower number, and a lower number is the collision above.
+**When git's output cannot be read, or a number cannot be counted safely, the gate
+stops: exit 2, a reason on stderr, nothing on stdout.** It does not skip and answer
+anyway. A skipped number is a lower number, and that is the collision above.
 """
 
 from __future__ import annotations
@@ -52,14 +52,27 @@ LAST_READABLE = 999
 LINE_BREAK = re.compile(r"\r\n|\r|\n")
 #: The heading of a report's `## Outside text` section, which records text
 #: strangers wrote. Its body is not counted; see `counted_text()`.
-OUTSIDE_TEXT = re.compile(r" {0,3}##[ \t]+Outside text(?:[ \t]+#*)?[ \t]*", re.I)
-#: Any level-1 or level-2 heading, which ends that section.
-SECTION_END = re.compile(r" {0,3}#{1,2}(?:[ \t]|$)")
-#: A level-3 or deeper heading: how a report heads a finding.
-SUBHEADING = re.compile(r" {0,3}#{3,6}(?:[ \t]|$)")
+OUTSIDE_TEXT = re.compile(r"##[ \t]+Outside text(?:[ \t]+#+)?[ \t]*", re.ASCII | re.I)
+#: Blockquote and list markers, and indentation, in front of a line's content.
+CONTAINER = re.compile(r"[ \t]*(?:(?:>|[-+*]|[0-9]{1,9}[.)])[ \t]*)*", re.ASCII)
+#: A level-1 or level-2 heading, once `CONTAINER` is removed.
+SECTION_END = re.compile(r"#{1,2}(?:[ \t]|$)")
+#: A setext underline or a thematic break: also the end of a section.
+RULE = re.compile(r" {0,3}(?:=+|-+|(?:\*[ \t]*){3,}|(?:_[ \t]*){3,})[ \t]*")
+#: A line that starts with a finding number, as a finding's heading or entry
+#: does, once `CONTAINER` is removed.
+ENTRY = re.compile(r"[#*_ \t]*F-([0-9]{3})\b", re.ASCII)
 #: A code fence's opening or closing line: its character and length.
 FENCE = re.compile(r" {0,3}(`{3,}|~{3,})(.*)")
-
+#: CommonMark's HTML blocks that may hold a blank line: start and end.
+HTML_BLOCKS = [
+    (re.compile(r" {0,3}<(?:pre|script|style|textarea)(?:[ \t>]|$)", re.I),
+     re.compile(r"</(?:pre|script|style|textarea)>", re.I)),
+    (re.compile(r" {0,3}<!--"), re.compile(r"-->")),
+    (re.compile(r" {0,3}<\?"), re.compile(r"\?>")),
+    (re.compile(r" {0,3}<![A-Za-z]"), re.compile(r">")),
+    (re.compile(r" {0,3}<!\[CDATA\["), re.compile(r"\]\]>")),
+]
 
 class GateCannotAnswer(RuntimeError):
     """No number is safe to print: git's output is unreadable, or cannot be counted."""
@@ -140,51 +153,70 @@ def newest_report() -> tuple[date, str, str] | None:
     return when, name, where
 
 
-def counted_text(ref: str, path: str, text: str) -> str:
-    """Return the text of a file whose finding numbers count.
+def counted_text(path: str, text: str) -> tuple[str, list[tuple[int, str]]]:
+    """Split a file into the text whose numbers count, and entries to check.
 
-    Everything, except in a review report under `reports/review/`: there the
-    body of an `## Outside text` section is left out, up to the next level-1 or
-    level-2 heading. That section records what strangers wrote, and the review
-    skill tells the run to write their numbers as `F-[NNN]`. The gate does not
-    rely on a model having obeyed.
+    In a review report under `reports/review/`, the body of an `## Outside text`
+    section is left out. That section records what strangers wrote, and the gate
+    does not trust the report to have written their numbers harmlessly. Every
+    other file is returned whole.
 
-    **Every ambiguity errs toward counting**, because a number counted wrongly
-    leaves a gap and a number missed is a collision. Only a real heading opens
-    the section: one inside a code fence does not. Anything shaped like a
-    level-1 or level-2 heading closes it, fence or not.
+    **Only an unmistakable heading opens the section**: `## Outside text` at
+    the start of a line, after a blank line, outside any code fence or HTML
+    block. **Almost anything closes it**: a level-1 or level-2 heading, even
+    quoted or in a list, a setext underline, or a thematic break. Each rule
+    errs toward counting, because a number counted wrongly leaves a gap and a
+    number missed is a collision.
 
-    **A finding heading inside the section stops the gate.** The skill allows
-    outside text to reveal a real finding. Counted, a copied heading moves the
-    series; ignored, a real finding's number is issued again. Neither is safe.
+    **A line inside the section that starts with a finding number is returned
+    as an entry**, with that number, whatever its shape: a heading, a list
+    item, a quote, bold text. It may be a real finding filed in the wrong
+    place, and `highest_finding()` stops if it is the highest number seen.
+
+    **What this cannot see**: a new finding's number in the middle of a
+    sentence inside the section, with nothing after it that closes the section,
+    and written nowhere else that is counted. That is not counted.
     """
     if not path.startswith("reports/review/"):
-        return text
+        return text, []
 
     kept: list[str] = []
+    entries: list[tuple[int, str]] = []
     fence: tuple[str, int] | None = None
+    html = None
     outside = False
+    previous = ""
     for line in LINE_BREAK.split(text):
-        if outside and SECTION_END.match(line):
+        if outside and (SECTION_END.match(line[CONTAINER.match(line).end():])
+                        or RULE.fullmatch(line)):
             outside = False
-        if outside and SUBHEADING.match(line) and FINDING.search(line):
-            raise GateCannotAnswer(
-                f"`{ref}:{path}` has a finding heading inside `## Outside text`: "
-                f"{line.strip()!r}. Move a real finding under `## Findings`."
-            )
-        if not outside and fence is None and OUTSIDE_TEXT.fullmatch(line):
+            if RULE.fullmatch(line):
+                kept.append(previous)  # the text of a setext heading
+        opens = fence is None and html is None and not previous.strip()
+        if not outside and opens and OUTSIDE_TEXT.fullmatch(line):
             outside = True
-        elif not outside:
+        elif outside:
+            if entry := ENTRY.match(line[CONTAINER.match(line).end():]):
+                entries.append((int(entry.group(1)), line.strip()))
+        else:
             kept.append(line)
 
+        if html is not None:
+            html = None if html.search(line) else html
+        elif fence is None:
+            for start, end in HTML_BLOCKS:
+                if begun := start.match(line):
+                    html = None if end.search(line, begun.end()) else end
+                    break
         if found := FENCE.match(line):
             marks, rest = found.groups()
             closes = fence and marks[0] == fence[0] and len(marks) >= fence[1]
-            if fence is None and not (marks[0] == "`" and "`" in rest):
+            if fence is None and html is None and not (marks[0] == "`" and "`" in rest):
                 fence = (marks[0], len(marks))
             elif closes and not rest.strip():
                 fence = None
-    return "\n".join(kept)
+        previous = line
+    return "\n".join(kept), entries
 
 
 def highest_finding() -> int:
@@ -192,24 +224,40 @@ def highest_finding() -> int:
 
     Zero when none exists. Read from `reports/` and `docs/` together rather than
     from either alone — see the module docstring for why each is insufficient.
+    A review report's `## Outside text` is not read; see `counted_text()`.
 
-    **At F-999 the gate stops.** The next number, F-1000, is one `FINDING`
-    cannot read back, so every later run would be told F-1000 again.
+    **Two things stop the gate.** A finding entry inside `## Outside text` whose
+    number is above every counted one: ignored, a real finding filed there has
+    its number issued again, and counted, a stranger's number moves the series.
+    And F-999: the next number, F-1000, is one `FINDING` cannot read back, so
+    every later run would be told F-1000 again.
     """
     highest, source = 0, ""
+    entries: list[tuple[int, str, str]] = []
     for ref in remote_refs():
         listing = git("ls-tree", "-r", "--name-only", ref, "reports/", "docs/")
         for path in listing.split():
             if not path.endswith(".md"):
                 continue
-            text = counted_text(ref, path, git("show", f"{ref}:{path}"))
+            text, found = counted_text(path, git("show", f"{ref}:{path}"))
+            entries += [(number, f"{ref}:{path}", line) for number, line in found]
             for number in FINDING.findall(text):
                 if int(number) > highest:
                     highest, source = int(number), f"{ref}:{path}"
+    for number, where, line in entries:
+        if number > highest:
+            raise GateCannotAnswer(
+                f"`{where}` has {line!r} inside `## Outside text`, above every "
+                f"counted number (F-{highest:03d}). If it is a real finding, it "
+                "belongs under `## Findings`; if it is outside text, write its "
+                "digits in brackets, as in F-[999]."
+            )
     if highest >= LAST_READABLE:
         raise GateCannotAnswer(
             f"`{source}` mentions F-{highest:03d}, so the next number would be "
-            f"F-{highest + 1:03d}, which this gate cannot read back."
+            f"F-{highest + 1:03d}, which this gate cannot read back. If that is "
+            "quoted text, write its digits in brackets, as in F-[999]; if "
+            "findings really reached F-999, `FINDING` must be widened on purpose."
         )
     return highest
 
