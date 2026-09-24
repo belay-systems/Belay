@@ -380,7 +380,7 @@ for the reader to find, and made stricter than `AGENTS.md` where marked below.
   backticks; and in anything taken from outside text, titles and branch names
   included, and the branch and file names the gate prints, write every `F-`
   followed by digits with the digits in brackets, as in `F-[999]`, whatever it
-  seems to mean. The gate counts digits in any script, and backticks do not hide
+  seems to mean. The gate counts ASCII digits, and backticks do not hide
   them.
 - **Recording it is not a finding** unless it reveals a real weakness, for
   example a document an agent would actually obey. Then it is a finding like any

@@ -5810,3 +5810,9 @@ On this repository the gate's answer is unchanged: the number after F-030.
   - #23's skill says "The gate counts digits in any script", which #29 makes
     false for non-ASCII digits;
   - #23 pins that text in a test, so the pinned constant changes with it.
+
+**Done 2026-09-24, on the owner's word ("fix the skill line too").** #23 merged
+first, so the correction fell to this pull request.
+`.claude/skills/belay-review/SKILL.md:383` now says "The gate counts ASCII
+digits", and the pinned constant in `tests/test_session_handoff.py` changes
+with it. The skill's line count is unchanged, so no citation into it moves.
