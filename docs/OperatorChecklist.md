@@ -702,3 +702,32 @@ obligations. No session can assess that. It needs a lawyer.
 
 Neither is ready yet. Each needs drafting from Part 18, then a fresh
 independent pass, before it is put to the owner.
+
+# 2026-09-24 — owner items from the outside-text review (#23, #25, #26, #27)
+
+## Open — how #23 and #26 reach `main`
+
+Both passed independent falsification passes and are green. Neither can be
+approved by an agent, because agents post under the owner's login. The choice
+is the second contributor's review, or the owner telling a session "merge #23"
+(and "merge #26"), which uses the owner bypass for that pull request only. #23
+matters before the scheduled review fires on 2026-09-25 06:07 UTC.
+
+## Open — declare `markdown-it-py` as a dev dependency, or accept it as it is
+
+#23's tests parse markdown with it. Today it arrives only because `rich`, a
+runtime dependency, requires it. Declaring it under `dev` in `pyproject.toml`
+(an owner-only file) makes the dependency visible. Recommendation: declare it.
+
+## Open — the review routine's stored prompt can be rewritten by any session
+
+The review skill trusts the stored prompt as the run's own instructions. Any
+agent session on the owner's account can rewrite that prompt, or append a turn
+to a firing. Check the prompt against a known copy before relying on a
+scheduled review. Do not paste the prompt or its identifier into this
+repository.
+
+## Closed 2026-09-24 — #23 reached `main`
+
+On the owner's word ("merge"), a session merged #23 through the owner bypass at
+`22d2d81`, for that pull request only. #26 is still open, as above.
