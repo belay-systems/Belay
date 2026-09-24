@@ -5772,3 +5772,86 @@ every line citation below it. The list below is the current one.
    copy.
 5. Then: ADR-016, the passes on ADR-015 and ADR-016, and the sample-adequacy
    questions.
+
+## Session, 2026-09-24 — the review gate's finding count (#29)
+
+Appended here so that no line citation moves.
+
+**What was done.** Pull request #29 (branch `claude/determined-meitner-9h8sx3`)
+hardens `scripts/review_due.py`, part of item 2 ("Harden the gate") in the
+close record on #28's branch:
+
+- finding numbers are read in ASCII digits only;
+- the body of a review report's `## Outside text` section is not counted;
+- a line in that section that starts with a finding number above every counted
+  one stops the gate;
+- the gate stops at finding number 999 rather than issue a four-digit number it
+  cannot read back. (Written without the prefix: the gate reads this file.)
+
+On this repository the gate's answer is unchanged: the number after F-030.
+
+**Verification.**
+- Two independent falsification passes ran, both fresh-context agents inside
+  the authoring session. Their findings and what was done about each are on
+  #29.
+- The second pass showed that the first fix's mutation count, written in a
+  commit message, did not reproduce. Recount mutation claims with the pass's
+  own script, not the author's.
+
+**Open.**
+- **The owner decides** whether to keep the outside-text rule (with a stated
+  limit, in `counted_text`'s docstring) or drop it and count everything. The
+  question is on #29 and in `docs/OperatorChecklist.md`.
+- **Not done here, from #28's item 2:**
+  - match report names with `fullmatch`;
+  - survive an invalid date;
+  - make `REPORT`'s own `\d` ASCII.
+- **For whichever of #23 and #29 merges second:**
+  - #23's skill says "The gate counts digits in any script", which #29 makes
+    false for non-ASCII digits;
+  - #23 pins that text in a test, so the pinned constant changes with it.
+
+**Done 2026-09-24, on the owner's word ("fix the skill line too").** #23 merged
+first, so the correction fell to this pull request.
+`.claude/skills/belay-review/SKILL.md:383` now says "The gate counts ASCII
+digits", and the pinned constant in `tests/test_session_handoff.py` changes
+with it. The skill's line count is unchanged, so no citation into it moves.
+
+**Superseded 2026-09-24, on the owner's ruling "count everything"
+(`docs/OwnerDecisions.md` Part 23).** The section reader and its entry stop are
+removed. Every number counts, in outside text too. ASCII digits only and the
+ceiling stop remain. Testing this change found that the old pattern's `\b`
+treats `_` as a letter, so an italic number such as `_F-[NNN]_` was invisible
+on `main` too. `FINDING` now uses explicit "no letter or digit" bounds. The citations into
+`scripts/review_due.py` from the review skill and `tests/test_session_handoff.py`
+are repointed, each matched by its exact text, and the skill's line count is
+unchanged.
+
+**Corrections to the #29 record above, from the fresh pass on `8acb256`.** The
+bullets that describe the Outside-text reader, and the "Open" item that asks
+whether to keep it, describe removed code. Part 23 supersedes them. Four
+independent passes ran on #29, not two: two inside the authoring session, one
+fresh-context pass on `53d1e4a` and one on `8acb256`. The last one's defects are
+fixed on this branch. The edge tests now pin every bound of `FINDING`.
+
+## Highest priority next task (supersedes every list above, once #29 is on `main`)
+
+The gate work is done. Do not act on the older lists' "ignore `## Outside
+text` sections": Part 23 ruled the opposite.
+
+1. **Owner, quick decisions:** declare `markdown-it-py` as a dev dependency or
+   not; check the review routine's stored prompt against a known copy; #14; and
+   #22, which removes the owner bypass, so sessions could no longer merge on
+   the owner's word.
+2. **Issue #21: the joint independent pass on ADR-015 (#7) and ADR-016 (#20).**
+   This is the core work. Every later question about evidence depends on these
+   two decisions.
+3. **The sample-adequacy questions**
+   (`docs/proposals/sample-adequacy-definition.md`), then ratification.
+4. **#24:** regression tests for the guards on the capital path (F-019).
+5. **Small, when convenient:**
+   - the gate items #29 left: `fullmatch` on report names, surviving an
+     invalid date, and ASCII digits in `REPORT`;
+   - a sentence in the review skill (owner-only) saying to write every finding
+     number in full ASCII (`F-NNN`), never abbreviated or with another hyphen,
+     because the gate cannot read those shapes.
