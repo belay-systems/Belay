@@ -702,3 +702,27 @@ obligations. No session can assess that. It needs a lawyer.
 
 Neither is ready yet. Each needs drafting from Part 18, then a fresh
 independent pass, before it is put to the owner.
+
+# 2026-09-24 — owner items from hardening the review gate (#29)
+
+## Open — keep or drop the gate's "outside text" rule
+
+Pull request #29 makes `scripts/review_due.py` skip the body of a review
+report's `## Outside text` section, so a stranger's number quoted there cannot
+move the finding series. Two independent passes each found shapes where a
+real finding number in or after that section was silently not counted, and
+an uncounted number is issued again. The concrete shapes they found are
+fixed. One stated limit remains: a real number inside the section that does
+not start its line, with nothing after it that closes the section, and
+written nowhere else.
+
+The choice: **keep the rule** and accept that limit, or **drop it and count
+everything**. Since #29 also stops the gate at F-999, counting everything can
+no longer re-issue a number silently. A stranger's quoted number only leaves a
+gap, and a quoted F-999 stops the gate until that report is edited. The
+question, the trade-off and a recommendation are on #29.
+
+## Open — code-owner review of #29
+
+#29 changes `.claude/skills/belay-review/SKILL.md`, where the owner is the
+only code owner. It only repoints citations and states what the gate reads.

@@ -5687,3 +5687,40 @@ said review due 2026-09-23. The routine fires 2026-09-25.
 4. **Part 19's open questions**, one at a time: whether an AI-made change to a
    user's gates needs that user's recorded yes; Belay's own minimum
    paper-trading length; what makes a thesis "no longer valid".
+
+## Session, 2026-09-24 — the review gate's finding count (#29)
+
+Appended here so that no line citation moves.
+
+**What was done.** Pull request #29 (branch `claude/determined-meitner-9h8sx3`)
+hardens `scripts/review_due.py`, part of item 2 ("Harden the gate") in the
+close record on #28's branch:
+
+- finding numbers are read in ASCII digits only;
+- the body of a review report's `## Outside text` section is not counted;
+- a line in that section that starts with a finding number above every counted
+  one stops the gate;
+- the gate stops at F-999 rather than issue an F-1000 it cannot read back.
+
+On this repository the gate's answer is unchanged: `first finding: F-031`.
+
+**Verification.**
+- Two independent falsification passes ran, both fresh-context agents inside
+  the authoring session. Their findings and what was done about each are on
+  #29.
+- The second pass showed that the first fix's mutation count, written in a
+  commit message, did not reproduce. Recount mutation claims with the pass's
+  own script, not the author's.
+
+**Open.**
+- **The owner decides** whether to keep the outside-text rule (with a stated
+  limit, in `counted_text`'s docstring) or drop it and count everything. The
+  question is on #29 and in `docs/OperatorChecklist.md`.
+- **Not done here, from #28's item 2:**
+  - match report names with `fullmatch`;
+  - survive an invalid date;
+  - make `REPORT`'s own `\d` ASCII.
+- **For whichever of #23 and #29 merges second:**
+  - #23's skill says "The gate counts digits in any script", which #29 makes
+    false for non-ASCII digits;
+  - #23 pins that text in a test, so the pinned constant changes with it.
