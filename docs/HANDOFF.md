@@ -5737,3 +5737,38 @@ quote outside text either.
    account can rewrite the routine's stored prompt (item below).
 4. Then the list above continues: ADR-016, the passes on ADR-015 and ADR-016,
    and the sample-adequacy questions.
+
+## Session close, 2026-09-24 (later): #23 merged; one session carries on
+
+**The owner's word.** A session asked the owner to say "merge #23" if they
+chose the bypass route. The owner answered: "merge". #23 was merged to `main`
+through the owner bypass at `22d2d81`, from head `9db65ed` (CI 5 of 5 green).
+This was for that pull request only. It is not a standing permission, and it
+does not cover #26.
+
+**What it changes.** The scheduled review at 2026-09-25 06:07 UTC reads the
+skill with the outside-text rule. The warning in the record above, about #23
+not being on `main`, no longer applies.
+
+**One session now.** The owner said: "make this thread the current - close
+out/carry over accordingly". Four sessions had been working on this: one wrote
+#23, two watched it, and one wrote #29. They are closed. This session's pull
+request carries #28's record unchanged, and #28 is closed as superseded. #26
+and #29 are watched from here.
+
+**Not changed, on purpose.** `# Highest Priority Next Task` near the middle of
+this file still opens with the 2026-09-20 entry. Adding lines there would move
+every line citation below it. The list below is the current one.
+
+## Highest priority next task (supersedes the list directly above)
+
+1. **#26** (a one-line docstring citation) still needs a route to `main`: the
+   second contributor's review, or the owner's explicit "merge #26".
+2. **Harden the gate**, which is #29 (draft). Finish and verify it there.
+3. **Owner: `markdown-it-py`.** Declare it as a dev dependency or accept it as
+   it is (`docs/OperatorChecklist.md`).
+4. The stored-prompt item is now recorded in `docs/OperatorChecklist.md`, which
+   was #28's item 3. The owner still has to check the prompt against a known
+   copy.
+5. Then: ADR-016, the passes on ADR-015 and ADR-016, and the sample-adequacy
+   questions.

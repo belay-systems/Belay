@@ -726,3 +726,8 @@ agent session on the owner's account can rewrite that prompt, or append a turn
 to a firing. Check the prompt against a known copy before relying on a
 scheduled review. Do not paste the prompt or its identifier into this
 repository.
+
+## Closed 2026-09-24 — #23 reached `main`
+
+On the owner's word ("merge"), a session merged #23 through the owner bypass at
+`22d2d81`, for that pull request only. #26 is still open, as above.
