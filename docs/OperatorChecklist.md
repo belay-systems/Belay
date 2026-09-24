@@ -784,8 +784,8 @@ until that ruling. ADR-015 remains **PROPOSED**.
 **Independent passes.** First proposal pass (2026-09-19): 17 defects, 4 blockers,
 applied (evidence-bar Appendix B). Issue #6 was the second falsification pass on
 both the evidence-bar and sample-adequacy proposals (15/5 on sample-adequacy's
-first pass). Confirmed defects were corrected through **PR #15** (merged after CI
-and an independent regression check). Post-merge carrier wording was finalized
+first pass). Confirmed defects were corrected through **PR #15** (merged with CI
+green; no regression-check record exists, per PR #7's review). Wording finalized
 through **PR #17** (merged). **Issue #6 is CLOSED / completed.**
 
 Neither proposal is doctrine. No evidence floor and no sample-adequacy threshold
