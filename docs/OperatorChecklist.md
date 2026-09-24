@@ -767,3 +767,8 @@ than repoint citations. In `.claude/skills/belay-review/SKILL.md` it rewrites
 the gate paragraph (`:287-295`) and one sentence of the outside-text rule
 (`:383`). It also appends Part 23 to `docs/OwnerDecisions.md`. Both files need
 your code-owner review.
+
+## Closed 2026-09-24 — `markdown-it-py`
+
+Owner ruled "Declare it" (`docs/OwnerDecisions.md` Part 24). It is declared in
+`pyproject.toml`'s `dev` extra.

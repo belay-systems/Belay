@@ -2862,3 +2862,18 @@ both loud and both safe.
 
 Whether the gate should ever read four-digit numbers. At the ceiling it stops
 and names the file.
+
+# Part 24 — Ruled 2026-09-24: `markdown-it-py` is a declared dev dependency
+
+**Question put.** The tests of #23 parse the review skill with `markdown-it-py`.
+It was installed only because `rich`, a runtime dependency, requires it. If a
+future `rich` dropped it, those tests would fail to import, for a reason nobody
+could see from `pyproject.toml`. The session recommended declaring it.
+
+**Owner said: "Declare it".**
+
+### What it settles
+
+- `pyproject.toml`'s `dev` extra lists `markdown-it-py>=3.0`. The tests that
+  import it were run against 3.0.0 and 2.2.0 (the floor `rich` requires), and
+  both pass.
