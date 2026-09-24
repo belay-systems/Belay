@@ -5816,3 +5816,13 @@ first, so the correction fell to this pull request.
 `.claude/skills/belay-review/SKILL.md:383` now says "The gate counts ASCII
 digits", and the pinned constant in `tests/test_session_handoff.py` changes
 with it. The skill's line count is unchanged, so no citation into it moves.
+
+**Superseded 2026-09-24, on the owner's ruling "count everything"
+(`docs/OwnerDecisions.md` Part 23).** The section reader and its entry stop are
+removed. Every number counts, in outside text too. ASCII digits only and the
+ceiling stop remain. Testing this change found that the old pattern's `\b`
+treats `_` as a letter, so an italic number such as `_F-[NNN]_` was invisible
+on `main` too. `FINDING` now uses explicit "no letter or digit" bounds. The citations into
+`scripts/review_due.py` from the review skill and `tests/test_session_handoff.py`
+are repointed, each matched by its exact text, and the skill's line count is
+unchanged.

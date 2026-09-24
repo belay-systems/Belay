@@ -40,44 +40,15 @@ from datetime import date, datetime, timezone
 MINIMUM_AGE_DAYS = 12
 
 REPORT = re.compile(r"(\d{4}-\d{2}-\d{2})-review\.md")
-#: ASCII only. Without the flag `\d` matches any Unicode digit and `int()` reads
-#: it, so a quoted fullwidth `F-９９９` counted as 999.
-FINDING = re.compile(r"\bF-(\d{3})\b", re.ASCII)
+#: ASCII digits only: `\d` matches any Unicode digit and `int()` reads it, so a
+#: quoted fullwidth `F-９９９` counted as 999. Bounded by "no letter or digit"
+#: rather than `\b`, which treats `_` as a letter and so missed `_F-150_`.
+FINDING = re.compile(r"(?<![A-Za-z0-9])F-([0-9]{3})(?![A-Za-z0-9])")
 
 #: The highest number `FINDING` can read back. The gate stops rather than issue
 #: the one after it; see `highest_finding()`.
 LAST_READABLE = 999
 
-#: Lines of a Markdown file, split where CommonMark splits them.
-LINE_BREAK = re.compile(r"\r\n|\r|\n")
-#: The heading of a report's `## Outside text` section, which records text
-#: strangers wrote. Its body is not counted; see `counted_text()`.
-OUTSIDE_TEXT = re.compile(r"##[ \t]+Outside text(?:[ \t]+#+)?[ \t]*", re.ASCII | re.I)
-#: Blockquote and list markers, and indentation, in front of a line's content.
-CONTAINER = re.compile(r"[ \t]*(?:(?:>|[-+*]|[0-9]{1,9}[.)])[ \t]*)*", re.ASCII)
-#: A level-1 or level-2 heading, once `CONTAINER` is removed.
-SECTION_END = re.compile(r"#{1,2}(?:[ \t]|$)")
-#: A setext underline or a thematic break, once any `QUOTE` is removed: also
-#: the end of a section.
-RULE = re.compile(
-    r" {0,3}(?:=+|-+|(?:-[ \t]*){3,}|(?:\*[ \t]*){3,}|(?:_[ \t]*){3,})[ \t]*"
-)
-#: Blockquote markers in front of a line's content.
-QUOTE = re.compile(r"(?:[ \t]*>)*")
-#: A line that starts with a finding number, as a finding's heading or entry
-#: does, once `CONTAINER` is removed.
-ENTRY = re.compile(r"[#*_ \t]*F-([0-9]{3})\b", re.ASCII)
-#: A code fence's opening or closing line: its character and length.
-FENCE = re.compile(r" {0,3}(`{3,}|~{3,})(.*)")
-#: CommonMark's HTML blocks that may hold a blank line: start and end.
-HTML_BLOCKS = [
-    (re.compile(r" {0,3}<(?:pre|script|style|textarea)(?:[ \t>]|$)", re.I | re.ASCII),
-     re.compile(r"</(?:pre|script|style|textarea)>", re.I | re.ASCII)),
-    (re.compile(r" {0,3}<!--"), re.compile(r"-->")),
-    (re.compile(r" {0,3}<\?"), re.compile(r"\?>")),
-    (re.compile(r" {0,3}<![A-Za-z]"), re.compile(r">")),
-    (re.compile(r" {0,3}<!\[CDATA\["), re.compile(r"\]\]>")),
-]
 
 class GateCannotAnswer(RuntimeError):
     """No number is safe to print: git's output is unreadable, or cannot be counted."""
@@ -158,105 +129,29 @@ def newest_report() -> tuple[date, str, str] | None:
     return when, name, where
 
 
-def counted_text(path: str, text: str) -> tuple[str, list[tuple[int, str]]]:
-    """Split a file into the text whose numbers count, and entries to check.
-
-    In a review report under `reports/review/`, the body of an `## Outside text`
-    section is left out. That section records what strangers wrote, and the gate
-    does not trust the report to have written their numbers harmlessly. Every
-    other file is returned whole.
-
-    **Only an unmistakable heading opens the section**: `## Outside text` at
-    the start of a line, after a blank line, outside any code fence or HTML
-    block. **Almost anything closes it**: a level-1 or level-2 heading, even
-    quoted or in a list, a setext underline, or a thematic break. Each rule
-    errs toward counting, because a number counted wrongly leaves a gap and a
-    number missed is a collision.
-
-    **A line inside the section that starts with a finding number is returned
-    as an entry**, with that number, whatever its shape: a heading, a list
-    item, a quote, bold text. It may be a real finding filed in the wrong
-    place, and `highest_finding()` stops if it is the highest number seen.
-
-    **What this cannot see**: a new finding's number inside the section that
-    does not start its line (in a sentence, a table row, a link), with nothing
-    after it that closes the section, and written nowhere else that is counted.
-    """
-    if not path.startswith("reports/review/"):
-        return text, []
-
-    kept: list[str] = []
-    entries: list[tuple[int, str]] = []
-    fence: tuple[str, int] | None = None
-    html = None
-    outside = False
-    previous = ""
-    for line in LINE_BREAK.split(text):
-        rule = RULE.fullmatch(line[QUOTE.match(line).end():])
-        if outside and (SECTION_END.match(line[CONTAINER.match(line).end():]) or rule):
-            outside = False
-            if rule:
-                kept.append(previous)  # the text of a setext heading
-        opens = fence is None and html is None and not previous.strip()
-        if not outside and opens and OUTSIDE_TEXT.fullmatch(line):
-            outside = True
-        elif outside:
-            if entry := ENTRY.match(line[CONTAINER.match(line).end():]):
-                entries.append((int(entry.group(1)), line.strip()))
-        else:
-            kept.append(line)
-
-        if html is not None:
-            html = None if html.search(line) else html
-        elif fence is None:
-            for start, end in HTML_BLOCKS:
-                if start.match(line):
-                    html = None if end.search(line) else end
-                    break
-        if found := FENCE.match(line):
-            marks, rest = found.groups()
-            closes = fence and marks[0] == fence[0] and len(marks) >= fence[1]
-            if fence is None and html is None and not (marks[0] == "`" and "`" in rest):
-                fence = (marks[0], len(marks))
-            elif closes and not rest.strip(" \t"):
-                fence = None
-        previous = line
-    return "\n".join(kept), entries
-
-
 def highest_finding() -> int:
     """Return the highest F-NNN mentioned in any tracked prose, on any ref.
 
     Zero when none exists. Read from `reports/` and `docs/` together rather than
     from either alone — see the module docstring for why each is insufficient.
-    A review report's `## Outside text` is not read; see `counted_text()`.
 
-    **Two things stop the gate.** A finding entry inside `## Outside text` whose
-    number is above every counted one: ignored, a real finding filed there has
-    its number issued again, and counted, a stranger's number moves the series.
-    And F-999: the next number, F-1000, is one `FINDING` cannot read back, so
-    every later run would be told F-1000 again.
+    **Every number counts, including one a review report quotes from outside
+    text** (owner's ruling, 2026-09-24: "count everything"). A quoted number can
+    only leave a gap or stop the gate; skipping any text could issue a real
+    number twice. Reports write outside numbers as `F-[NNN]`, which never match.
+
+    **F-999 stops the gate**: the next number, F-1000, is one `FINDING` cannot
+    read back, so every later run would be told F-1000 again.
     """
     highest, source = 0, ""
-    entries: list[tuple[int, str, str]] = []
     for ref in remote_refs():
         listing = git("ls-tree", "-r", "--name-only", ref, "reports/", "docs/")
         for path in listing.split():
             if not path.endswith(".md"):
                 continue
-            text, found = counted_text(path, git("show", f"{ref}:{path}"))
-            entries += [(number, f"{ref}:{path}", line) for number, line in found]
-            for number in FINDING.findall(text):
+            for number in FINDING.findall(git("show", f"{ref}:{path}")):
                 if int(number) > highest:
                     highest, source = int(number), f"{ref}:{path}"
-    for number, where, line in entries:
-        if number > highest:
-            raise GateCannotAnswer(
-                f"`{where}` has {line!r} inside `## Outside text`, above every "
-                f"counted number (F-{highest:03d}). If it is a real finding, it "
-                "belongs under `## Findings`; if it is outside text, write its "
-                "digits in brackets, as in F-[999]."
-            )
     if highest >= LAST_READABLE:
         raise GateCannotAnswer(
             f"`{source}` mentions F-{highest:03d}, so the next number would be "

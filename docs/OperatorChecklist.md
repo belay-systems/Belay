@@ -755,3 +755,9 @@ question, the trade-off and a recommendation are on #29.
 
 #29 changes `.claude/skills/belay-review/SKILL.md`, where the owner is the
 only code owner. It only repoints citations and states what the gate reads.
+
+## Closed 2026-09-24 — keep the Outside-text rule, or count everything
+
+Owner ruled "count everything" (`docs/OwnerDecisions.md` Part 23). The rule is
+removed on #29. Still open for #29: your code-owner review of
+`.claude/skills/belay-review/SKILL.md` and `docs/OwnerDecisions.md`.
