@@ -262,7 +262,7 @@ same file. **The approval itself is not yet on file in `docs/OwnerDecisions.md`
 — a records pull request follows this one.** Until that lands, the record of
 the authority is this block, the closing entry in `docs/HANDOFF.md` and the
 `CHANGELOG.md` entry, and nothing in the register where the other Parts are. The instruction the paragraph above quotes is gone;
-`.claude/skills/belay-review/SKILL.md:279-299` now says the first finding takes
+`.claude/skills/belay-review/SKILL.md:285-305` now says the first finding takes
 the number `python scripts/review_due.py` prints and that the number is never
 derived from where a previous report's headings ended, and
 `tests/test_session_handoff.py:287-445` holds both halves of that.
@@ -676,6 +676,97 @@ access cannot be granted until they accept. Until then `main: review` binds
 nobody but the owner, because GitHub counts a code owner only if they have write
 access. The owner's part is getting the invitation accepted; a session grants
 the Write once it has been.
+
+# 2026-09-22 — owner items from the evidence-bar rulings (`docs/OwnerDecisions.md` Parts 18-19)
+
+Appended so that no line citation moves.
+
+## Open — merge pull request #19
+
+It records Parts 18a-18g and 19 in the owner's words. It changes no code and no
+ADR status. No independent pass was run on it: it records rulings, and the pass
+that counts is on ADR-016 once it is drafted.
+
+## Open — Belay's licence terms (Part 19c, item 4)
+
+Belay is sold and then downloaded. `LICENSE` still forbids running it. The
+terms a buyer receives are the owner's to write or commission. No session may
+change `LICENSE`.
+
+## Open — legal advice on selling investment recommendations (Part 19b, item 5)
+
+Software that recommends investments to other people may carry legal
+obligations. No session can assess that. It needs a lawyer.
+
+## Later — ratify ADR-015 and ADR-016
+
+Neither is ready yet. Each needs drafting from Part 18, then a fresh
+independent pass, before it is put to the owner.
+
+# 2026-09-24 — owner items from the outside-text review (#23, #25, #26, #27)
+
+## Open — how #23 and #26 reach `main`
+
+Both passed independent falsification passes and are green. Neither can be
+approved by an agent, because agents post under the owner's login. The choice
+is the second contributor's review, or the owner telling a session "merge #23"
+(and "merge #26"), which uses the owner bypass for that pull request only. #23
+matters before the scheduled review fires on 2026-09-25 06:07 UTC.
+
+## Open — declare `markdown-it-py` as a dev dependency, or accept it as it is
+
+#23's tests parse markdown with it. Today it arrives only because `rich`, a
+runtime dependency, requires it. Declaring it under `dev` in `pyproject.toml`
+(an owner-only file) makes the dependency visible. Recommendation: declare it.
+
+## Open — the review routine's stored prompt can be rewritten by any session
+
+The review skill trusts the stored prompt as the run's own instructions. Any
+agent session on the owner's account can rewrite that prompt, or append a turn
+to a firing. Check the prompt against a known copy before relying on a
+scheduled review. Do not paste the prompt or its identifier into this
+repository.
+
+## Closed 2026-09-24 — #23 reached `main`
+
+On the owner's word ("merge"), a session merged #23 through the owner bypass at
+`22d2d81`, for that pull request only. #26 is still open, as above.
+
+# 2026-09-24 — owner items from hardening the review gate (#29)
+
+## Open — keep or drop the gate's "outside text" rule
+
+Pull request #29 makes `scripts/review_due.py` skip the body of a review
+report's `## Outside text` section, so a stranger's number quoted there cannot
+move the finding series. Two independent passes each found shapes where a
+real finding number in or after that section was silently not counted, and
+an uncounted number is issued again. The concrete shapes they found are
+fixed. One stated limit remains: a real number inside the section that does
+not start its line, with nothing after it that closes the section, and
+written nowhere else.
+
+The choice: **keep the rule** and accept that limit, or **drop it and count
+everything**. Since #29 also stops the gate at finding number 999, counting everything can
+no longer re-issue a number silently. A stranger's quoted number only leaves a
+gap, and a quoted number 999 stops the gate until that report is edited. The
+question, the trade-off and a recommendation are on #29.
+
+## Open — code-owner review of #29
+
+#29 changes `.claude/skills/belay-review/SKILL.md`, where the owner is the
+only code owner. It only repoints citations and states what the gate reads.
+
+## Closed 2026-09-24 — keep the Outside-text rule, or count everything
+
+Owner ruled "count everything" (`docs/OwnerDecisions.md` Part 23). The rule is
+removed on #29. Still open for #29: your code-owner review of
+`.claude/skills/belay-review/SKILL.md` and `docs/OwnerDecisions.md`.
+
+**Correction to "Open — code-owner review of #29" above.** #29 now does more
+than repoint citations. In `.claude/skills/belay-review/SKILL.md` it rewrites
+the gate paragraph (`:287-295`) and one sentence of the outside-text rule
+(`:383`). It also appends Part 23 to `docs/OwnerDecisions.md`. Both files need
+your code-owner review.
 
 ## Grant the second contributor collaborator access — DONE 2026-09-22, as Write, per Part 15b
 
