@@ -761,3 +761,9 @@ only code owner. It only repoints citations and states what the gate reads.
 Owner ruled "count everything" (`docs/OwnerDecisions.md` Part 23). The rule is
 removed on #29. Still open for #29: your code-owner review of
 `.claude/skills/belay-review/SKILL.md` and `docs/OwnerDecisions.md`.
+
+**Correction to "Open — code-owner review of #29" above.** #29 now does more
+than repoint citations. In `.claude/skills/belay-review/SKILL.md` it rewrites
+the gate paragraph (`:287-295`) and one sentence of the outside-text rule
+(`:383`). It also appends Part 23 to `docs/OwnerDecisions.md`. Both files need
+your code-owner review.

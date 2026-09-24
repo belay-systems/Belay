@@ -5826,3 +5826,32 @@ on `main` too. `FINDING` now uses explicit "no letter or digit" bounds. The cita
 `scripts/review_due.py` from the review skill and `tests/test_session_handoff.py`
 are repointed, each matched by its exact text, and the skill's line count is
 unchanged.
+
+**Corrections to the #29 record above, from the fresh pass on `8acb256`.** The
+bullets that describe the Outside-text reader, and the "Open" item that asks
+whether to keep it, describe removed code. Part 23 supersedes them. Four
+independent passes ran on #29, not two: two inside the authoring session, one
+fresh-context pass on `53d1e4a` and one on `8acb256`. The last one's defects are
+fixed on this branch. The edge tests now pin every bound of `FINDING`.
+
+## Highest priority next task (supersedes every list above, once #29 is on `main`)
+
+The gate work is done. Do not act on the older lists' "ignore `## Outside
+text` sections": Part 23 ruled the opposite.
+
+1. **Owner, quick decisions:** declare `markdown-it-py` as a dev dependency or
+   not; check the review routine's stored prompt against a known copy; #14; and
+   #22, which removes the owner bypass, so sessions could no longer merge on
+   the owner's word.
+2. **Issue #21: the joint independent pass on ADR-015 (#7) and ADR-016 (#20).**
+   This is the core work. Every later question about evidence depends on these
+   two decisions.
+3. **The sample-adequacy questions**
+   (`docs/proposals/sample-adequacy-definition.md`), then ratification.
+4. **#24:** regression tests for the guards on the capital path (F-019).
+5. **Small, when convenient:**
+   - the gate items #29 left: `fullmatch` on report names, surviving an
+     invalid date, and ASCII digits in `REPORT`;
+   - a sentence in the review skill (owner-only) saying to write every finding
+     number in full ASCII (`F-NNN`), never abbreviated or with another hyphen,
+     because the gate cannot read those shapes.

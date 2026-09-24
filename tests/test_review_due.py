@@ -291,7 +291,8 @@ def test_a_directory_that_is_not_a_repository_is_still_told_so(tmp_path, monkeyp
 # ------------------------------------------- numbers the gate must not take on trust
 #
 # Each fixture below also holds F-123 in `docs/notes.md`, so the right answer is
-# F-124 unless the case says otherwise. Found by independent passes on #27.
+# F-124 unless a case adds a higher number. Found by independent passes on #27
+# and #29.
 
 
 def _first_finding(tmp_path: Path, monkeypatch, prose: str, files=None) -> tuple[int, str, str]:
@@ -333,6 +334,34 @@ def test_the_gate_counts_only_ascii_digits(digits, tmp_path, monkeypatch):
 
     assert (code, err) == (0, "")
     assert "first finding: F-124" in out
+
+
+@pytest.mark.parametrize(
+    "text, counted",
+    [
+        pytest.param("F-150_", True, id="underscore-after"),
+        pytest.param("_F-150_", True, id="underscores-around"),
+        pytest.param("(F-150)", True, id="punctuation"),
+        pytest.param("REF-150", False, id="capital-letter-before"),
+        pytest.param("xF-150", False, id="small-letter-before"),
+        pytest.param("1F-150", False, id="digit-before"),
+        pytest.param("F-150A", False, id="capital-letter-after"),
+        pytest.param("F-150a", False, id="small-letter-after"),
+        pytest.param("F-1504", False, id="fourth-digit"),
+        pytest.param("f-150", False, id="lower-case-f"),
+    ],
+)
+def test_the_finding_pattern_is_bounded_by_letters_and_digits_only(
+    text, counted, tmp_path, monkeypatch
+):
+    """Pins each bound of `FINDING`: the pass on 8acb256 removed each one, and no
+    test failed. A letter or digit on either side makes it another token; `_`
+    does not, because `\\b` treating `_` as a letter is what hid `_F-150_`.
+    """
+    code, out, err = _first_finding(tmp_path, monkeypatch, f"F-123, and {text}.\n")
+
+    assert (code, err) == (0, "")
+    assert f"first finding: F-{151 if counted else 124}" in out
 
 
 def test_a_number_in_a_reports_outside_text_is_counted(tmp_path, monkeypatch):
