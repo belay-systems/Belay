@@ -5788,7 +5788,7 @@ close record on #28's branch:
 - the gate stops at finding number 999 rather than issue a four-digit number it
   cannot read back. (Written without the prefix: the gate reads this file.)
 
-On this repository the gate's answer is unchanged: `first finding: F-031`.
+On this repository the gate's answer is unchanged: the number after F-030.
 
 **Verification.**
 - Two independent falsification passes ran, both fresh-context agents inside
