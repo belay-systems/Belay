@@ -717,9 +717,9 @@ not start its line, with nothing after it that closes the section, and
 written nowhere else.
 
 The choice: **keep the rule** and accept that limit, or **drop it and count
-everything**. Since #29 also stops the gate at F-999, counting everything can
+everything**. Since #29 also stops the gate at finding number 999, counting everything can
 no longer re-issue a number silently. A stranger's quoted number only leaves a
-gap, and a quoted F-999 stops the gate until that report is edited. The
+gap, and a quoted number 999 stops the gate until that report is edited. The
 question, the trade-off and a recommendation are on #29.
 
 ## Open — code-owner review of #29

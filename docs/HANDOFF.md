@@ -5700,7 +5700,8 @@ close record on #28's branch:
 - the body of a review report's `## Outside text` section is not counted;
 - a line in that section that starts with a finding number above every counted
   one stops the gate;
-- the gate stops at F-999 rather than issue an F-1000 it cannot read back.
+- the gate stops at finding number 999 rather than issue a four-digit number it
+  cannot read back. (Written without the prefix: the gate reads this file.)
 
 On this repository the gate's answer is unchanged: `first finding: F-031`.
 
