@@ -2927,3 +2927,39 @@ counts in 25h. It also does not ratify either ADR. Both stay PROPOSED until
 they are revised, a fresh independent pass has tried to break them, and the
 owner ratifies them. The owner's chosen different-AI pass on Issue #21 is
 still owed.
+
+# Part 26 — Ruled 2026-09-24: six more principles for the evidence bar
+
+**Question put.** A second falsification pass on the redrafts of ADR-015 (#7)
+and ADR-016 (#20), posted on Issue #21, found two new blocking holes in how
+ADR-015 reads a strategy's stage after a downward step. It also found six
+questions only the owner can answer. The session put each one with a
+recommendation.
+
+**Owner said: "Aligned".**
+
+### What it settles
+
+- **26a. A downward step whose review does not resolve lowers the stage read
+  now, and nothing more.** It never makes a Retire final and never bars
+  earlier evidence under 25i. It is flagged for a human to repair.
+- **26b. The trial cap uses an overall false-positive rate of 5%.** It is
+  computed from each significance report's own degrees of freedom, not from a
+  fixed count. It applies only where 25b's 3.0 hurdle applies: Paper Trading
+  and the capital rungs.
+- **26c. Confidence on a capital stage is a capital decision.** Changing a
+  funded strategy's confidence needs a recorded human yes, as in 25f.
+- **26d. 25i's "evidence" means the data.** A report computed after a
+  demotion over data from before it is still evidence from before the
+  demotion.
+- **26e. Reading a stage re-checks its evidence.** The current-stage read
+  resolves the last review's bound reports and applies ADR-016 rule 8, not
+  only the validator.
+- **26f. Capital waits for verification.** The capital rungs stay closed
+  until a human authorization can be verified, not only declared.
+
+### What it does not settle
+
+How a human authorization is verified. It also does not ratify either ADR;
+both stay PROPOSED until they are revised, a fresh independent pass has tried
+to break them, and the owner ratifies them.
