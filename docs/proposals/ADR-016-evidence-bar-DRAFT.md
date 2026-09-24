@@ -1,103 +1,152 @@
 # DRAFT — ADR-016: The Evidence Bar — What Evidence Buys Each Rung, And What No User Setting Can Lower
 
 Status:
-**PROPOSED — drafted from owner rulings, not ratified. Not implemented in any part.**
+**PROPOSED — drafted from owner rulings, revised 2026-09-24 after a falsification
+pass and the owner's Part 25. Not ratified. Not implemented in any part.**
 
 Date:
-2026-09-22
+2026-09-22 (revised 2026-09-24)
 
 ---
 
 > **Where this lives, and why here.** ADR-015 is PROPOSED and lives only on public
 > pull request #7's branch, `adr/015-stage-is-carried`, not on `main`. This draft
-> fills ADR-015 rule 4's empty table, so it cannot be appended to
-> `docs/DECISIONS.md` on `main` without citing an ADR that is not there. It is kept
-> here, beside `docs/proposals/ADR-014-rule-5-amendment-DRAFT.md`, until the owner
-> rules where both ADRs land. ADR-015 is cited by description, never by line.
+> fills ADR-015 rule 4's table, so it cannot be appended to `docs/DECISIONS.md` on
+> `main` without citing an ADR that is not there. It is kept here, beside
+> `docs/proposals/ADR-014-rule-5-amendment-DRAFT.md`, until the owner rules where
+> both ADRs land.
+>
+> **ADR-015 is now cited by line** (finding N7): as "ADR-015 at `94815a2`, lines
+> n-m", meaning DECISIONS.md under docs/ on branch `adr/015-stage-is-carried` at
+> commit 94815a2. The file name and line numbers are written without backticks on
+> purpose: the file on this branch is `main`'s, where ADR-015 does not exist, and the
+> repository's citation test would read them against the wrong file. They go stale when that
+> branch changes; repoint them when it does.
+
+> **What changed in this revision (2026-09-24).** A falsification pass on this
+> draft and ADR-015 together (Issue #21, the comment "Supplementary falsification
+> pass on ADR-015 (#7) and ADR-016 (#20), taken together") found both not ready.
+> Against this draft: B4, one made-up evidence record listed under all seven
+> criteria passed every rule for a capital rung (executed); B5, a bound report
+> pinned neither the grade, the strategy it is about, nor its verdict; B6, drafter
+> choices were labeled RULED; B3 and B7, shared with ADR-015. The owner then ruled
+> ten principles, **Part 25 (25a-25j), 2026-09-24: "aligned to all 10
+> recommendations".** "Findings and rulings, and where each is resolved", at the
+> end, maps every finding and every ruling to the rule that resolves it.
+
+> **Where the rulings this draft rests on are recorded.**
+>
+> - Parts 18 and 19 are on `main` (`docs/OwnerDecisions.md`).
+> - **Part 22 (sample adequacy) is on this branch and not yet on `main`.**
+> - **Part 25 is recorded on branch `claude/kind-knuth-9g7xlr` and is not yet on
+>   `main` or on this branch.** Every rule below that cites 25x rests on that
+>   record. If it does not reach `main` as written, those rules revert to DRAFTER.
 
 > **What the owner ruled, and what the drafter chose.** Every rule below carries
-> one of two marks:
+> one of two marks, and a rule with parts of each marks each part:
 >
-> - **RULED** — the owner's ruling, cited to `docs/OwnerDecisions.md` Part 18 or
->   19, where the owner's words are quoted.
+> - **RULED (Part n)** — the owner's ruling, cited to `docs/OwnerDecisions.md`,
+>   where the owner's words are quoted.
 > - **DRAFTER** — a choice this draft makes to turn a ruling into something code can
 >   check. The owner has not seen or ruled it. Each one is listed again under
 >   "Put to the owner at ratification".
 >
-> Nothing marked DRAFTER may be read as ruled.
+> Nothing marked DRAFTER may be read as ruled. *(Finding B6: the previous revision
+> marked rule 1's whole table RULED, including a column that 18f says "is not
+> ruled", and restated 19c's minimums in words 19c does not use. Both are
+> corrected below.)*
 
-> **Nothing here has had an independent pass.** `AGENTS.md` (How work is claimed
-> and landed, point 4) requires one before anything is called verified, and every
-> ADR in `docs/DECISIONS.md` that had a second reader lost claims to it. The next
-> step is that pass, told to falsify this draft.
+> **Nothing in this revision has had an independent pass.** `AGENTS.md` (How work is
+> claimed and landed, point 4) requires one before anything is called verified. The
+> owner's chosen different-AI pass on Issue #21 is still owed (Part 25, "What it
+> does not settle").
 
 ---
 
 ## Context
 
-**ADR-015 closes F-007 and F-014 and leaves one hole open on purpose.** Its rule 4
-requires every stage move to carry evidence, and reserves an empty table for the
-minimum grade each rung needs. Until that table is filled, "a single Level D
-record, `constitution/Evidence_Standards.md:31-35`, 'Hypothesis. Research only.',
-satisfies it for a promotion into real capital." The owner blocked ADR-015's
-ratification on researching a bar first. The research is
-evidence-bar-per-rung.md under docs/proposals/ on pull request #7's branch (not on
-`main`, so named without backticks). It ended in seven questions.
+**ADR-015 closes F-007 and F-014.** Its rule 4 requires every review outcome to carry
+evidence, and reserves a table for the minimum each rung needs. The research the
+owner asked for is evidence-bar-per-rung.md under docs/proposals/ on pull request
+#7's branch (not on `main`, so named without backticks). It ended in seven
+questions.
 
 **On 2026-09-22 the owner answered all seven** (`docs/OwnerDecisions.md` 18a-18g)
 and, while answering, stated that Belay is a product for others: bought,
 downloaded, and connected to the buyer's own AI, with a human saying yes or no to
-each recommendation (Part 19). Part 19c ruled that Belay's rules are minimums no
-user can lower.
+each recommendation (Part 19). Part 19c ruled that Belay's minimums are ones no
+user can lower. **18g ruled that the bar is its own decision record**, so that it can
+change without reopening how the ladder works. This is that record.
 
-**18g ruled that the bar is its own decision record**, so that it can change
-without reopening how the ladder works. This is that record.
+**On 2026-09-24 the owner ruled Part 25** after the falsification pass above.
 
 **What the rulings demand that nothing in Belay can check today:**
 
-1. **ADR-015's gate reads one grade.** Rule 4's check is `strongest_evidence_level`
-   (`framework/artifacts/enums.py:29-43`) compared against a table. It cannot count
-   records or see what any record is about, so 18a's "one record per criterion" has
-   no mechanism.
+1. **ADR-015's gate reads one grade.** Its check is `strongest_evidence_level`
+   (`framework/artifacts/enums.py:29-43`) against a table. It cannot count records
+   or see what any record is about, so 18a's "one record per criterion" has no
+   mechanism.
 2. **An evidence record's `provenance` is free text**
    (`framework/artifacts/evidence.py:12-18`). Its seal proves the record is
    unedited, not that anything it names exists (18f).
-3. **`EvidenceRecord` cannot gain a field.** Its hashed payload is pinned by a
-   literal digest (`tests/artifacts/test_evidence_hashing.py:18`). A new field
-   would stop historical evidence verifying.
-4. **No REVIEW has ever been stored.** ADR-015 rule 5 verified that only
+3. **A REPORT names no strategy.** `metric_artifact()` writes `metric`, `value`,
+   `observations`, the caller's parameters and the four disclosures into `content`
+   (`framework/metrics/reporting.py:219-232`), and nothing that says which strategy
+   the series came from.
+4. **Every metric report is graded C.** `metric_artifact()` grades its own evidence
+   `HISTORICAL` unconditionally (`framework/metrics/reporting.py:210-217`).
+5. **No REVIEW has ever been stored.** ADR-015 rule 5 verified that only
    `artifacts/RPT-0001/1.0.0.yaml` was ever committed, so REVIEW `content` is still
    free to change. After the first review is saved, every change is a migration of
    permanent records.
 
-Points 3 and 4 together decide where this ADR puts everything new: **on the REVIEW's
-signed `content`, never on `EvidenceRecord`.**
+**Where new fields go.** This draft puts every new review field on the REVIEW's signed
+`content` (point 5), and adds `subject_id` and `subject_integrity_hash` to REPORT
+`content` (point 3). **DRAFTER.** The previous revision also said a new
+`EvidenceRecord` field was impossible because the record's hashed payload is
+pinned by a literal digest (`tests/artifacts/test_evidence_hashing.py:18`). **That
+reason was overstated (finding S9) and is withdrawn:** a new optional field left out
+of `canonical_payload` when unset (`framework/artifacts/evidence.py:62-75`) would not
+move any existing digest. Both routes are open, and 18f leaves the choice to the
+implementing change. The reasons this draft still prefers the REVIEW are weaker and
+stated as such: the per-criterion mapping, the subject check and the "every report
+since the previous step" check (rule 3) are properties of one review, not of one
+record. The cost of that choice: a record does not itself commit to its report, so
+the same record could be bound to different reports on different reviews. Rule 3's
+grade check and rule 2's distinctness check limit what that buys.
 
 ---
 
 ## Decision
 
-### Rule 1 — The floor per rung, upward moves only
+### Rule 1 — The grade floor per rung, upward moves only
 
-**RULED** (18a, 18b). This fills ADR-015 rule 4's table.
+**RULED (18a, 18b).** This fills ADR-015 rule 4's table (ADR-015 at `94815a2`, lines
+4545-4563).
 
-| Rung reached (`to_stage`) | Minimum `EvidenceLevel` — upward moves only | Also required on this rung |
-|---|---|---|
-| Research | D | — |
-| Validation | D | — |
-| Paper Trading | C | rule 3 binding |
-| Promotion Review | B | rule 3 binding |
-| Micro Capital | B | rule 2 criterion coverage; rule 3 binding; rule 5 closure |
-| Limited Capital | A | rule 2 criterion coverage; rule 3 binding |
-| Production | A | rule 2 criterion coverage; rule 3 binding |
-| Retired | no floor — a retirement is never upward | — |
+| Rung reached (`to_stage`) | Minimum `EvidenceLevel` — upward moves only |
+|---|---|
+| Research | D |
+| Validation | D |
+| Paper Trading | C |
+| Promotion Review | B |
+| Micro Capital | B |
+| Limited Capital | A |
+| Production | A |
+| Retired | no floor — a retirement is never upward |
 
-**Direction is computed exactly as ADR-015 rule 4 already drafts it**: a move to
-`Retired` is classified first and is never upward; otherwise a move is upward when
-`STRATEGY_LADDER.index(to_stage) > STRATEGY_LADDER.index(from_stage)`
-(`framework/artifacts/enums.py:107-109`). Grades compare through
-`EVIDENCE_STRENGTH` (`framework/artifacts/enums.py:21-26`), never through
-declaration order.
+**The grades are RULED** (18a: "destination `Research` D, `Validation` D, `Paper
+Trading` C, `Promotion Review` B, `Micro Capital` B, `Limited Capital` A,
+`Production` A"). **Upward only is RULED** (18b). *(The previous revision had a third
+column, "Also required on this rung", under the same RULED mark. It is removed: which
+other rules bind which rung is set in each rule below, with its own mark.)*
+
+**Direction is computed exactly as ADR-015 rule 4 drafts it** (ADR-015 at `94815a2`,
+lines 4586-4620): a move to `Retired` is classified first and is never upward;
+otherwise a move is upward when `STRATEGY_LADDER.index(to_stage) >
+STRATEGY_LADDER.index(from_stage)` (`framework/artifacts/enums.py:107-109`). Grades
+compare through `EVIDENCE_STRENGTH` (`framework/artifacts/enums.py:21-26`), never
+through declaration order.
 
 **Why these grades.** They are the proposal's option 3: each rung needs the grade
 the last evidence-producing stage before it is defined to produce. That mapping is
@@ -105,169 +154,530 @@ an inference from names, which the proposal states in its section 9 and the owne
 ruled knowingly. Level A on `Limited Capital` is not a deadlock: `Micro Capital`
 trades real capital, and so produces Level A (`Knowledge/EvidenceRegistry.md:9`).
 
-### Rule 2 — On the three capital rungs, one record per promotion criterion
+### Rule 2 — On the three capital rungs, seven distinct records backed by seven distinct reports
 
-**RULED** (18a). An upward move into `Micro Capital`, `Limited Capital` or
+**RULED (18a, 25a).** An upward move into `Micro Capital`, `Limited Capital` or
 `Production` carries, for **each** of the seven criteria of
-`constitution/Promotion_Pipeline.md:75-81`, at least one evidence record at or
-above that rung's floor. The list is exactly:
+`constitution/Promotion_Pipeline.md:75-81`, an evidence record at or above that
+rung's floor. The list is exactly:
 
 > Statistical performance · Risk-adjusted returns · Drawdown behavior · Regime
 > robustness · Execution quality · Liquidity · Operational consistency
 
 The spellings in `strategies/PromotionCriteria.md` and `Validation/CapitalReview.md`
-do not change the list (18a).
+do not change the list (18a). **25a: "'One evidence record per promotion criterion'
+(18a) means seven distinct records. Each is backed by its own stored report, of a
+kind suited to its criterion."**
 
-**DRAFTER — the mechanism.** The REVIEW's `content` gains a key
+**DRAFTER — the mechanism** (finding B4). The REVIEW's `content` gains
 **`criterion_evidence`**: a mapping from each of the seven criterion names, spelled
-as above, to a non-empty list of evidence-record hashes. The check refuses the
-review unless:
+as above, to exactly one evidence-record hash. The check refuses the review unless:
 
 1. all seven names are present, and no other name;
 2. every listed hash is the `hash` of a record in the review's `Artifact.evidence`;
-3. for each criterion, at least one listed record's `level` meets the rung's floor.
+3. **the seven hashes are distinct** — no record is listed under two criteria;
+4. each listed record meets the rung's floor (rule 1);
+5. each listed record is bound under rule 3 to a report, and **the seven reports
+   are distinct**, compared by `(report_id, report_version)`;
+6. **each bound report's `metric` is in its criterion's allowlist**, below.
 
-**What this does not check, stated so nobody assumes it does:** that a record is
-*about* the criterion it is listed under. That is the reviewer's declaration,
-signed and attributable, and nothing more. Rule 3 makes it a declaration about a
-real, stored report. Checking a report's topic is Required Follow-Up item 3.
+**The per-criterion allowlist — DRAFTER, tied to the modules that exist.** `metric`
+is the `content` key `metric_artifact()` writes
+(`framework/metrics/reporting.py:220`).
 
-### Rule 3 — Qualifying evidence names a stored, signed report
+| Criterion | Allowed `metric` values | Written by |
+|---|---|---|
+| Statistical performance | `statistical_significance`, and rule 8 applies | `framework/metrics/statistics.py:355` |
+| Risk-adjusted returns | `sharpe_ratio`, `sortino_ratio` | `framework/metrics/risk_adjusted.py:161`, `:195` |
+| Drawdown behavior | `max_drawdown` | `framework/metrics/drawdown.py:89` |
+| Regime robustness | *none — empty* | no working module (`scripts/status.py:48-56`) |
+| Execution quality | *none — empty* | no working module |
+| Liquidity | *none — empty* | no working module |
+| Operational consistency | *none — empty* | no working module |
 
-**RULED** (18f): each qualifying record names a stored, signed report by
-identifier, version and integrity hash, and Belay refuses a record whose report
-does not resolve or whose hash does not match.
+**An empty allowlist refuses every report for that criterion**, so every capital
+rung stays closed until all four missing criteria have a module and a ruled entry
+here. That is 18a's "Real money is closed until all seven can be measured", made
+checkable. `cagr` (`framework/metrics/returns.py:124`) is in no list: a growth rate
+is not risk-adjusted. **Adding a metric to a list is an amendment of this ADR and a
+new `bar_version` (rule 10), never a code change a session makes.**
 
-**DRAFTER — which records qualify.** Every evidence record on an **upward** move
-whose destination is `Paper Trading` or above. That is where the proposal placed it
-(its section 7), and where Level C or better is required, so a stored report can
-exist. Records on `Research` and `Validation` promotions are Level D notes with no
-report behind them. Records on downward moves (18b) and on `Remain` (18c) are not
-bound by this draft; see "Put to the owner", item 2.
+**B4's executed attack, and why it now fails.** One `EvidenceRecord`, self-graded A,
+source "I made this up", empty methodology, listed under all seven criteria and
+bound to `RPT-0001` (28 daily bars). It fails check 3 (one hash under seven names),
+check 5 (one report for seven criteria), check 6 (`RPT-0001`'s metric, and four empty
+allowlists), and rule 3's grade check (an A record bound to a report graded C).
 
-**DRAFTER — the mechanism.** The REVIEW's `content` gains a key
-**`evidence_reports`**: a mapping from each qualifying evidence record's `hash` to
-three strings, `report_id`, `report_version` and `report_integrity_hash`. This is
-ADR-015 rule 1's three-part reference, the same shape one level down. On `save()`
-and on `get()`, the repository resolves each reference and refuses the review when:
+**What this still does not check:** that a report *measures well* what its metric
+names. The allowlist checks the report's declared kind; the report's own numbers are
+as trustworthy as the run that produced them. Required Follow-Up item 3.
 
-- a qualifying record has no entry;
-- the named artifact does not exist at that version;
-- its `type` is not REPORT;
-- its stored `integrity_hash` differs from `report_integrity_hash`.
+### Rule 3 — Qualifying evidence names a stored report that resolves, is about this strategy, and is no weaker than the record
 
-It resolves one level only. It checks that the report exists and is unedited. It
-does not re-open the report's own inputs. That bound matches ADR-015 rule 3c, which
-the owner selected as "Yes, check on load".
+**RULED (18f):** each qualifying record names a stored, signed report by identifier,
+version and integrity hash, and Belay refuses a record whose report does not resolve
+or whose hash does not match. **RULED (25a)** that each capital-rung criterion record
+is backed by its own report; **RULED (25b)** that the Paper Trading and capital rungs
+rest on a significance report (rule 8).
 
-**Why on the REVIEW and not on the record** (Context points 3 and 4): a new
-`EvidenceRecord` field breaks the pinned digest, and a parsed format inside
-`provenance` would turn a free-text field into a hidden schema that old records do
-not follow. REVIEW `content` is still free to change and already signed.
+**DRAFTER — which records qualify.** Every evidence record on an **upward** move whose
+destination is `Paper Trading` or above. 18f says which records qualify "is not
+ruled"; 25a and 25b rule it for the capital-rung criterion records and for the
+significance report, and this draft extends it to every record on those moves and to
+`Promotion Review`. Records on `Research` and `Validation` promotions are Level D
+notes with no report behind them. **Records on downward moves and on `Remain` are
+not bound** (DRAFTER): binding them would put a step before a demotion, which 18b
+and 25d argue against. See "Put to the owner", items 2 and 3.
+
+**DRAFTER — the mechanism.** The REVIEW's `content` gains **`evidence_reports`**: a
+mapping from each qualifying record's `hash` to three strings, `report_id`,
+`report_version` and `report_integrity_hash` — ADR-015 rule 1's three-part reference,
+one level down. On `save()` and `get()` of the review, and in ADR-015 rule 3f's
+sweep, the repository refuses the review when:
+
+1. **a qualifying record has no entry;**
+2. **the report does not resolve through `get(report_id, report_version)`** (finding
+   S8). Resolution goes through `get()`, which recomputes the hash from the stored
+   contents (`framework/artifacts/repository.py:185-190`), and then compares the
+   returned artifact's `integrity_hash` with `report_integrity_hash`. **Reading the
+   stored `integrity_hash` field and comparing it is not resolution**: a file edited
+   after storing keeps its old field. The resolved report is then run through
+   `ArtifactValidator().validate()`, because ADR-015 rule 3.0 does not put REPORTs
+   in `get()`'s validation scope;
+3. **its `type` is not `REPORT`;**
+4. **the record's grade is stronger than the report's** (finding B5): the record's
+   `level` must be at or below the report's `evidence_level`, as the validator
+   re-derives it, compared through `EVIDENCE_STRENGTH`. A record self-graded A
+   cannot bind to a report the code grades C;
+5. **the report is not about this strategy** (finding B5). REPORT `content` gains
+   **`subject_id`** and **`subject_integrity_hash`**, written by `metric_artifact()`
+   and inside the report's signature. The review is refused unless `subject_id`
+   equals the review's `subject_id`, and `subject_integrity_hash` is the
+   `integrity_hash` of a stored version of that strategy whose ladder is a prefix of
+   the reviewed version's ladder. A report with no subject, or about another
+   strategy, binds to nothing. **This is also what lets ADR-015 rule 4(f) refuse a
+   report from before a demotion** (25i), by the subject version's ladder length;
+6. **the report omits a disclosure** (finding S15): any of `assumptions`,
+   `data_source`, `sample_period_start`, `sample_period_end` or `known_limitations`
+   is missing or blank in its `content` (`framework/metrics/reporting.py:124-133`,
+   `:227-231`);
+7. **a stored report about this subject is left out** (finding S14; below).
+
+**Every stored report since the previous step must be bound — DRAFTER, finding S14.**
+Binding only the reports an author chooses lets failed trials and flattering windows
+be dropped. So `save()` of an upward review lists every stored REPORT whose
+`subject_id` is the review's subject and whose `subject_integrity_hash` names a
+version at the subject's **current ladder length** — every report produced since the
+last rung — and refuses the review if any is absent from `evidence_reports`. A report
+that is bound but did not pass (a `significant: false`) does not satisfy rule 8, and
+it is still bound: its presence is the record that it was tried. **Cost, stated:**
+this needs a listing of the store by subject, which the repository does not have
+(`framework/artifacts/repository.py:69-84` lists one identifier's versions). An index
+is part of implementing this rule. **Limit, stated:** a report that was never stored,
+or was run outside Belay, is invisible to this check (25j).
+
+**What binding does not prove — survivorship and lookahead (finding S15).** Check 6
+proves the report *discloses*; it does not check what the disclosure says. The
+survivorship guard is defeated three ways in committed code (F-008, open, with F-003
+and F-016), so a report can carry a softened survivorship caveat. Nothing in Belay
+detects lookahead. **This draft therefore does not claim a bound report is free of
+either.** Whether the Paper Trading and capital rungs should stay closed until F-003,
+F-008 and F-016 are closed is put to the owner (item 9). The capital rungs are closed
+today on other grounds (rules 2 and 5).
+
+**It resolves one level only.** It checks that each report exists, is unedited, is
+about this strategy and says what it is. It does not re-open the report's own
+inputs.
 
 ### Rule 4 — Every review outcome carries evidence, `Remain` included
 
-**RULED** (18c). ADR-015 rule 4 requires evidence for `Promote`, `Demote` and
-`Retire` and leaves `Remain Current Stage` optional as the drafter's judgement.
-**That optional is replaced: all four outcomes carry at least one verifying
-evidence record**, in both of `Remain`'s senses: a promotion rejected, and a
-strategy kept on the stage it holds.
+**RULED (18c).** All four outcomes — `Promote`, `Remain Current Stage`, `Demote`,
+`Retire` — carry at least one verifying evidence record, in both of `Remain`'s
+senses: a promotion rejected, and a strategy kept on the stage it holds. Applied in
+ADR-015 rule 4 (ADR-015 at `94815a2`, lines 4448-4457).
 
-Consequence for ADR-015 rule 4(a): `review_artifact()`'s `evidence` parameter no
-longer has a reason to default to empty. **DRAFTER:** it becomes required.
+**DRAFTER:** `review_artifact()`'s `evidence` parameter is required (ADR-015 at
+`94815a2`, lines 4474-4481).
 
-**No grade floor on `Remain`.** A `Remain` is not an upward move, so rule 1 does not
-reach it. Whether keeping a strategy on capital must meet the floor of the rung it
-holds was not ruled (18c); see "Put to the owner", item 1.
+**No grade floor on `Remain` — DRAFTER.** A `Remain` is not an upward move, so rule 1
+does not reach it. Whether keeping a strategy on capital must meet the floor of the
+rung it holds was not ruled (18c, "What it does not settle"). See "Put to the owner",
+item 1.
 
-### Rule 5 — `Micro Capital` is closed until a paper-trading length is ruled
+### Rule 5 — The rungs that stay closed until a number is ruled
 
-**RULED** (18d, 19c). How long a paper track record must be is referred to the
-Investment Committee. **Until a number is ruled, no upward move into
-`Micro Capital` is accepted.** A blank number closes the rung and never means "any
-length".
+**RULED (18d): "Until the Committee rules a number, no strategy may enter `Micro
+Capital`. A blank number closes the rung. It never means 'any length'."**
+**RULED (25e): "Limited Capital and Production stay closed until a minimum live
+duration is ruled, in the same way as Part 18d's minimum for paper trading."**
 
-**DRAFTER — the mechanism.** A module constant, `MINIMUM_PAPER_TRADING = None`,
-beside the rule 1 table. While it is `None`, the check refuses every upward move
-into `Micro Capital` with a message naming this rule and 18d. Filling it is an
-amendment to this ADR, not a code change a session makes. What unit it takes, and
-what report proves a duration, is decided when it is filled.
+**DRAFTER — the mechanism.** Three module constants beside rule 1's table, each
+`None`:
 
-### Rule 6 — Every promotion states how many variants were tried
+| Constant | Closes | Rests on |
+|---|---|---|
+| `MINIMUM_PAPER_TRADING = None` | every upward move into `Micro Capital` | 18d, 19c |
+| `MINIMUM_MICRO_CAPITAL_DURATION = None` | every upward move into `Limited Capital` | 25e |
+| `MINIMUM_LIMITED_CAPITAL_DURATION = None` | every upward move into `Production` | 25e |
 
-**RULED** (18e). A `Promote` review's `content` carries **`variants_tried`**. The
-check refuses a `Promote` whose count is missing, not an integer, or less than 1.
-The count corrects nothing. ADR-012 rule 10 (`docs/DECISIONS.md:2244-2250`) is
-unchanged: no multiple-testing correction is applied until one is ruled.
+While a constant is `None`, the validator refuses every upward move into the rung it
+closes, with a message naming this rule and the Part. **The check needs nothing but
+the review**, so ADR-015 rule 3c runs it on every read of a strategy (finding B3;
+ADR-015 at `94815a2`, lines 4173-4191). **`None` wins over any user setting** (rule
+7). Filling a constant is an amendment to this ADR and a new `bar_version`, never a
+code change a session makes. Its unit, and what report proves a duration, are
+decided when it is filled. **No number is proposed here** (25, "What it does not
+settle": "the live duration minimums in 25e").
 
-**DRAFTER:** required on every `Promote`, not only upward moves into capital.
-Luck enters at the first backtest, not at the first dollar.
+### Rule 6 — Every promotion states how many variants were tried, and a count the hurdle cannot cover is refused
 
-### Rule 7 — Belay's bar is a floor no user setting can lower
+**RULED (18e):** "Every promotion states how many strategy variants were tried. A
+promotion that leaves it blank is refused." **Every `Promote` is RULED, not a drafter
+choice** (finding N2: the previous revision marked it DRAFTER). The count corrects
+nothing; ADR-012 rule 10 (`docs/DECISIONS.md:2244-2250`) is unchanged.
 
-**RULED** (19c). In the product, each user sets their own gates at onboarding and
-may change them at any time, directly or through their connected AI, **only at or
-above Belay's minimums**. Rules 1 to 6 are those minimums.
+**RULED (25h): "A `variants_tried` count above what the 3.0 hurdle covers is refused
+until the owner rules on a correction."**
 
-**DRAFTER — the shape, and nothing more.** The effective bar for any check is the
-stricter of Belay's and the user's, computed per rule: the higher grade, the
-larger count, the longer duration. A user setting weaker than Belay's is refused
-when the settings are loaded, never silently clamped: a clamp would hide from the
-user that their setting did nothing. No settings mechanism exists in Belay today,
-so this rule binds whatever is built; it builds nothing.
+A `Promote` review's `content` carries **`variants_tried`**. **DRAFTER — the checks**
+(finding S4):
+
+1. **An `int`, and not a `bool`.** `type(value) is int`, so `True` — which is an
+   `int` in Python and passed the previous revision's check (executed) — is refused.
+   At least 1.
+2. **At most `MAXIMUM_VARIANTS_TRIED = 18`.** DRAFTER, derived and not invented; the
+   derivation is stated so the owner can check it. At a critical value of 3.0 the
+   two-sided tail probability is 0.0026998 (`erfc(3 / sqrt(2))`). Bonferroni keeps a
+   family of `k` trials at a family-wise rate of 0.05 while `k * 0.0026998 <= 0.05`,
+   so `k <= 18.52`; Šidák gives the same 18. Command: `python3 -c "from math import
+   erfc,sqrt; a=erfc(3/sqrt(2)); print(a, 0.05/a)"` prints `0.0026997960632601913
+   18.519917367247928`. **The family-wise rate of 0.05 is not ruled anywhere.** It is
+   the conventional level, and it is the one input to 18 that the owner has not seen.
+   If the owner does not confirm it, the constant becomes `None`, and `None` refuses
+   every `Promote`.
+3. **Never decreasing along the ladder.** `save()` refuses a `Promote` whose count is
+   below the count on any earlier `Promote` review named in the subject's ladder.
+4. **Following `Derived From` lineage.** A new identifier saved under ADR-015 rule 3g
+   carries a `Derived From` edge to the strategy it came from. `save()` refuses a
+   `Promote` whose count is below the largest count recorded on any `Promote` review
+   of any identifier in its `Derived From` ancestry, plus one for each identifier
+   between. A new identifier does not reset the count. This overcounts when several
+   identifiers came from one batch of trials, which errs toward less capital.
+
+Checks 1 and 2 need only the review and run in ADR-015 rule 3c. Checks 3 and 4 read
+other reviews and run in `save()` and the sweep.
+
+**What is still not settled:** what counts as one "variant" (18e, "What it does not
+settle"), and whether variants a user's AI generated and discarded are counted. The
+count is self-reported; checks 3 and 4 make it harder to understate, not impossible.
+
+### Rule 7 — Belay's bar is a floor no user setting can lower, and `None` beats every setting
+
+**RULED (19c):** "Belay sets the minimums; users can only be stricter." **19c names
+what the minimums are: "Belay's constitution and Part 18 are fixed minimums in the
+product."** *(Finding B6: the previous revision said "Rules 1 to 6 are those
+minimums", which is a drafter's restatement, not 19c's words.)* Part 25's rulings are
+of the same kind, and this draft treats them as minimums too (DRAFTER).
+
+**DRAFTER — which constants a user may not lower.** Every constant and every rule of
+this ADR that implements the constitution, Part 18 or Part 25: the rule 1 grades,
+rule 2's seven criteria and allowlists, rule 5's closures, rule 6's maximum, rule
+8's hurdle, rule 9's authorization.
+
+**DRAFTER — the shape.** The effective bar for any check is the stricter of Belay's
+and the user's, computed per rule: the higher grade, the larger duration, the smaller
+maximum count, the higher critical value.
+
+**`None` wins over any user setting (finding S6).** "The stricter of" a closed rung
+and a number is undefined, so it is defined here: **when Belay's constant is `None`,
+the rung is closed, whatever the user has set.** 19c lets a user's Investment
+Committee "set any number Belay leaves open, such as 18d's paper-trading length, on
+the strict side of Belay's floor" — and 19c also says that until Belay's own minimum
+exists, "18d keeps `Micro Capital` closed". A user's number counts only once Belay's
+constant is a number, and only when it is stricter.
+
+A user setting weaker than Belay's is refused when the settings are loaded, never
+silently clamped: a clamp would hide from the user that their setting did nothing.
+The ADR-012 amendment's DRAFTER item 1 refuses a weaker alpha the same way. No
+settings mechanism exists in Belay today, so this rule binds whatever is built; it
+builds nothing.
+
+### Rule 8 — The Paper Trading rung and every capital rung rest on a significance report that passed at 3.0 and is adequate
+
+**RULED (25b): "The Paper Trading rung and every capital rung rest on a significance
+report that passed at a critical value of at least 3.0. It must also have enough
+data, as amended ADR-012 defines."** Finding B5 (verdict).
+
+**DRAFTER — the mechanism.** An upward move into `Paper Trading`, `Micro Capital`,
+`Limited Capital` or `Production` binds, under rule 3, at least one report with
+`metric` `statistical_significance` (on the capital rungs, the one listed under
+"Statistical performance" in rule 2) whose `content` records:
+
+1. `significant` is `true`;
+2. **the critical value it was tested against is at least 3.0** — the value the
+   amended ADR-012 rule 3 bounds (Part 22h; draft
+   `docs/proposals/ADR-012-amendment-sample-adequacy-DRAFT.md`, "Rule 3, amended");
+3. `sample_adequate` is `true` **under amended ADR-012 rule 8** (Part 22a-22g, 22i),
+   **with every condition's floor, measured value and result recorded**, as that
+   draft's DRAFTER item 7 requires. A report without those recorded conditions was
+   produced before the amendment, when `sample_adequate` was the significance test
+   restated (F-004), and it is refused;
+4. `mean_return` is above `null_return_per_period` — DRAFTER: a result significant in
+   the losing direction is not an edge.
+
+**Consequence, stated.** The ADR-012 amendment is itself PROPOSED and unimplemented,
+so no report today can carry item 3's record. **Until it is ratified and implemented,
+nothing can enter `Paper Trading`.** That follows from 25b; it is not an extra rule.
+
+**Not `Promotion Review`** — 25b names Paper Trading and the capital rungs. Whether
+`Promotion Review` should also rest on one is put to the owner (item 8). A strategy
+reaching it has already passed rule 8 at `Paper Trading`.
+
+### Rule 9 — A human authorizes every capital rung, and an AI is never the approving reviewer
+
+**RULED (25f): "A recorded human yes is required before any capital rung, and an AI is
+never the approving reviewer of one."** Finding S7. Part 19c item 2: "record human
+interraction evidence there" — what the human was shown, and what they decided.
+
+**DRAFTER — the mechanism.** On an upward move into `Micro Capital`, `Limited Capital`
+or `Production`, the REVIEW's `content` carries **`human_authorization`**, a mapping
+with:
+
+- `authorized_by` — a non-blank name, equal to the review's `reviewer`, so the
+  approving reviewer is the human who said yes;
+- `authorizer_kind` — exactly `"human"`. **`"ai"`, any other value, or its absence
+  is refused.** This is the check that an AI is never the approving reviewer;
+- `decision` — exactly `"yes"`. A no is recorded as a `Remain Current Stage` review,
+  which rule 4 already requires to carry evidence;
+- `shown` — a non-empty list of `(artifact_id, version, integrity_hash)`
+  references to what the human was shown: at least every report bound under rule 3,
+  and the recorded AI recommendation where there is one (19b item 3). Each resolves
+  through `get()`, as in rule 3.
+
+The first three need only the review and run in ADR-015 rule 3c; `shown` is resolved
+on save and in the sweep.
+
+**Downward moves need no authorization** (DRAFTER): 25d, "It never refuses in a way
+that would block a demotion", and 18b. A `Remain` that keeps capital deployed does
+not either (DRAFTER; put to the owner, item 4).
+
+**What this cannot do, stated.** `authorizer_kind` is a declaration, like the grade
+letter. Nothing in `framework/` authenticates an author; `review_artifact()` checks
+only that `reviewer` is not blank (`framework/artifacts/review.py:123-124`). An AI
+that writes `"human"` is refused by nothing but the record it leaves. What Belay must
+record about a human decision is itself unruled beyond 19c item 2 (Required
+Follow-Up item 1).
+
+### Rule 10 — The bar has a version, and a raised bar applies from each strategy's next step
+
+**RULED (25g): "A raised bar applies from each strategy's next step. It does not
+re-judge past steps. No strategy holds capital today."** Finding S1.
+
+**DRAFTER — the mechanism.**
+
+- A module constant `BAR_VERSION`, starting at `1` on ratification, and a table of
+  every ratified version's constants (rules 1, 2, 5, 6, 8). Every amendment of this
+  ADR that changes a constant adds a version; none edits an old one.
+- **Every review records `bar_version`**, on every outcome. `save()` accepts only the
+  current version. A stored review is validated against the constants of the version
+  it records — never against a later one — so raising a floor does not make an old
+  review unreadable, and does not re-judge the step it bought (25g). An unknown
+  version is refused.
+- **A conformance test pins each version's constants to the ratified text** of this
+  ADR, parsed from `docs/DECISIONS.md` once it lands there. A constant changed in
+  code without an amendment turns the suite red, which is how a *lowered* bar is
+  detected. **That test, not a promotion test, is what catches a `D` floor removed
+  outright** (finding N4): nothing is below `D`, so no grade test can see the
+  difference between a `D` floor and none.
 
 ---
 
-## Changes this makes to ADR-015 (to be applied on pull request #7's branch)
+## What these rules do not reach — trading outside Belay
 
-1. Rule 4's table: every *to be ruled* cell replaced by a pointer to ADR-016 rule 1.
-2. Rule 4's paragraph making `Remain` optional: replaced by ADR-016 rule 4.
-3. Rule 4(a): `evidence` stops defaulting to empty.
-4. Rule 5: REVIEW `content` grows by `criterion_evidence`, `evidence_reports` and
-   `variants_tried`, all in `FIELDS` (`framework/artifacts/review.py:56-67`), so
-   writer and reader cannot drift apart.
-5. The Status block: ratification is no longer blocked on the evidence-bar ruling.
-   It is blocked on this draft's independent pass and the owner's ratification of
-   both.
+**RULED (25j): "Trading done outside Belay, for example by a user's own connected AI,
+is out of scope for these ADRs. Belay's documents state that limitation plainly."**
+
+So, plainly: **every rule here governs what Belay records and what Belay acts on.**
+None of it can stop a user, or a user's connected AI, from trading a strategy through
+an account or a tool Belay does not control, at any size, whatever stage Belay reads.
+A strategy closed at every capital rung by this ADR can still be traded outside it.
+Reports produced outside Belay and never stored are invisible to rule 3's
+every-report check. ADR-015 rule 8 (ADR-015 at `94815a2`, lines 4780-4809) states
+the same limit for the capital read.
+
+---
+
+## Which checks need nothing but the review, and where each runs (finding B3)
+
+ADR-015 rule 3c now reads the last rung's review through the full validator (ADR-015
+at `94815a2`, lines 4173-4191). The validator does no I/O, so it runs only the checks
+that need nothing but the review. The rest run where the store is available.
+
+| Check | Validator: runs on save, on `get()` of the review, and in ADR-015 rule 3c | Needs the store: `save()`, `get()` of the review, ADR-015 rule 3f |
+|---|---|---|
+| Rule 1 floor | yes | — |
+| Rule 2 checks 1-4 | yes | — |
+| Rule 2 checks 5-6 | — | yes (reads each report) |
+| Rule 3 checks 1-7 | check 1 only | yes |
+| Rule 4 | yes | — |
+| Rule 5 closures | yes | — |
+| Rule 6 checks 1-2 | yes | — |
+| Rule 6 checks 3-4 | — | yes |
+| Rule 8 | — | yes (reads the report) |
+| Rule 9, all but `shown` | yes | — |
+| Rule 9, `shown` | — | yes |
+| Rule 10 | yes | — |
+
+**The residual this leaves, and why it cannot reach capital today:** a forged review
+whose bound reports do not exist passes ADR-015 rule 3c. Every capital rung is closed
+by rule 5, which rule 3c does run. Before any rule 5 constant is filled, the owner is
+asked whether rule 3c must also resolve reports on a capital rung (ADR-015 at
+`94815a2`, lines 4338-4345).
+
+---
+
+## Changes this makes to ADR-015 — every one, and where it was applied (finding B7)
+
+The previous revision listed five changes. The falsification pass found twelve more
+places they left ADR-015 contradicting itself or 18c. **All are applied on pull
+request #7's branch at commit 94815a2.** "PR7:n" is the line the pass cited in the
+previous revision of ADR-015; "now" is ADR-015 at `94815a2`.
+
+| # | Change | Was (PR7:) | Now (lines) |
+|---|---|---|---|
+| 1 | Rule 4's table points at this ADR in every cell | 4248-4258 | 4545-4563 |
+| 2 | Rule 4's paragraph making `Remain` optional replaced by 18c | 4185-4193 | 4448-4457 |
+| 3 | Rule 4(a): `evidence` required, not defaulted | 4197-4200 | 4474-4481 |
+| 4 | Rule 4(b): the construction refusal covers all four outcomes | 4201-4203 | 4482-4486 |
+| 5 | Rule 5: `FIELDS` grows by this ADR's five keys, to eighteen | 4381-4382 | 4695-4699 |
+| 6 | Rule 5: outcome-specific keys hold `None` where they do not apply (N3) | — | 4701-4709 |
+| 7 | The three places to reconcile at ruling time, now each ruled | 4312-4333 | 4631-4640 |
+| 8 | "Until it is filled… a single Level D record… satisfies it" | 4335-4339 | 4642-4645 |
+| 9 | Test 21: four outcomes, twelve tests | 4518-4520 | 4879-4882 |
+| 10 | Test 22: `Remain` with empty evidence refused, not saved | 4521-4522 | 4883-4887 |
+| 11 | Tests 23a and 23b: run, not `xfail`; example moved to `Paper Trading` | 4526-4529 | 4891-4912 |
+| 12 | Consequences: the signature grows by four, plus this ADR's keys | 4622-4623 | 5071-5076 |
+| 13 | Rejected Alternatives: "mandatory `evidence`" no longer rejected | 4729-4731 | 5201-5205 |
+| 14 | Required Follow-Up: the bar is ruled; S12's claim corrected | 4755-4761 | 5241-5249 |
+| 15 | Still Open: the bar and `Remain` items settled | 4786-4804 | 5282-5288 |
+| 16 | Rule 3c reads the last review through the full validator (B3) | 4050-4051 | 4173-4191 |
+| 17 | The Status block: ratification blocked on this ADR's revision, Part 25 on `main`, a fresh pass, and the owner | 3622-3623 | 3622-3665 |
 
 ---
 
 ## Tests this implies
 
-Each is written red first, against the rule it names.
+Each is written red first, against the rule it names, and each asserts the named
+refusal, never a bare exception type.
 
-1. An upward move into each rung with evidence one grade below its floor is
-   refused. The same move at the floor is accepted, for every row of rule 1.
+**Rule 1**
+
+1. An upward move into each rung with evidence one grade below its floor is refused,
+   naming the floor and the grade. The same move at the floor is accepted, for every
+   row.
 2. `Production → Limited Capital` and `Micro Capital → Paper Trading` with only a
-   Level D record are **accepted** (rule 1 binds upward only).
+   Level D record are **accepted** (18b).
 3. A move to `Retired` from `Production` with one Level D record is accepted.
-4. A capital-rung promotion with six of seven criteria in `criterion_evidence` is
-   refused, and the message names the missing one.
-5. `criterion_evidence` listing a hash that is not on the artifact is refused.
-6. `criterion_evidence` with an eighth, unknown name is refused.
-7. A qualifying record with no `evidence_reports` entry is refused.
-8. An `evidence_reports` entry naming a report that is not stored is refused, by
-   `save()` and by `get()`.
-9. An entry whose `report_integrity_hash` differs from the stored report's is
-   refused. So is one naming an artifact whose `type` is not REPORT.
-10. A `Remain Current Stage` review with no evidence is refused (rule 4).
-11. Any upward move into `Micro Capital` is refused while `MINIMUM_PAPER_TRADING`
-    is `None`, even with every other requirement met.
-12. A `Promote` with `variants_tried` missing, `0`, `-1` or `"3"` is refused. With
-    `1` it is accepted.
-13. **Mutation check.** Changing any floor in the rule 1 table by one grade turns at
-    least one test red. So does deleting any criterion name from rule 2's list.
+
+**Rule 2 (B4)**
+
+4. **B4's executed attack**: one self-graded A record, source "I made this up", empty
+   methodology, under all seven criteria, bound to one report. Refused, naming the
+   repeated hash (check 3). With seven distinct records all bound to one report:
+   refused naming the repeated report (check 5).
+5. Six of seven criteria: refused naming the missing one. An eighth, unknown name:
+   refused. A listed hash not on the artifact: refused.
+6. A report whose `metric` is outside its criterion's allowlist (`cagr` under
+   Risk-adjusted returns): refused naming both. Any report under Regime robustness:
+   refused naming the empty allowlist.
+
+**Rule 3 (B5, S8, S14, S15)**
+
+7. A qualifying record with no `evidence_reports` entry: refused.
+8. An entry naming a report that is not stored: refused, by `save()` and by `get()`.
+9. **S8.** A stored report edited on disk after storing, whose stored
+   `integrity_hash` field still equals the reference: refused, because `get()`
+   recomputes. A test that compared stored fields would pass it.
+10. An entry naming an artifact whose `type` is not REPORT: refused.
+11. **B5, grade.** A Level A record bound to a `metric_artifact()` report (graded C):
+    refused naming both grades.
+12. **B5, subject.** A report with no `subject_id`; one about another strategy; one
+    whose `subject_integrity_hash` names no stored version, or a version whose ladder
+    is not a prefix of the reviewed version's: each refused, naming the field.
+13. **S14.** Two reports stored about the subject since the last rung, one bound:
+    refused naming the unbound one. With the failed one bound too: accepted, if
+    rule 8 is met by another.
+14. **S15.** A report whose `known_limitations` is blank: refused naming it.
+
+**Rule 4**
+
+15. A `Remain Current Stage` review with no evidence: refused (ADR-015 test 22).
+
+**Rule 5 (18d, 25e)**
+
+16. Every upward move into `Micro Capital`, `Limited Capital` and `Production` is
+    refused while its constant is `None`, even with every other requirement met,
+    naming the constant and the Part. Run through ADR-015 rule 3c as well
+    (ADR-015 tests 49-50).
+
+**Rule 6 (S4, 25h)**
+
+17. `variants_tried` missing, `0`, `-1`, `"3"`, `True` and `19`: each refused. `1` and
+    `18` accepted.
+18. A `Promote` whose count is below an earlier `Promote`'s on the same ladder:
+    refused, naming both counts.
+19. A new identifier with a `Derived From` edge whose first `Promote` states a count
+    at or below its ancestor's largest: refused, naming the ancestor.
+
+**Rule 7 (S6)**
+
+20. A user setting of any number for the paper-trading length, while
+    `MINIMUM_PAPER_TRADING` is `None`: the rung stays closed. A user grade weaker than
+    rule 1's: refused on load, never clamped.
+
+**Rule 8 (25b)**
+
+21. An upward move into `Paper Trading` with a bound significance report that has
+    `significant: false`; one tested at a critical value below 3.0; one with no
+    recorded adequacy conditions (a pre-amendment report); one significant with
+    `mean_return` below the null: each refused, naming the item.
+
+**Rule 9 (25f, S7)**
+
+22. An upward move into `Micro Capital` with no `human_authorization`; with
+    `authorizer_kind: "ai"`; with `decision: "no"`; with `authorized_by` different
+    from `reviewer`: each refused, naming the field.
+23. A demotion from `Limited Capital` into `Micro Capital` with no
+    `human_authorization`: **accepted** (25d, 18b).
+
+**Rule 10 (25g, S1, N4)**
+
+24. A review stored under bar version 1 still validates after a hypothetical version
+    2 raises a floor; a new review saved under version 1 is refused naming the current
+    version; an unknown version is refused.
+25. **Mutation check, through the conformance test.** Changing any constant — a floor
+    by one grade, **the `D` floor removed**, a criterion deleted, an allowlist
+    widened, a rule 5 constant filled, the maximum raised — turns the conformance
+    test red.
 
 ---
 
 ## Consequences
 
-**Real money is closed for the foreseeable future, by the owner's choice.** Rule 2
-needs all seven criteria measurable. `python scripts/status.py` reports "promotion
-criteria 3 of 7 computable", and regime robustness, execution quality, liquidity
-and operational consistency have no working module (`scripts/status.py:48-56`).
-Rule 5 closes `Micro Capital` independently of that. Rule 1 needs Level B, which
+**Real money is closed for the foreseeable future, by the owner's choice.** Four of
+rule 2's allowlists are empty: `python scripts/status.py` reports "promotion criteria
+3 of 7 computable", and regime robustness, execution quality, liquidity and
+operational consistency have no working module (`scripts/status.py:48-56`). Rule 5
+closes all three capital rungs independently of that. Rule 1 needs Level B, which
 needs a paper-trading engine that does not exist (`docs/ROADMAP.md:247`).
+
+**`Paper Trading` is closed too, until the ADR-012 amendment is ratified and
+implemented** (rule 8). **`Promotion Review` is effectively closed** until a report
+graded B can be produced (rule 3 check 4), which also waits on a paper-trading
+engine.
+
+**Promotion gets heavier:** seven distinct reports on a capital rung, every report
+since the last step bound, a human authorization, a non-decreasing variant count.
 
 **Rules that are never exercised rot.** The proposal's author said so of its own
 recommendation (section 9). The mitigation is the tests above: the suite exercises
@@ -275,28 +685,32 @@ every rule now, while nothing in production does.
 
 ### Residual risk, stated rather than buried
 
-- **Grades, criterion labels and the variant count are declarations.** Rule 3 ties
-  each to a real, unedited report. It does not prove the report is right, that it
-  measures the criterion it is listed under, or that the count is honest.
+- **Grades, allowlisted metrics, the variant count and `authorizer_kind` are
+  declarations.** Rule 3 ties each record to a real, unedited report about this
+  strategy, no stronger than it. It does not prove the report is right.
 - **A report can be produced to order.** Binding raises the cost of forging from
-  typing a sentence to producing and storing a signed report. It does not remove
-  it.
-- **The human's yes is not recorded yet.** Part 19c rules that it is, and nothing
-  here builds it. Required Follow-Up item 1.
+  typing a sentence to producing and storing a signed report about this strategy. It
+  does not remove it.
+- **Survivorship and lookahead are not checked** (rule 3, S15).
+- **Trading outside Belay is not reached** (25j, above).
 
 ---
 
 ## Rejected Alternatives
 
 - **Putting the bar inside ADR-015.** The owner ruled against it (18g).
-- **A new `EvidenceRecord` field for the report reference.** Breaks the pinned
-  digest (`tests/artifacts/test_evidence_hashing.py:18`) and every stored record's
-  verification.
 - **A parsed format inside `provenance`.** Turns free text into a hidden schema that
   every existing record silently fails to follow, and that `verify()` cannot tell
   apart from prose.
-- **Clamping a weaker user setting up to Belay's minimum.** Hides from the user
-  that their setting had no effect. Refusing it tells them.
+- **"A new `EvidenceRecord` field breaks the pinned digest" as a reason.** Withdrawn
+  (S9): it does not, if the field is left out of the hashed payload when unset. The
+  choice between the record and the REVIEW is open; see Context.
+- **Clamping a weaker user setting up to Belay's minimum.** Hides from the user that
+  their setting had no effect. Refusing it tells them.
+- **Raising the hurdle for a large `variants_tried` instead of refusing it.** 25h
+  chose refusal until a correction is ruled; ADR-012 rule 10 still applies none.
+- **Re-judging past promotions when the bar is raised.** 25g ruled against it.
+- **A single report binding several criteria.** 25a rules seven distinct reports.
 
 ---
 
@@ -305,24 +719,89 @@ every rule now, while nothing in production does.
 1. **`Remain` on capital:** no grade floor (rule 4). Alternative: the floor of the
    rung held.
 2. **Report binding on downward moves and `Remain`:** not required (rule 3).
-   Required on those would add a step before a demotion, which 18b's reasoning
-   argues against.
-3. **The mechanism for criterion coverage:** the `criterion_evidence` key (rule 2),
-   and the choice that it checks declarations, not topics.
-4. **Where the binding lives:** on the REVIEW (rule 3), not the record.
-5. **`variants_tried` on every `Promote`**, not only on capital rungs (rule 6).
-6. **Weaker user settings are refused, not clamped** (rule 7).
-7. **Where both ADRs land in `docs/DECISIONS.md`**, and in which order.
+3. **Which records are bound:** every record on an upward move into `Paper Trading`
+   or above, including `Promotion Review`, which 25a and 25b do not name (rule 3).
+4. **Human authorization on a `Remain` that keeps capital deployed:** not required
+   (rule 9).
+5. **The mechanisms:** `criterion_evidence`, the allowlists, `evidence_reports`,
+   report `subject_id` and `subject_integrity_hash`, the every-report check, the
+   `human_authorization` shape, `bar_version`.
+6. **`MAXIMUM_VARIANTS_TRIED = 18`**, which rests on a family-wise rate of 0.05 that
+   no Part rules (rule 6). If declined, `None`, which refuses every `Promote`.
+7. **Weaker user settings are refused, not clamped**, and Part 25's rulings are
+   minimums a user cannot lower (rule 7).
+8. **Whether `Promotion Review` also rests on a rule 8 significance report.**
+9. **Whether the Paper Trading and capital rungs stay closed until F-003, F-008 and
+   F-016 (the survivorship surface) are closed** (rule 3, S15).
+10. **Where the binding lives:** on the REVIEW, not the record (Context, S9).
+11. **Where both ADRs land in `docs/DECISIONS.md`**, and in which order.
 
 ## Required Follow-Up (ADR-016)
 
-1. **Recording each human decision** (19c item 2): what the human was shown, and
-   their yes or no, as evidence. That needs its own ruling on shape.
+1. **The shape of a recorded human decision** beyond rule 9's minimum (19c item 2).
 2. **Recording the connected AI's recommendation once, never re-asking it** (19b
    item 3, `AGENTS.md` Determinism).
-3. **Checking what a bound report measures**, so that rule 2's criterion labels
-   stop being declarations.
-4. **Belay's own minimum paper-trading length** (19c), which fills rule 5.
-5. **Whether an AI-made change to a user's gates needs that user's recorded yes**
+3. **Checking what a bound report measures**, so that the allowlist stops being a
+   declared kind.
+4. **Belay's own minimum paper-trading length** (19c), which fills
+   `MINIMUM_PAPER_TRADING`.
+5. **The live duration minimums** (25e), which fill the other two rule 5 constants.
+6. **A correction for trial counts** (25h), which would replace rule 6's refusal.
+7. **Whether an AI-made change to a user's gates needs that user's recorded yes**
    (19c).
-6. **What counts as one variant** (18e).
+8. **What counts as one variant** (18e).
+9. **A store index by subject**, which rule 3's every-report check needs.
+10. **`metric_artifact()` writes `subject_id` and `subject_integrity_hash`**, and the
+    ADR-012 amendment's reported conditions (rule 8).
+11. **Part 25's record merged to `main`**, and this draft revised again if it changes.
+12. **A fresh independent pass** on this ADR and ADR-015 together.
+
+---
+
+## Findings and rulings, and where each is resolved
+
+**The falsification pass (Issue #21).** Findings against ADR-015 alone are resolved on
+pull request #7's branch and listed in ADR-015's revision history (ADR-015 at
+`94815a2`, lines 3740-3764).
+
+| Finding | Resolved here in | Also in ADR-015 at `94815a2` |
+|---|---|---|
+| B1 | — | rule 3g, tests 39-43 |
+| B2 | — | rules 3e, 3h, tests 44-47 |
+| B3 | "Which checks need nothing but the review" | rules 3c, 3f, tests 48-51 |
+| B4 | rule 2; test 4 | — |
+| B5 | rule 3 checks 4-5 (grade, subject); rule 8 (verdict); tests 11, 12, 21 | — |
+| B6 | the marks legend; rule 1; rule 7 | rule 7's "It is ruled" corrected |
+| B7 | "Changes this makes to ADR-015" | all seventeen applied |
+| S1 | rule 10; test 24 | rule 4, "Which ADR-016 version applies" |
+| S2 | — | rule 3b, downward append; test 46 |
+| S3 | rule 3 check 5 (makes it checkable) | rule 4(f); test 52 |
+| S4 | rule 6; tests 17-19 | — |
+| S5 | rule 5 | — |
+| S6 | rule 7; test 20 | — |
+| S7 | rule 9; tests 22-23 | — |
+| S8 | rule 3 check 2; test 9 | — |
+| S9 | Context; Rejected Alternatives | — |
+| S10, S11, S12, S13 | — | rule 4; rule 8; Required Follow-Up; rule 2 step 6 |
+| S14 | rule 3, "Every stored report since the previous step"; test 13 | — |
+| S15 | rule 3 check 6 and "What binding does not prove"; test 14; owner item 9 | — |
+| N1, N3, N6 | — | Context; rule 5; rule 1 |
+| N2 | rule 6 | — |
+| N4 | rule 10; test 25 | rule 4, the note under the table |
+| N5 | `main` merged into both branches | — |
+| N7 | the "Where this lives" block; every ADR-015 citation | — |
+
+**The owner's Part 25.**
+
+| Ruling | Resolved here in | Also in ADR-015 at `94815a2` |
+|---|---|---|
+| 25a Distinct evidence | rule 2 | — |
+| 25b Part 22 joined to the ladder | rule 8 | — |
+| 25c Fixed specification | rule 6 check 4 (`Derived From` lineage) | rule 3g |
+| 25d Fail toward less capital | rule 3 (no binding on downward moves); rule 9 (no authorization on downward moves) | rules 3b, 3e, 3h, 8 |
+| 25e Live rungs closed | rule 5 | rule 3c runs it (B3) |
+| 25f A human authorizes capital | rule 9 | residual risk note |
+| 25g Raised bar applies from next step | rule 10 | rule 4, "Which ADR-016 version applies" |
+| 25h Refuse trial counts beyond the hurdle | rule 6 | — |
+| 25i No reuse after a demotion | rule 3 check 5 (report subject position) | rule 4(f) |
+| 25j Trading outside Belay out of scope | "What these rules do not reach" | rule 8 |
