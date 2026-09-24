@@ -2877,3 +2877,53 @@ could see from `pyproject.toml`. The session recommended declaring it.
 - `pyproject.toml`'s `dev` extra lists `markdown-it-py>=3.0`. The tests that
   import it were run against 3.0.0 and 2.2.0 (the floor `rich` requires), and
   both pass.
+
+# Part 25 — Ruled 2026-09-24: ten principles for the evidence bar (ADR-015, ADR-016)
+
+**Question put.** A falsification pass on ADR-015 (#7) and ADR-016 (#20),
+posted on Issue #21, found that neither is ready. As drafted, one made-up
+evidence record passes every rule for a capital rung. A stage can be read
+without its evidence being checked. A funded strategy's rules can be swapped,
+and a demotion undone by deleting one file. The pass listed ten questions only
+the owner can answer. The session put each one with a recommendation, and all
+of them follow one principle: when in doubt, less capital.
+
+**Owner said: "aligned to all 10 recommendations".**
+
+### What it settles
+
+- **25a. Distinct evidence.** "One evidence record per promotion criterion"
+  (18a) means seven distinct records. Each is backed by its own stored report,
+  of a kind suited to its criterion.
+- **25b. Part 22 is joined to the ladder.** The Paper Trading rung and every
+  capital rung rest on a significance report that passed at a critical value
+  of at least 3.0. It must also have enough data, as amended ADR-012 defines.
+- **25c. The specification is fixed on a capital stage.** A strategy's rules
+  cannot change while it holds a capital stage. A changed specification is a
+  new strategy with a new identifier, and it starts at Idea.
+- **25d. Fail toward less capital.** When the record is damaged or the
+  versions disagree, Belay reads the lowest stage it can establish. It never
+  refuses in a way that would block a demotion.
+- **25e. The live rungs stay closed until a duration is ruled.** Limited
+  Capital and Production stay closed until a minimum live duration is ruled,
+  in the same way as Part 18d's minimum for paper trading.
+- **25f. A human authorizes capital.** A recorded human yes is required
+  before any capital rung, and an AI is never the approving reviewer of one.
+- **25g. A raised bar applies from each strategy's next step.** It does not
+  re-judge past steps. No strategy holds capital today.
+- **25h. Refuse trial counts beyond the hurdle.** A `variants_tried` count
+  above what the 3.0 hurdle covers is refused until the owner rules on a
+  correction. This does not contradict 18e, which applies no correction.
+- **25i. No reuse after a demotion.** Evidence gathered before a demotion
+  cannot be reused to climb back.
+- **25j. Trading outside Belay is out of scope, and says so.** Trading done
+  outside Belay, for example by a user's own connected AI, is out of scope
+  for these ADRs. Belay's documents state that limitation plainly.
+
+### What it does not settle
+
+The numbers: the live duration minimums in 25e, and the correction for trial
+counts in 25h. It also does not ratify either ADR. Both stay PROPOSED until
+they are revised, a fresh independent pass has tried to break them, and the
+owner ratifies them. The owner's chosen different-AI pass on Issue #21 is
+still owed.
