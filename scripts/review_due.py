@@ -22,9 +22,9 @@ own correction block renumbers them F-014..F-018 — so scanning headings return
 015 and would collide, and so would scanning `docs/HANDOFF.md`, which carries
 only what has been registered so far.
 
-**When git's output cannot be obtained or read, the gate stops: exit 2, a reason
-on stderr, nothing on stdout.** It does not skip the file and answer anyway. A
-skipped file is a lower number, and a lower number is the collision above.
+**When git's output cannot be read, or a number cannot be counted safely, the gate
+stops: exit 2, a reason on stderr, nothing on stdout.** It does not skip and answer
+anyway. A skipped number is a lower number, and that is the collision above.
 """
 
 from __future__ import annotations
@@ -40,11 +40,18 @@ from datetime import date, datetime, timezone
 MINIMUM_AGE_DAYS = 12
 
 REPORT = re.compile(r"(\d{4}-\d{2}-\d{2})-review\.md")
-FINDING = re.compile(r"\bF-(\d{3})\b")
+#: ASCII digits only: `\d` matches any Unicode digit and `int()` reads it, so a
+#: quoted fullwidth `F-９９９` counted as 999. Bounded by "no letter or digit"
+#: rather than `\b`, which treats `_` as a letter and so missed `_F-150_`.
+FINDING = re.compile(r"(?<![A-Za-z0-9])F-([0-9]{3})(?![A-Za-z0-9])")
+
+#: The highest number `FINDING` can read back. The gate stops rather than issue
+#: the one after it; see `highest_finding()`.
+LAST_READABLE = 999
 
 
 class GateCannotAnswer(RuntimeError):
-    """Git's output could not be obtained or read, so no number is safe to print."""
+    """No number is safe to print: git's output is unreadable, or cannot be counted."""
 
 
 def git(*args: str, may_fail: bool = False) -> str:
@@ -127,15 +134,31 @@ def highest_finding() -> int:
 
     Zero when none exists. Read from `reports/` and `docs/` together rather than
     from either alone — see the module docstring for why each is insufficient.
+
+    **Every number counts, including one a review report quotes from outside
+    text** (owner's ruling, 2026-09-24: "count everything"). A quoted number can
+    only leave a gap or stop the gate; skipping any text could issue a real
+    number twice. Reports write outside numbers as `F-[NNN]`, which never match.
+
+    **F-999 stops the gate**: the next number, F-1000, is one `FINDING` cannot
+    read back, so every later run would be told F-1000 again.
     """
-    highest = 0
+    highest, source = 0, ""
     for ref in remote_refs():
         listing = git("ls-tree", "-r", "--name-only", ref, "reports/", "docs/")
         for path in listing.split():
             if not path.endswith(".md"):
                 continue
             for number in FINDING.findall(git("show", f"{ref}:{path}")):
-                highest = max(highest, int(number))
+                if int(number) > highest:
+                    highest, source = int(number), f"{ref}:{path}"
+    if highest >= LAST_READABLE:
+        raise GateCannotAnswer(
+            f"`{source}` mentions F-{highest:03d}, so the next number would be "
+            f"F-{highest + 1:03d}, which this gate cannot read back. If that is "
+            "quoted text, write its digits in brackets, as in F-[999]; if "
+            "findings really reached F-999, `FINDING` must be widened on purpose."
+        )
     return highest
 
 

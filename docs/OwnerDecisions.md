@@ -2835,6 +2835,34 @@ independent pass has tried to break it, and the owner ratifies it.
 or closed, and no code changes. The seven questions of
 `docs/proposals/sample-adequacy-definition.md` are not yet put.
 
+# Part 23 — Ruled 2026-09-24: the finding-number gate counts everything
+
+**Question put.** #29 made `scripts/review_due.py` skip the body of a review
+report's `## Outside text` section, with a stop for a line that starts with a
+high number. An independent pass on `53d1e4a` found lines the skip rule missed
+silently: italic, struck-through, and after a non-breaking space. Two choices:
+keep the rule and keep patching shapes, or drop it and count everything. The
+session recommended counting everything. The failure that breaks the record
+is a number issued twice. Counting everything can only cause a gap or a stop,
+both loud and both safe.
+
+**Owner said: "count everything".**
+
+### What it settles
+
+- **The gate counts every finding number in `.md` under `reports/` and
+  `docs/` on every ref, in outside text too.** No section of any file is
+  skipped.
+- **Outside numbers are still written in brackets** (the review skill's rule),
+  and bracketed numbers are never counted. A report that forgets the brackets
+  can leave a gap, or stop the gate at the ceiling, but never cause a
+  duplicate.
+
+### What it does not settle
+
+Whether the gate should ever read four-digit numbers. At the ceiling it stops
+and names the file.
+
 # Part 22 — Ruled 2026-09-23: sample adequacy, "how much data is enough" (F-004's numbers)
 
 The seven questions of the sample-adequacy proposal, as corrected on pull

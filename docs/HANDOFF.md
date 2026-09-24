@@ -2687,7 +2687,7 @@ is kept because a reader who has only ever seen `main` will still find the old
 instruction there.** The skill is edited by *this* commit, on the owner's chat
 selection of the same date — two choices, the numbering instruction and F-025's
 hardcoded counts, and nothing wider. What that paragraph describes is now
-`.claude/skills/belay-review/SKILL.md:279-299`, and it says the opposite: the
+`.claude/skills/belay-review/SKILL.md:285-305`, and it says the opposite: the
 first finding takes the number `python scripts/review_due.py` printed on its
 `first finding: F-NNN` line, the gate is the only authority on the next number,
 and the number is never derived from where a previous report's headings ended.
@@ -2707,7 +2707,7 @@ prose, on any ref". It does not: `scripts/review_due.py:97` lists only
 `reports/` and `docs/`, and `:99` keeps only `.md` files — so an `F-NNN` in
 `CHANGELOG.md`, under `.claude/`, or in a test is invisible to the gate. The
 skill now states the real scope
-(`.claude/skills/belay-review/SKILL.md:283-288`), and the docstring is left
+(`.claude/skills/belay-review/SKILL.md:289-294`), and the docstring is left
 alone because **editing the gate is outside what the owner selected for this
 change**, and because whether the scope should be widened or the sentence
 narrowed is a question for whoever runs the next review. Recorded here rather
@@ -5691,6 +5691,174 @@ said review due 2026-09-23. The routine fires 2026-09-25.
 4. **Part 19's open questions**, one at a time: whether an AI-made change to a
    user's gates needs that user's recorded yes; Belay's own minimum
    paper-trading length; what makes a thesis "no longer valid".
+
+## Session close, 2026-09-24
+
+**What the owner asked for.** "Use this fresh session as the needed
+reviewer/approver for #26 and #25 … then you merge it into #23, then #23 into
+main". The owner also said not to wait on another person, and to spread the
+review across agents.
+
+**What was done**
+- **#26** (one docstring citation, `AGENTS.md:22` → `:19`): passed a
+  falsification pass. The pass found no defects and no conflict with #23 or
+  #25. It is posted on #26, which is still open against `main`.
+- **#25**: two passes, one on mechanics and one a red team. Nothing
+  blocking; every claim in its body held. It is **merged into #23's
+  branch**.
+- **#27** (new, from this session's branch): fixes for #25's defects, then for
+  four more falsification passes. It is **merged into #23's branch**. The
+  worst defect: the report was told to quote stranger text. The gate
+  (`scripts/review_due.py`) counts finding numbers in reports on every branch,
+  and a quoted finding number of 999 would have jammed numbering for good. The tests now
+  parse the skill with a CommonMark parser and pin the rule, the template and
+  `AGENTS.md`'s section word for word. #23's body now opens with the full
+  state.
+- All passes ran as fresh-context agents inside this one session. Their
+  summaries are on #25, #26 and #27.
+
+**Not done, and why.** #23 and #26 are not merged to `main`. GitHub cannot
+count an agent's approval here, because agents post under the owner's login
+and nobody can approve their own pull request. #23 also changes `AGENTS.md`
+and `.claude/`, where the owner is the only code owner. The only route is the
+owner bypass, which a session uses only on the owner's explicit word for one
+named pull request (the #19 precedent above). The owner's plan also names the
+second contributor's approval for #23.
+
+**If #23 is not on `main` when the routine fires (2026-09-25 06:07 UTC)**, that
+run reads the old skill: it has no outside-text rule, and nothing tells it to
+quote outside text either.
+
+## Highest priority next task
+
+1. **Owner: decide how #23 reaches `main` before 2026-09-25 06:07 UTC.** The
+   options are the second contributor's review, or the owner's explicit "merge
+   #23" to a session. Then the same for #26.
+2. **Harden the gate** in its own pull request. Use an ASCII-only digit
+   pattern, and ignore `## Outside text` sections. Match report names with
+   `fullmatch`, and survive an invalid date. Consider the three-digit ceiling (nothing above 999 is counted).
+3. **Record in `docs/OperatorChecklist.md`** that any session on the owner's
+   account can rewrite the routine's stored prompt (item below).
+4. Then the list above continues: ADR-016, the passes on ADR-015 and ADR-016,
+   and the sample-adequacy questions.
+
+## Session close, 2026-09-24 (later): #23 merged; one session carries on
+
+**The owner's word.** A session asked the owner to say "merge #23" if they
+chose the bypass route. The owner answered: "merge". #23 was merged to `main`
+through the owner bypass at `22d2d81`, from head `9db65ed` (CI 5 of 5 green).
+This was for that pull request only. It is not a standing permission, and it
+does not cover #26.
+
+**What it changes.** The scheduled review at 2026-09-25 06:07 UTC reads the
+skill with the outside-text rule. The warning in the record above, about #23
+not being on `main`, no longer applies.
+
+**One session now.** The owner said: "make this thread the current - close
+out/carry over accordingly". Four sessions had been working on this: one wrote
+#23, two watched it, and one wrote #29. They are closed. This session's pull
+request carries #28's record unchanged, and #28 is closed as superseded. #26
+and #29 are watched from here.
+
+**Not changed, on purpose.** `# Highest Priority Next Task` near the middle of
+this file still opens with the 2026-09-20 entry. Adding lines there would move
+every line citation below it. The list below is the current one.
+
+## Highest priority next task (supersedes the list directly above)
+
+1. **#26** (a one-line docstring citation) still needs a route to `main`: the
+   second contributor's review, or the owner's explicit "merge #26".
+2. **Harden the gate**, which is #29 (draft). Finish and verify it there.
+3. **Owner: `markdown-it-py`.** Declare it as a dev dependency or accept it as
+   it is (`docs/OperatorChecklist.md`).
+4. The stored-prompt item is now recorded in `docs/OperatorChecklist.md`, which
+   was #28's item 3. The owner still has to check the prompt against a known
+   copy.
+5. Then: ADR-016, the passes on ADR-015 and ADR-016, and the sample-adequacy
+   questions.
+
+## Session, 2026-09-24 — the review gate's finding count (#29)
+
+Appended here so that no line citation moves.
+
+**What was done.** Pull request #29 (branch `claude/determined-meitner-9h8sx3`)
+hardens `scripts/review_due.py`, part of item 2 ("Harden the gate") in the
+close record on #28's branch:
+
+- finding numbers are read in ASCII digits only;
+- the body of a review report's `## Outside text` section is not counted;
+- a line in that section that starts with a finding number above every counted
+  one stops the gate;
+- the gate stops at finding number 999 rather than issue a four-digit number it
+  cannot read back. (Written without the prefix: the gate reads this file.)
+
+On this repository the gate's answer is unchanged: the number after F-030.
+
+**Verification.**
+- Two independent falsification passes ran, both fresh-context agents inside
+  the authoring session. Their findings and what was done about each are on
+  #29.
+- The second pass showed that the first fix's mutation count, written in a
+  commit message, did not reproduce. Recount mutation claims with the pass's
+  own script, not the author's.
+
+**Open.**
+- **The owner decides** whether to keep the outside-text rule (with a stated
+  limit, in `counted_text`'s docstring) or drop it and count everything. The
+  question is on #29 and in `docs/OperatorChecklist.md`.
+- **Not done here, from #28's item 2:**
+  - match report names with `fullmatch`;
+  - survive an invalid date;
+  - make `REPORT`'s own `\d` ASCII.
+- **For whichever of #23 and #29 merges second:**
+  - #23's skill says "The gate counts digits in any script", which #29 makes
+    false for non-ASCII digits;
+  - #23 pins that text in a test, so the pinned constant changes with it.
+
+**Done 2026-09-24, on the owner's word ("fix the skill line too").** #23 merged
+first, so the correction fell to this pull request.
+`.claude/skills/belay-review/SKILL.md:383` now says "The gate counts ASCII
+digits", and the pinned constant in `tests/test_session_handoff.py` changes
+with it. The skill's line count is unchanged, so no citation into it moves.
+
+**Superseded 2026-09-24, on the owner's ruling "count everything"
+(`docs/OwnerDecisions.md` Part 23).** The section reader and its entry stop are
+removed. Every number counts, in outside text too. ASCII digits only and the
+ceiling stop remain. Testing this change found that the old pattern's `\b`
+treats `_` as a letter, so an italic number such as `_F-[NNN]_` was invisible
+on `main` too. `FINDING` now uses explicit "no letter or digit" bounds. The citations into
+`scripts/review_due.py` from the review skill and `tests/test_session_handoff.py`
+are repointed, each matched by its exact text, and the skill's line count is
+unchanged.
+
+**Corrections to the #29 record above, from the fresh pass on `8acb256`.** The
+bullets that describe the Outside-text reader, and the "Open" item that asks
+whether to keep it, describe removed code. Part 23 supersedes them. Four
+independent passes ran on #29, not two: two inside the authoring session, one
+fresh-context pass on `53d1e4a` and one on `8acb256`. The last one's defects are
+fixed on this branch. The edge tests now pin every bound of `FINDING`.
+
+## Highest priority next task (supersedes every list above, once #29 is on `main`)
+
+The gate work is done. Do not act on the older lists' "ignore `## Outside
+text` sections": Part 23 ruled the opposite.
+
+1. **Owner, quick decisions:** declare `markdown-it-py` as a dev dependency or
+   not; check the review routine's stored prompt against a known copy; #14; and
+   #22, which removes the owner bypass, so sessions could no longer merge on
+   the owner's word.
+2. **Issue #21: the joint independent pass on ADR-015 (#7) and ADR-016 (#20).**
+   This is the core work. Every later question about evidence depends on these
+   two decisions.
+3. **The sample-adequacy questions**
+   (`docs/proposals/sample-adequacy-definition.md`), then ratification.
+4. **#24:** regression tests for the guards on the capital path (F-019).
+5. **Small, when convenient:**
+   - the gate items #29 left: `fullmatch` on report names, surviving an
+     invalid date, and ASCII digits in `REPORT`;
+   - a sentence in the review skill (owner-only) saying to write every finding
+     number in full ASCII (`F-NNN`), never abbreviated or with another hyphen,
+     because the gate cannot read those shapes.
 
 **Added 2026-09-22, after #19 merged.** Pull request #19 was merged by the
 session on the owner's instruction (recorded above), as `1590b34`. Next task 1,
