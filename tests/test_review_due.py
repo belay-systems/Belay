@@ -507,6 +507,10 @@ def _counted(text: str, path: str = R) -> tuple[list[int], list[int]]:
         pytest.param("```\nx\n```\n\n## Outside text\nsaid F-999\n", id="after-a-closed-fence"),
         pytest.param("<!--\nc\n-->\n\n## Outside text\nsaid F-999\n", id="after-a-long-comment"),
         pytest.param("<!--\n```\n-->\n\n## Outside text\nsaid F-999\n", id="no-fence-in-a-comment"),
+        pytest.param("```\n<!--\n```\n\n## Outside text\nsaid F-999\n", id="no-comment-in-a-fence"),
+        pytest.param("<!-->\n\n## Outside text\nsaid F-999\n", id="after-an-empty-comment"),
+        pytest.param("\n\n## Outside text \nsaid F-999\n", id="trailing-space"),
+        pytest.param("x\n \t\n## Outside text\nsaid F-999\n", id="after-a-whitespace-line"),
     ],
 )
 def test_the_outside_text_heading_opens_the_section(text):
@@ -527,6 +531,12 @@ def test_the_outside_text_heading_opens_the_section(text):
         pytest.param("~~~ a`b\n\n## Outside text\nsaid F-999\n", id="in-a-tilde-fence-with-a-backtick"),
         pytest.param("<!--\n\n## Outside text\nsaid F-999\n-->\n", id="in-a-comment"),
         pytest.param("<pre>\n\n## Outside text\nsaid F-999\n</pre>\n", id="in-a-pre-block"),
+        pytest.param("<pre\n\n## Outside text\nsaid F-999\n</pre>\n", id="in-a-bare-pre-tag"),
+        pytest.param("<?x\n>\n\n## Outside text\nsaid F-999\n?>\n", id="in-an-instruction-past-a-gt"),
+        pytest.param("<!doctype\n\n## Outside text\nsaid F-999\n>\n", id="in-a-lowercase-declaration"),
+        pytest.param("<![CDATA[\n>\n\n## Outside text\nsaid F-999\n]]>\n", id="in-cdata-past-a-gt"),
+        pytest.param("<style>\n</ſtyle>\n\n## Outside text\nsaid F-999\n</style>\n", id="in-a-style-block-unicode-folding"),
+        pytest.param("```\n``` \u00a0\n\n## Outside text\nsaid F-999\n```\n", id="in-a-fence-past-an-nbsp-closer"),
         pytest.param("<?x\n\n## Outside text\nsaid F-999\n?>\n", id="in-an-instruction"),
         pytest.param("<!X\n\n## Outside text\nsaid F-999\n>\n", id="in-a-declaration"),
         pytest.param("<![CDATA[\n\n## Outside text\nsaid F-999\n]]>\n", id="in-cdata"),
@@ -547,6 +557,15 @@ def test_nothing_but_the_heading_opens_the_section(text):
         pytest.param("> # Correction", id="quoted"),
         pytest.param("- ## Item", id="in-a-list"),
         pytest.param("1. ## Item", id="in-an-ordered-list"),
+        pytest.param("10) ## Item", id="in-a-long-ordered-list"),
+        pytest.param("* ## Item", id="in-a-star-list"),
+        pytest.param("Title\n=", id="setext-1-short"),
+        pytest.param("   ---", id="indented-rule"),
+        pytest.param("- - -", id="spaced-hyphens"),
+        pytest.param("-- --", id="split-hyphens"),
+        pytest.param("> ---", id="quoted-rule"),
+        pytest.param("> ***", id="quoted-stars"),
+        pytest.param("> Correction\n> ==========", id="quoted-setext"),
         pytest.param("Title\n=====", id="setext-1"),
         pytest.param("Title\n-", id="setext-2"),
         pytest.param("***", id="thematic-stars"),
@@ -558,8 +577,9 @@ def test_almost_anything_closes_the_section(closer):
     assert _counted(f"{SAID}\n{closer}\n\nF-140 is real.\n") == ([140], [])
 
 
-def test_a_setext_headings_text_is_counted():
-    assert _counted(f"{SAID}\nTitle F-140\n---\n") == ([140], [])
+@pytest.mark.parametrize("eol", ["\n", "\r\n", "\r"])
+def test_a_setext_headings_text_is_counted(eol):
+    assert _counted(f"{SAID}\nTitle F-140\n---\n".replace("\n", eol)) == ([140], [])
 
 
 def test_a_subheading_does_not_close_the_section():
@@ -583,7 +603,7 @@ def test_a_line_starting_with_a_number_in_the_section_is_an_entry(line):
     assert _counted(f"{SAID}{line}\n") == ([], [200])
 
 
-@pytest.mark.parametrize("line", ["said F-200", "`F-200`", "F-[200]"])
+@pytest.mark.parametrize("line", ["said F-200", "`F-200`", "F-[200]", "F-2000"])
 def test_a_number_elsewhere_in_a_line_is_not_an_entry(line):
     assert _counted(f"{SAID}{line}\n") == ([], [])
 

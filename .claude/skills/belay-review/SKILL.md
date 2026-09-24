@@ -45,7 +45,7 @@ turn, after they have read it.
 answer for itself: whether a review is due, and what number its first finding
 takes. **Call it rather than reimplementing either.** It fetches first and then
 reads every `refs/remotes/origin/*` ref rather than the working tree
-(`scripts/review_due.py:115-121`, `:290`), because a review sitting on an unmerged
+(`scripts/review_due.py:120-126`, `:295`), because a review sitting on an unmerged
 branch is invisible to anything that lists a directory.
 
 It prints one of three things. Two are verdicts:
@@ -53,7 +53,7 @@ It prints one of three things. Two are verdicts:
 - `DUE — last review was N days ago (<file>, on <branch>).`, exit 0, followed by
   `  first finding: F-NNN`. Run the review; its first finding takes that number.
   A repository with no report on any ref prints `DUE — no review report on any
-  ref.` and the same first-finding line (`scripts/review_due.py:295-298`).
+  ref.` and the same first-finding line (`scripts/review_due.py:300-303`).
 - `SKIP — last review was N days ago (<file>, on <branch>). Next due <date>.`,
   exit 1, and **no first-finding line, because no number is allocated.** Do not
   run the review. Report that line and the date it names, and stop — a pass run
@@ -61,7 +61,7 @@ It prints one of three things. Two are verdicts:
   threshold is twelve days (`scripts/review_due.py:40`).
 
 The third thing is not a verdict. **Anything else — `not a git repository;
-cannot answer across refs` (`scripts/review_due.py:284-286`), a non-zero exit
+cannot answer across refs` (`scripts/review_due.py:289-291`), a non-zero exit
 with no SKIP line, a traceback, or no script there at all — means the gate did
 not answer. STOP and report what happened, in those words.** Do not derive a
 number by hand, and **never fall back to listing `reports/review/` yourself**:
@@ -282,8 +282,8 @@ Order findings most severe first.
 its `first finding: F-NNN` line, and the rest of the report counts up from
 there.** The gate is the only authority on the next number. **What it actually
 reads, exactly:** every `F-NNN` in ASCII digits in `.md` files under `reports/` and
-`docs/`, on every `origin/*` ref (`scripts/review_due.py:238-240`), except the body of a
-review report's `## Outside text` section (`:156-219`). Nothing else — an `F-NNN` in
+`docs/`, on every `origin/*` ref (`scripts/review_due.py:243-245`), except the body of a
+review report's `## Outside text` section (`:161-224`). Nothing else — an `F-NNN` in
 `CHANGELOG.md`, under `.claude/`, or in a test is invisible to it. That is still a wider
 view than any other reader here has, and it is the one Belay has agreed to be bound by. If
 you have not run it, run it now; if it printed SKIP, no number was allocated and there is no report to write.

@@ -57,8 +57,13 @@ OUTSIDE_TEXT = re.compile(r"##[ \t]+Outside text(?:[ \t]+#+)?[ \t]*", re.ASCII |
 CONTAINER = re.compile(r"[ \t]*(?:(?:>|[-+*]|[0-9]{1,9}[.)])[ \t]*)*", re.ASCII)
 #: A level-1 or level-2 heading, once `CONTAINER` is removed.
 SECTION_END = re.compile(r"#{1,2}(?:[ \t]|$)")
-#: A setext underline or a thematic break: also the end of a section.
-RULE = re.compile(r" {0,3}(?:=+|-+|(?:\*[ \t]*){3,}|(?:_[ \t]*){3,})[ \t]*")
+#: A setext underline or a thematic break, once any `QUOTE` is removed: also
+#: the end of a section.
+RULE = re.compile(
+    r" {0,3}(?:=+|-+|(?:-[ \t]*){3,}|(?:\*[ \t]*){3,}|(?:_[ \t]*){3,})[ \t]*"
+)
+#: Blockquote markers in front of a line's content.
+QUOTE = re.compile(r"(?:[ \t]*>)*")
 #: A line that starts with a finding number, as a finding's heading or entry
 #: does, once `CONTAINER` is removed.
 ENTRY = re.compile(r"[#*_ \t]*F-([0-9]{3})\b", re.ASCII)
@@ -66,8 +71,8 @@ ENTRY = re.compile(r"[#*_ \t]*F-([0-9]{3})\b", re.ASCII)
 FENCE = re.compile(r" {0,3}(`{3,}|~{3,})(.*)")
 #: CommonMark's HTML blocks that may hold a blank line: start and end.
 HTML_BLOCKS = [
-    (re.compile(r" {0,3}<(?:pre|script|style|textarea)(?:[ \t>]|$)", re.I),
-     re.compile(r"</(?:pre|script|style|textarea)>", re.I)),
+    (re.compile(r" {0,3}<(?:pre|script|style|textarea)(?:[ \t>]|$)", re.I | re.ASCII),
+     re.compile(r"</(?:pre|script|style|textarea)>", re.I | re.ASCII)),
     (re.compile(r" {0,3}<!--"), re.compile(r"-->")),
     (re.compile(r" {0,3}<\?"), re.compile(r"\?>")),
     (re.compile(r" {0,3}<![A-Za-z]"), re.compile(r">")),
@@ -173,9 +178,9 @@ def counted_text(path: str, text: str) -> tuple[str, list[tuple[int, str]]]:
     item, a quote, bold text. It may be a real finding filed in the wrong
     place, and `highest_finding()` stops if it is the highest number seen.
 
-    **What this cannot see**: a new finding's number in the middle of a
-    sentence inside the section, with nothing after it that closes the section,
-    and written nowhere else that is counted. That is not counted.
+    **What this cannot see**: a new finding's number inside the section that
+    does not start its line (in a sentence, a table row, a link), with nothing
+    after it that closes the section, and written nowhere else that is counted.
     """
     if not path.startswith("reports/review/"):
         return text, []
@@ -187,10 +192,10 @@ def counted_text(path: str, text: str) -> tuple[str, list[tuple[int, str]]]:
     outside = False
     previous = ""
     for line in LINE_BREAK.split(text):
-        if outside and (SECTION_END.match(line[CONTAINER.match(line).end():])
-                        or RULE.fullmatch(line)):
+        rule = RULE.fullmatch(line[QUOTE.match(line).end():])
+        if outside and (SECTION_END.match(line[CONTAINER.match(line).end():]) or rule):
             outside = False
-            if RULE.fullmatch(line):
+            if rule:
                 kept.append(previous)  # the text of a setext heading
         opens = fence is None and html is None and not previous.strip()
         if not outside and opens and OUTSIDE_TEXT.fullmatch(line):
@@ -205,15 +210,15 @@ def counted_text(path: str, text: str) -> tuple[str, list[tuple[int, str]]]:
             html = None if html.search(line) else html
         elif fence is None:
             for start, end in HTML_BLOCKS:
-                if begun := start.match(line):
-                    html = None if end.search(line, begun.end()) else end
+                if start.match(line):
+                    html = None if end.search(line) else end
                     break
         if found := FENCE.match(line):
             marks, rest = found.groups()
             closes = fence and marks[0] == fence[0] and len(marks) >= fence[1]
             if fence is None and html is None and not (marks[0] == "`" and "`" in rest):
                 fence = (marks[0], len(marks))
-            elif closes and not rest.strip():
+            elif closes and not rest.strip(" \t"):
                 fence = None
         previous = line
     return "\n".join(kept), entries
