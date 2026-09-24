@@ -5687,3 +5687,53 @@ said review due 2026-09-23. The routine fires 2026-09-25.
 4. **Part 19's open questions**, one at a time: whether an AI-made change to a
    user's gates needs that user's recorded yes; Belay's own minimum
    paper-trading length; what makes a thesis "no longer valid".
+
+## Session close, 2026-09-24
+
+**What the owner asked for.** "Use this fresh session as the needed
+reviewer/approver for #26 and #25 … then you merge it into #23, then #23 into
+main". The owner also said not to wait on another person, and to spread the
+review across agents.
+
+**What was done**
+- **#26** (one docstring citation, `AGENTS.md:22` → `:19`): passed a
+  falsification pass. The pass found no defects and no conflict with #23 or
+  #25. It is posted on #26, which is still open against `main`.
+- **#25**: two passes, one on mechanics and one a red team. Nothing
+  blocking; every claim in its body held. It is **merged into #23's
+  branch**.
+- **#27** (new, from this session's branch): fixes for #25's defects, then for
+  four more falsification passes. It is **merged into #23's branch**. The
+  worst defect: the report was told to quote stranger text. The gate
+  (`scripts/review_due.py`) counts finding numbers in reports on every branch,
+  and a quoted finding number of 999 would have jammed numbering for good. The tests now
+  parse the skill with a CommonMark parser and pin the rule, the template and
+  `AGENTS.md`'s section word for word. #23's body now opens with the full
+  state.
+- All passes ran as fresh-context agents inside this one session. Their
+  summaries are on #25, #26 and #27.
+
+**Not done, and why.** #23 and #26 are not merged to `main`. GitHub cannot
+count an agent's approval here, because agents post under the owner's login
+and nobody can approve their own pull request. #23 also changes `AGENTS.md`
+and `.claude/`, where the owner is the only code owner. The only route is the
+owner bypass, which a session uses only on the owner's explicit word for one
+named pull request (the #19 precedent above). The owner's plan also names the
+second contributor's approval for #23.
+
+**If #23 is not on `main` when the routine fires (2026-09-25 06:07 UTC)**, that
+run reads the old skill: it has no outside-text rule, and nothing tells it to
+quote outside text either.
+
+## Highest priority next task
+
+1. **Owner: decide how #23 reaches `main` before 2026-09-25 06:07 UTC.** The
+   options are the second contributor's review, or the owner's explicit "merge
+   #23" to a session. Then the same for #26.
+2. **Harden the gate** in its own pull request. Use an ASCII-only digit
+   pattern, and ignore `## Outside text` sections. Match report names with
+   `fullmatch`, and survive an invalid date. Consider the three-digit ceiling (nothing above 999 is counted).
+3. **Record in `docs/OperatorChecklist.md`** that any session on the owner's
+   account can rewrite the routine's stored prompt (item below).
+4. Then the list above continues: ADR-016, the passes on ADR-015 and ADR-016,
+   and the sample-adequacy questions.
