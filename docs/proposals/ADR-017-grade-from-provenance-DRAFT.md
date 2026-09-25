@@ -85,14 +85,32 @@ six inputs determining capital.
 
 ## Decision
 
-**Ruled (Part 35a): a computed number carries Level C only when its input series came
-from a recorded fetch. Otherwise it carries Level D.**
+**A computed number carries Level C only when its input series came from a stored
+fetch record. Otherwise it carries Level D.** Ruled as Part 35a and, after the gap
+below, again as **Part 36** — "yes require the stored fetch record".
 
-**Built, and it is weaker: a computed number carries Level C only when its disclosure
-came through `disclosure_from`.** The gap is stated here rather than in a footnote
-because an earlier draft of this document asserted the ruled sentence as the built
-behaviour, and it is not. See "The hole this does not close" below. The independent pass
-on this change found it; its author did not.
+`disclosure_from` takes a `Fetch`: the parsed series, the stored bytes, and the signed
+record over them. It refuses unless
+
+1. the record validates — signed and untampered;
+2. its signed content carries every provenance key `fetch_record` writes, so a REPORT
+   of another kind cannot pass as a fetch record;
+3. the bytes the record names are on disk and hash to what it is signed over;
+4. the vendor name, covered window and survivorship answer are read from that record.
+
+Each failure **refuses**. A caller reaching the function is claiming a fetch, and
+handing back Level D instead would flatter the caller while hiding a broken store.
+
+**This document's first draft ruled the same sentence and built something weaker**, and
+the history is kept because Law VIII makes it an asset: the first implementation took a
+`MarketDataSource` and a `DailyBarSeries` and enforced only "came through
+`disclosure_from`". A `DailyBarSeries` is a frozen dataclass any caller can build, so
+eight bars typed into a Python file with a real source produced a Level C artifact
+carrying that vendor's name and CC BY-SA attribution — the grade and the source string
+agreeing, and both wrong. It was **worse than the F-033 it fixed**, whose artifact at
+least read `data_source: I made these up`. An independent pass found it; the author did
+not. The owner then ruled the stronger form rather than letting the ruling be softened
+to fit the code.
 
 The grade is read from the disclosure's provenance rather than stamped by the emitter:
 
@@ -175,57 +193,34 @@ true today and held by no test: `grep -n "EvidenceLevel\|\.level" tests/metrics/
 returns nothing. That is the shape of F-019 and F-032 and it is owed a test, which this
 document should not be ratified without.
 
-## The hole this does not close, and it is larger than first admitted
+## The hole that is closed, and the one that remains
 
-**`disclosure_from` proves nothing about a fetch.** It takes a `DailyBarSeries` — a
-frozen dataclass any caller can construct — and never touches a `FetchedSeries`, a
-payload, a `content_hash`, a stored version or a fetch record. Reproduced against the
-committed code, using Belay's own `DoltHubStocksSource`, no subclass and no network:
+**Closed by Part 36.** The route described in this document's first draft — a real
+`MarketDataSource` plus hand-typed bars — no longer exists: `disclosure_from` takes
+neither argument. Verified against the implementation:
 
 ```
-disclosure type:  FetchedDisclosure
-evidence_level:   EvidenceLevel.HISTORICAL   <- Level C
-data_source:      DoltHub post-no-preference/stocks (CC BY-SA 4.0)
-sample_period:    2024-01-02 -> 2024-01-09
-validates:        True
+the old attack (source= + series=)        -> TypeError: unexpected keyword argument 'source'
+a Fetch forged around a signed non-record -> ValueError: is not a fetch record
+a genuine stored fetch                     -> FetchedDisclosure, EvidenceLevel.HISTORICAL
+the stored bytes tampered after signing    -> ValueError: is not the one this record describes
+the stored bytes deleted                   -> ValueError: no file at ...
+the record tampered after signing          -> ValueError: integrity ... mismatch
 ```
 
-Eight bars typed into a Python file. **This is worse than F-033 in one respect:** the
-construction that raised F-033 printed `data_source: I made these up`, so the artifact
-disclosed its own worthlessness. This one carries a real vendor's name and licence
-attribution, so the grade and the source string agree and both are wrong.
+**What remains, stated precisely.** A caller can construct a `FetchedDisclosure`
+directly. That is narrower than what Part 36 closed, and different in kind: it is an
+explicit claim, greppable by class name, rather than something that happens by using
+the ordinary function. It is recorded here rather than fixed because closing it means
+making the class private or binding it to a record too, and neither is worth the
+coupling for a line that announces itself.
 
-It is the same substitution the `source` parameter was explicitly designed to prevent —
-`fetch_record`'s docstring says "taking the name rather than the source let a fabricated
-disclosure be paired with a real source's identity" — arriving through the unguarded
-`series` door.
-
-**An earlier draft's defence of this does not survive.** It admitted only that a caller
-could hand-construct a `FetchedDisclosure`, and argued the dishonest path was therefore
-"an explicit, greppable claim". The route above never names `FetchedDisclosure` at all.
-
-**What is genuinely bounded.** A hand-built `Disclosure` cannot reach Level C; the grade
-survives serialisation, `dataclasses.replace`, pickle and deepcopy; and the mutation
-below is asserted by a test. The default is unflattering and every existing caller gets
-Level D. What is not bounded is a caller who calls the sanctioned function with invented
-bars.
-
-**Closing it, which is an owner question and is open.** Bind the grade to a stored fetch
-record's `content_hash`, so Level C cannot be claimed without the bytes that earn it.
-That decides what a metric artifact must carry and touches ADR-014's persistence rules,
-so it is not an agent's to choose. It is put to the owner in
-`docs/OperatorChecklist.md` (2026-09-25, "Level C does not yet mean what Part 35a
-rules"). **Until it is answered, this ADR must not be ratified as written**, because
-Part 35a rules the stronger thing and this document would otherwise certify a weaker one
-as delivering it.
-
-**It does not change `constitution/Evidence_Standards.md`.** The four classes are
-untouched. One wrinkle the owner was shown and which is still open: Level D is defined
-as "Hypothesis. Research only.", and arithmetic over unsourced numbers is not really a
-hypothesis either. Neither class fits it exactly. If the constitution is ever amended
-here, the phrasing wanted is closer to "Level D is the floor for a computation whose
-inputs have no recorded provenance". **That amendment is the owner's and is not
-proposed by this ADR.**
+**One honest limit on the "stored" check.** It proves the bytes on disk match what the
+record is signed over *at the moment the disclosure is built*. It does not prove the
+bytes came from the vendor rather than being written by whoever also wrote the record —
+that would need a signature from the source, which Belay has no way to obtain. What it
+does close is every route that does not involve running `fetch_and_record` and keeping
+its output intact.
 
 ## Alternatives rejected
 
@@ -259,9 +254,27 @@ this section previously listed as owed:
   validation.
 - **The suite.** 710 passed, 1 skipped, 5 xfailed at `9d91870`.
 
+**Part 36's five guards are each asserted by their own test.** Every guard in
+`disclosure_from` mutated one at a time against the committed tree: **each turns the
+suite red on exactly one test, and it is that guard's test.** 715 passed at baseline.
+
+```
+MUTANT record validation removed      -> FAILED test_a_disclosure_is_refused_when_the_record_was_tampered_with
+MUTANT returns a plain Disclosure     -> FAILED test_a_derived_disclosure_grades_the_metric_historical_and_a_hand_built_one_does_not
+MUTANT provenance shape check removed -> FAILED test_a_disclosure_cannot_be_derived_from_a_record_that_is_not_a_fetch_record
+MUTANT bytes-missing check removed    -> FAILED test_a_disclosure_is_refused_when_the_stored_bytes_are_gone
+MUTANT bytes-changed check removed    -> FAILED test_a_disclosure_is_refused_when_the_stored_bytes_changed_under_the_record
+                                         (1 failed, 714 passed, 1 skipped, 5 xfailed — each)
+```
+
+**One of those tests exists only because the mutation found it missing.** The record
+validation guard originally survived its own removal at 714 passing — a guard asserted by
+nothing, in code written by the session whose whole subject was guards asserted by
+nothing. It was caught by mutating the new code rather than by reading it, which is the
+argument for doing that on every guard rather than trusting a green suite.
+
 **Still owed before ratification:**
 
-- **The owner's answer on the hole above.** Part 35a rules more than this delivers.
 - **A test for `significance_artifact`'s Level D**, which nothing asserts.
-- An independent pass over *this* revision, since the corrections above were written
-  after the pass that found them.
+- **An independent pass over this revision.** Part 36's implementation and this
+  document's rewrite have had none.

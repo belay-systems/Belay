@@ -3552,3 +3552,63 @@ and both survived an independent falsification pass.
   shown that `docs/HANDOFF.md:2755-2757` leaves High unmapped while its only
   High example is carried at P1. No recommendation was made and none was given,
   so P2 stands unchanged rather than by ruling.
+
+---
+
+# Part 36 — Ruled 2026-09-25: Level C requires the stored fetch record
+
+**Question put.** `docs/OperatorChecklist.md`, "Level C does not yet mean what
+Part 35a rules". Part 35a ruled that a computed number is Level C only when its
+series came from a recorded fetch. The implementation enforced something weaker —
+that the disclosure came through `disclosure_from` — and that function took a
+series of price bars any caller can type by hand, so eight invented bars passed
+in with a real data source produced a Level C artifact carrying that vendor's
+name and licence. Found by an independent pass, not by the session that wrote it.
+The owner was asked:
+
+> Should Level C require the stored fetch record — the bytes on disk — rather
+> than just having gone through the fetch-shaped function?
+
+Recommended yes, with the cost stated: a second ADR rather than an edit, because
+it decides what a metric artifact must carry and touches ADR-014.
+
+**Owner said: "yes require the stored fetch record".**
+
+### What it settles
+
+- **36a. Level C requires the stored fetch record.** `disclosure_from` takes a
+  `Fetch` — the parsed series, the stored bytes and the signed record — and
+  refuses anything it cannot verify. A `Fetch` cannot be had without
+  `fetch_and_record` having run.
+- **36b. Four things are checked, and each refuses rather than downgrading.** The
+  record validates; its signed content carries every provenance key
+  `fetch_record` writes; the bytes it names are on disk and hash to what it is
+  signed over; and the vendor name, covered window and survivorship answer are
+  read from the record, never from a caller.
+- **36c. Refusal, not a quiet Level D.** A caller reaching that function is
+  claiming a fetch. Handing back Level D instead would flatter the caller while
+  hiding a broken store.
+- **36d. Part 35a is delivered by this, and was never wrong.** The gap was
+  between the ruling and the code. The ruling stands as recorded.
+
+### Session readings, not the owner's words
+
+- **How a fetch record is told apart from any other report.** By the presence of
+  the provenance keys, not by a new marker field. A marker would change what
+  every fetch record is signed over and invalidate
+  `artifacts/RPT-0001/1.0.0.yaml`, the one fetch record this repository holds.
+  The owner ruled the requirement, not this mechanism.
+- **That ADR-017 carries this rather than a new ADR-018.** ADR-017 is unratified
+  and is about exactly this question, so its Decision was rewritten to the ruled
+  form. A second ADR for the same decision would split it across two documents.
+
+### What it does not settle
+
+- **ADR-017's ratification.** Still owed, and still the owner's alone.
+- **Any change to `constitution/Evidence_Standards.md`.** Untouched.
+- **The one remaining route to a hand-made Level C:** constructing a
+  `FetchedDisclosure` directly. Narrower than what this closes, an explicit and
+  greppable claim rather than a by-product of the ordinary path, and not raised
+  to the owner as a question.
+- **F-003.** Nothing calls `disclosure_from` in production yet, so every metric
+  artifact is still Level D. Unchanged by this ruling.

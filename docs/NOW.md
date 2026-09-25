@@ -17,11 +17,11 @@ said before lives in `docs/sessions/` and in git history
 Written 2026-09-25, for `main` at `95e5a4a`, plus this branch
 (`claude/brave-pascal-e7401x`, Issue #35) which is not yet merged.
 
-- **Suite:** 710 passed, 1 skipped, 5 xfailed (`python -m pytest -q`) at
-  `9d91870`. `main` at `95e5a4a` is 704. This line read "709" through two
-  consecutive commits, which was the *passing* count of a red run — 709 passed
-  plus 1 failed — so fixing the failure turned it into 710 while the sentence
-  stayed still. Re-derive it rather than carrying it forward.
+- **Suite:** 715 passed, 1 skipped, 5 xfailed (`python -m pytest -q`) on this
+  branch. `main` at `95e5a4a` is 704. **Re-derive this rather than carrying it
+  forward:** the line read "709" through two consecutive commits, which was the
+  *passing* count of a red run, so fixing the failure moved it while the sentence
+  stayed still.
 - **`python scripts/status.py`:** exits 0, 45 open findings on this branch.
 - **The 2026-09-25 review has merged** (#34) and raised F-032 to F-036. All
   five were independently attacked on this branch and **all five survive**;
@@ -40,12 +40,13 @@ Written 2026-09-25, for `main` at `95e5a4a`, plus this branch
   series came from a recorded fetch (F-033, drafted as ADR-017, **not ratified**),
   and `pandas`/`jinja2`/`python-dateutil` are removed with `numpy` not declared
   (F-036). Both are implemented on this branch.
-- **F-033's implementation is short of the ruling, and that is the live item.**
-  The code enforces "came through `disclosure_from`", not Part 35a's "came from a
-  recorded fetch" — eight hand-typed bars with a real source yield Level C
-  carrying that vendor's name. Found by the independent pass. **One owner question
-  is open on it** (`docs/OperatorChecklist.md`, "Level C does not yet mean what
-  Part 35a rules"), and **ADR-017 must not be ratified until it is answered.**
+- **F-033 is now implemented as ruled.** The owner answered "yes require the
+  stored fetch record" (**Part 36**), closing the gap an independent pass found in
+  Part 35's implementation. `disclosure_from` takes a `Fetch` and verifies the
+  record's signature, its provenance keys, and that the bytes it names are on disk
+  and hash to what it is signed over. Five guards, each asserted by its own test
+  and each mutation-checked. **ADR-017 still owes the owner's ratification** and
+  has had no independent pass since it was rewritten.
 - **F-036 is verified** in a fresh virtual environment: the install pulls none of
   the four packages, the suite passes, `status.py` exits 0, all six `scripts/` run
   and the dashboard renders. See
@@ -77,21 +78,23 @@ not edited from here: one Issue, one branch, one claimant.
 ## Highest Priority Next Task
 
 1. **An independent pass on Issue #35's branch, before it merges.** A fresh
-   session told to falsify it. The pass already run covered `cbc4d20`; **the
-   Part 35 work is later and has had none**, and it is the first production code
-   in this workstream. Where to aim:
-   - `framework/metrics/reporting.py` and `framework/data/fetch_record.py`: does
-     the grade actually come from provenance, and can a caller still get Level C
-     without a fetch?
-   - **Run the mutation ADR-017 requires and has not had:** `disclosure_from`
-     returning a plain `Disclosure` must turn the suite red. If it does not, the
-     new guard is asserted by nothing, which is F-032's shape.
-   - The full suite after the two test edits, which was never run locally.
-   - Whether ADR-017's draft claims anything it has not checked.
-   - The earlier work: whether the three F-032 tests isolate their guards
-     (re-apply each mutation, confirm exactly one test fails), whether the two new
-     conformance tests can be satisfied without fixing what they check, and
+   session told to falsify it. Passes have run on `cbc4d20` and `0367c46`; the
+   **Part 36 work is later and has had none**, and it is the part that matters —
+   it is what makes a Level C grade mean anything. Where to aim:
+   - `disclosure_from` in `framework/data/fetch_record.py`. Find a route to a
+     Level C disclosure that does not involve running `fetch_and_record` and
+     keeping its output intact. The previous pass found one by passing hand-typed
+     bars; find the next.
+   - Whether the five guards are each really isolated. Mutate each one: exactly
+     one test should fail, and it should be that guard's. One of those tests only
+     exists because the mutation found it missing.
+   - Whether `_PROVENANCE_KEYS` is the right discriminator, and whether a
+     non-fetch REPORT could satisfy all seven keys.
+   - ADR-017's rewritten text, and Part 36's faithfulness to "yes require the
+     stored fetch record" — does any line claim more than that?
+   - The earlier work: the three F-032 tests, the two conformance tests, and
      whether the rewritten `docs/ROADMAP.md` Stage 2 prose is true.
+
 2. **Finish the evidence bar the way Part 28e rules.**
    - **Step 1, the final text round on #7 and #20, with no redesign:** fix the
      fourth pass's two blocking findings (F4-3 and F4-1, Issue #21); apply

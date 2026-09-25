@@ -29,6 +29,7 @@ market, and a ten-year historical backfill is not a snapshot of anything.
 
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import tempfile
 from datetime import date, datetime, timezone
@@ -39,6 +40,8 @@ import pytest
 
 from framework.artifacts.enums import ArtifactType, DeliverableType, EvidenceLevel
 from framework.artifacts.integrity import ArtifactIntegrity
+from framework.artifacts.factory import ArtifactFactory
+from framework.artifacts.repository import ArtifactRepository
 from framework.artifacts.validator import ArtifactValidator
 from framework.data.contract import (
     DailyBar,
@@ -47,7 +50,11 @@ from framework.data.contract import (
     InstrumentClass,
     MarketDataSource,
 )
-from framework.data.fetch_record import disclosure_from, fetch_record
+from framework.data.fetch_record import (
+    disclosure_from,
+    fetch_and_record,
+    fetch_record,
+)
 from framework.data.store import SeriesStore, StoredSeries
 from framework.data.survivorship import Retention, SurvivorshipDisclosure
 from framework.metrics.reporting import Disclosure, SamplePeriod
@@ -341,7 +348,26 @@ def test_a_fetch_record_cannot_be_built_from_a_source_with_no_answers():
 # ------------------------------------------- the loop back into the metrics
 
 
-def test_a_disclosure_can_be_built_from_the_fetch_without_hand_written_strings():
+
+def _stored_fetch(tmp_path, source=None, bars=None):
+    """A genuine `Fetch`: bytes on disk and a signed record over them.
+
+    Owner ruling Part 36 made this the only way to a Level C disclosure, so the
+    provenance tests below need a real store and repository rather than a
+    hand-built series. Deterministic — `Source._fetch_daily_bars` returns fixed
+    bars and a fixed payload, and no network is touched.
+    """
+    src = source or SOURCE
+    return fetch_and_record(
+        identifier="RPT-0500",
+        source=src,
+        symbol="AAPL",
+        requested=SamplePeriod(start=date(2024, 1, 1), end=date(2024, 1, 31)),
+        store=SeriesStore(root=tmp_path / "market"),
+        repository=ArtifactRepository(tmp_path / "artifacts"),
+    )
+
+def test_a_disclosure_can_be_built_from_the_fetch_without_hand_written_strings(tmp_path):
     """This is the point of Stage 2 stated as a test.
 
     Every metric artifact carries `data_source` and `sample_period`, and until
@@ -351,8 +377,7 @@ def test_a_disclosure_can_be_built_from_the_fetch_without_hand_written_strings()
     something else.
     """
     disclosure = disclosure_from(
-        source=SOURCE,
-        series=SERIES,
+        fetch=_stored_fetch(tmp_path),
         assumptions="Daily closes, unadjusted for dividends.",
     )
 
@@ -363,7 +388,7 @@ def test_a_disclosure_can_be_built_from_the_fetch_without_hand_written_strings()
     assert "inflates" in disclosure.known_limitations.lower()
 
 
-def test_a_derived_disclosure_grades_the_metric_historical_and_a_hand_built_one_does_not():
+def test_a_derived_disclosure_grades_the_metric_historical_and_a_hand_built_one_does_not(tmp_path):
     """F-033, owner ruling Part 35 (ADR-017 draft): the grade comes from provenance.
 
     The pair is the point, and it is the whole of what makes the guard assertable.
@@ -376,8 +401,7 @@ def test_a_derived_disclosure_grades_the_metric_historical_and_a_hand_built_one_
     F-019's and F-032's shape.
     """
     derived = disclosure_from(
-        source=SOURCE,
-        series=SERIES,
+        fetch=_stored_fetch(tmp_path),
         assumptions="Daily closes, unadjusted for dividends.",
     )
     hand_built = Disclosure(
@@ -397,17 +421,22 @@ def test_a_derived_disclosure_grades_the_metric_historical_and_a_hand_built_one_
     assert derived.sample_period == hand_built.sample_period
 
 
-def test_the_derived_disclosure_reports_the_covered_window_not_a_claimed_one():
+def test_the_derived_disclosure_reports_the_covered_window_not_a_claimed_one(tmp_path):
     """The window comes from the bars that arrived. A disclosure stating the
     window that was *requested* would claim coverage the data does not have."""
-    short = DailyBarSeries(symbol="AAPL", bars=BARS[:1])
+    class ShortSource(Source):
+        def _fetch_daily_bars(self, symbol, start, end) -> FetchedSeries:
+            return FetchedSeries(
+                series=DailyBarSeries(symbol="AAPL", bars=BARS[:1]),
+                payload=b'[{"date":"2024-01-02","close":"10.75"}]',
+            )
 
     disclosure = disclosure_from(
-        source=SOURCE,
-        series=short,
+        fetch=_stored_fetch(tmp_path, source=ShortSource(survivorship=DISCLOSURE)),
         assumptions="Daily closes.",
     )
 
+    # The record's `covered_end`, not the requested 2024-01-31.
     assert disclosure.sample_period.end == date(2024, 1, 2)
 
 
@@ -444,3 +473,99 @@ def test_a_record_refuses_a_stored_file_whose_bytes_have_changed(tmp_path):
 
     with pytest.raises(ValueError, match="holding different data"):
         _record(stored=stored)
+
+
+# ------------------- Part 36: Level C requires the STORED record, not a shape
+#
+# Owner ruling 2026-09-25 (`docs/OwnerDecisions.md` Part 36), answering the gap an
+# independent pass found in Part 35's implementation: `disclosure_from` used to take
+# a `MarketDataSource` and a `DailyBarSeries`, and a `DailyBarSeries` is a frozen
+# dataclass any caller can build. Eight bars typed into a Python file, passed with a
+# real source, produced a Level C artifact carrying that vendor's name and licence.
+#
+# Each test below refuses a route to Level C that has no stored bytes behind it.
+
+
+def test_a_disclosure_cannot_be_derived_from_a_record_that_is_not_a_fetch_record(tmp_path):
+    """A signed REPORT of another kind carries none of the provenance keys.
+
+    Checked by shape because adding a marker field to a fetch record's content
+    would change what every record is signed over.
+    """
+    forged = ArtifactFactory().create(
+        identifier="RPT-0002",
+        title="Signed, but not a fetch record",
+        artifact_type=ArtifactType.REPORT,
+    )
+    genuine = _stored_fetch(tmp_path)
+
+    with pytest.raises(ValueError, match="is not a fetch record"):
+        disclosure_from(
+            fetch=dataclasses.replace(genuine, record=forged),
+            assumptions="Daily closes.",
+        )
+
+
+def test_a_disclosure_is_refused_when_the_stored_bytes_are_gone(tmp_path):
+    """The record names bytes. If they are not there, nothing proves a fetch."""
+    fetch = _stored_fetch(tmp_path)
+    fetch.stored.path.unlink()
+
+    with pytest.raises(ValueError, match="no file at"):
+        disclosure_from(fetch=fetch, assumptions="Daily closes.")
+
+
+def test_a_disclosure_is_refused_when_the_stored_bytes_changed_under_the_record(tmp_path):
+    """`fetch_record` runs this check at write time; this is the read-time half.
+
+    A store can lose or rewrite a file between the fetch and the metric, and a
+    Level C grade over the wrong bytes would be a verifiable statement about data
+    the record does not describe.
+    """
+    fetch = _stored_fetch(tmp_path)
+    fetch.stored.path.write_bytes(b"different bytes entirely")
+
+    with pytest.raises(ValueError, match="is not the one this record describes"):
+        disclosure_from(fetch=fetch, assumptions="Daily closes.")
+
+
+def test_the_disclosure_reads_the_vendor_name_off_the_record_not_off_a_caller(tmp_path):
+    """Part 36's point: the name comes from inside the signed record.
+
+    The pre-Part-36 form took the source as an argument, so a caller could pair a
+    real vendor's identity with a series that vendor never returned. There is now no
+    argument through which to do it — the only inputs are a `Fetch` and prose.
+    """
+    fetch = _stored_fetch(tmp_path)
+    signed = dict(fetch.record.content)
+
+    disclosure = disclosure_from(fetch=fetch, assumptions="Daily closes.")
+
+    assert disclosure.data_source == signed["data_source"]
+    assert disclosure.known_limitations.startswith(signed["known_limitations"])
+    assert disclosure.sample_period.start == date.fromisoformat(signed["covered_start"])
+    assert disclosure.sample_period.end == date.fromisoformat(signed["covered_end"])
+
+
+def test_a_disclosure_is_refused_when_the_record_was_tampered_with(tmp_path):
+    """The record must still verify, not merely look like a fetch record.
+
+    **This test exists because the guard it covers survived its own mutation.**
+    Removing `ArtifactValidator().validate(fetch.record)` left the suite green at
+    714 — a guard asserted by nothing, which is F-019's and F-032's shape, written
+    by the session whose subject was exactly that. Found by mutating the code it had
+    just added rather than by reading it.
+
+    `dataclasses.replace` deliberately does not re-sign (see
+    `test_replace_does_not_resign_an_artifact`), so the altered record keeps a hash
+    that no longer matches it: every provenance key is present, the bytes on disk are
+    untouched, and the signature is the only thing that refuses.
+    """
+    fetch = _stored_fetch(tmp_path)
+    forged = dataclasses.replace(fetch.record, title="Altered after signing")
+
+    with pytest.raises(ValueError, match="mismatch"):
+        disclosure_from(
+            fetch=dataclasses.replace(fetch, record=forged),
+            assumptions="Daily closes.",
+        )

@@ -978,7 +978,26 @@ choice if you expect numerical work soon.
 **No code changes either way. Nothing has been implemented, and this
 recommendation is not a decision.**
 
-## Open — 2026-09-25: Level C does not yet mean what Part 35a rules (F-033 follow-up)
+## Done — 2026-09-25: Level C does not yet mean what Part 35a rules (F-033 follow-up)
+
+**Answered. Owner said "yes require the stored fetch record"** — recorded as
+`docs/OwnerDecisions.md` **Part 36**. `disclosure_from` now takes a `Fetch` and
+refuses unless the record validates, carries every provenance key, and names bytes
+that are on disk and hash to what it is signed over. The old route — a real source
+plus hand-typed bars — no longer exists: the function takes neither argument.
+
+Each of the five guards was mutated one at a time and each turns the suite red on
+exactly its own test. One of those tests exists only because the mutation showed it
+was missing: the record-validation guard first survived its own removal, a guard
+asserted by nothing in the session whose subject was that.
+
+**Still owed and still yours: ADR-017's ratification.** Its Decision is now the
+ruled form, and it has had no independent pass. The question as put is below,
+unchanged.
+
+---
+
+### The question as it was put
 
 **This is the one thing from today's work that needs you, and it exists because the
 implementation of your ruling falls short of the ruling.** Found by the independent

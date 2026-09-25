@@ -187,13 +187,18 @@ class Disclosure:
         `FetchedDisclosure` below is the only thing in Belay that answers Level C,
         and `disclosure_from` is the only thing that builds one.
 
-        **What this does not do.** Nothing stops a caller constructing a
-        `FetchedDisclosure` by hand. That is a deliberate limit, not an oversight:
-        this change makes the honest path the easy one and the dishonest path an
-        explicit, greppable claim, which is what one enum value can buy. Binding
-        the grade to a stored fetch record's `content_hash` — so the claim cannot
-        be made without the bytes — is the stronger form, and ADR-017's draft
-        records it as the follow-up rather than smuggling it in here.
+        **What Level C now costs, since 2026-09-25 (Part 36).** A stored fetch
+        record whose bytes are on disk and hash to what the record is signed over.
+        `disclosure_from` takes a `Fetch` and checks all of that; it is the only
+        thing in Belay that answers Level C.
+
+        The first attempt at this took a source and a series and enforced only
+        "came through `disclosure_from`" — and a series is a frozen dataclass any
+        caller can build, so eight bars typed into a file with a real source
+        yielded Level C carrying that vendor's name. An independent pass found it.
+        The remaining limit is narrower and worth stating: a caller can still
+        construct a `FetchedDisclosure` directly, which is an explicit, greppable
+        claim rather than a by-product of the ordinary path.
         """
         return EvidenceLevel.RESEARCH
 
@@ -211,9 +216,11 @@ class FetchedDisclosure(Disclosure):
     through the property above, and the signed content of every artifact is
     byte-identical to what it was before this change.
 
-    Built only by `framework.data.fetch_record.disclosure_from`, which takes the
-    source and the arrived series rather than strings, so neither the name nor the
-    window can be typed by the caller.
+    Built only by `framework.data.fetch_record.disclosure_from`, which takes a
+    `Fetch` — the stored bytes and the signed record over them — and reads the
+    vendor name, the covered window and the survivorship answer out of that
+    record's signed content. There is no argument through which a caller can type
+    any of the three.
     """
 
     @property
