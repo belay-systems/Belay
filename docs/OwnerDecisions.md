@@ -3471,3 +3471,88 @@ owner was asked to confirm or correct them.
 Items 2-7 of those notes are not rulings. They are gaps and readings for the
 final text round on ADR-015 and ADR-016 (Part 28e, step 1). The open ones are
 25g against 26e and 27f, 25h and 26b against 18e, and 28e against 18g.
+
+---
+
+# Part 37 — Ruled 2026-09-25: what ADR-017 promises (option A)
+
+**Numbered 37, not 32.** Parts 32-34 are on #33 and Parts 35-36 are on #36, both
+open. This Part refers to Parts 35 and 36 and reads correctly only once #36 has
+merged. Until this Part is on `main` it is a proposal, not a ruling.
+
+**Why the question arose.** The fourth independent pass on #36
+(<https://github.com/belay-systems/Belay/pull/36#issuecomment-5838006269>) broke
+attempt three of ADR-017 three ways. The record `disclosure_from` checks is read
+from a repository and a store the caller chooses. Record identifiers and store
+paths can walk out of those folders with `..`. And the prices in a series are not
+bound to the record, so a genuine fetch with invented prices on the same dates is
+still graded Level C. The pass also found that ADR-017's own argument against
+keyed signing — the adversary is "a caller in this process", who can reach
+anything the code can — rules out every check made inside the program, attempt
+three included. So the ADR had to say which risk it guards against.
+
+**Question put**, in the session, one question with a recommendation:
+
+> Which should ADR-017 promise: stop honest mistakes and make faking visible in
+> review (A), or make faking impossible for code inside Belay (B)?
+
+*Recommended: A.* Reasons given: B cannot be delivered, because whoever can change
+the code that produces a result can change the code that checks it, and the only
+defences against that sit outside the program — git history, pull request review,
+continuous integration. A covers the likeliest failure (Belay's own code
+mislabelling by accident) and routes deliberate faking to review, which is the only
+defence that exists against it.
+
+**Owner said: "A - per your recommendations."**
+
+### What it settles
+
+- **37a. ADR-017 promises option A.** Level C is guarded against honest mistakes
+  in Belay's code, and faking a Level C result is made visible in review rather
+  than impossible.
+- **37b. Option B is not adopted.** ADR-017 does not promise that code running
+  inside Belay cannot fake a Level C result.
+
+### Session readings, not the owner's words
+
+- **What "visible in review" requires in the code.** The pass sketched it: the
+  record and the stored bytes are read only from the repository's own `artifacts/`
+  and `data/market/`, not from folders the caller passes in; joined paths must stay
+  inside those roots; the record loaded must carry the identifier asked for; so a
+  forged record has to be a new tracked file under `artifacts/`, which a pull
+  request shows. That is a design for the author of the next attempt to confirm,
+  not a ruling.
+- **"Visible" covers the record, never the bytes.** `data/market/` is outside git
+  by ADR-013, so a reviewer can see a new record but not the data it names.
+- **"per your recommendations" is read as covering option A only.** It is plural,
+  and Part 35's "Aligned to recommendations" was read as covering two questions.
+  Here the two follow-ups below had been named but not yet put as questions with
+  their costs, so they are not treated as ruled. They go to the owner next, one
+  at a time.
+- **A blockchain was considered and advised against.** Before answering, the owner
+  asked whether making Belay a blockchain or web3 project would help. The session's
+  answer: no, for this problem. A ledger proves when something was written and that
+  it has not changed since, never that it was true when written — the "oracle
+  problem". All three of the pass's breaks put the false label in at the moment of
+  writing, which a ledger would preserve faithfully. Git already chains every
+  change to the one before it, and GitHub keeps that public. A chain would also
+  cost fees, add a network dependency that `AGENTS.md`'s determinism rules forbid
+  in tests, and need an account and a dependency, both the owner's alone. The one
+  later use noted: proving a future paper-trading record was not backfilled, for
+  which timestamping a commit hash would do without a dapp. Not pursued.
+
+### What it does not settle
+
+- **Follow-up 1: should a fetch record store a fingerprint of the parsed prices?**
+  Recommended yes. It is the only check that catches prices changed after the
+  fetch. Cost: a series adjusted for splits or dividends after fetching would be
+  Level D until the adjustment is itself recorded. Not yet put formally.
+- **Follow-up 2: should every metric artifact name the fetch record behind its
+  grade?** Recommended yes, so a stored Level C result can be re-checked later.
+  The evidence record's existing `provenance` text could carry it, leaving the four
+  `Disclosure` fields the conformance test holds unchanged. Not yet put formally.
+- **Ratification of ADR-017.** Still owed and still the owner's alone. Attempt three
+  should not be ratified: the fourth pass's four blocking findings stand.
+- **The fixes themselves.** The pass's findings are #36's to fix, including the
+  "What it settles" wording in Part 36 that the pass says goes beyond the owner's
+  words. Nothing in Part 36 is changed by this Part.

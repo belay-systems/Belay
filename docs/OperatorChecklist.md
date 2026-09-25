@@ -852,3 +852,44 @@ the end of `docs/OwnerDecisions.md`. The recommendations you answered
 
 The owner answered "aligned to recommendation" (`docs/OwnerDecisions.md` Part
 31). This closes the Open item "confirm the labeled lines in Parts 25-28".
+
+# 2026-09-25 — owner items from the fourth pass on ADR-017 (#36)
+
+## Done — 2026-09-25: what should ADR-017 promise? (option A)
+
+**Answered. Owner said "A - per your recommendations"** — recorded as
+`docs/OwnerDecisions.md` **Part 37**, which reads correctly once #36 (Parts 35
+and 36) has merged.
+
+The fourth independent pass broke attempt three of ADR-017 three ways, and showed
+that ADR-017's own reasoning rules out any check made inside the program against a
+caller determined to fake. The question as put:
+
+> Which should ADR-017 promise: stop honest mistakes and make faking visible in
+> review (A), or make faking impossible for code inside Belay (B)?
+
+Recommended A: B cannot be delivered by code, and review is the only defence that
+exists against deliberate faking. The owner also asked whether a blockchain would
+help; the answer given, no for this problem, is recorded in Part 37.
+
+## Open — 2026-09-25: two follow-ups to option A
+
+Named when option A was put, not yet asked on their own. One at a time.
+
+1. **Should a fetch record store a fingerprint of the parsed prices?**
+   *Recommended: yes.* Today a genuine fetch with its prices replaced on the same
+   dates is still graded Level C; this is the only check that catches it, and it
+   catches the honest mistake as well as the fake. **Cost:** a backtest that
+   adjusts prices for splits or dividends after fetching drops to Level D until
+   the adjustment step is itself recorded. It changes what a fetch record carries,
+   which touches ADR-014.
+2. **Should every metric artifact name the fetch record behind its grade?**
+   *Recommended: yes.* Today a Level C result carries no record identifier, so its
+   grade can never be re-checked after it is built. The evidence record's existing
+   free-text `provenance` line could carry it, so the four `Disclosure` fields the
+   constitution's conformance test holds would not change.
+
+## Later — ratify or reject ADR-017
+
+After attempt four is built to Part 37 and has had its own independent pass. Not on
+attempt three.

@@ -40,6 +40,9 @@ open pull requests and Issues on GitHub, `python -m pytest -q`,
 |---|---|---|
 | #7 | ADR-015: a strategy's stage is carried, not asserted (F-007, F-014) | The final text round: item 1 below |
 | #20 | ADR-016 draft, Part 22, the ADR-012 amendment draft (`docs/proposals/ADR-016-evidence-bar-DRAFT.md`) | Moves with ADR-015 |
+| #33 | Parts 32-34 and the final-text-round session close | Open |
+| #36 | F-032 to F-036 fixes, Parts 35-36, ADR-017's draft (grade from provenance) | **The fourth pass broke attempt three** (four blocking). Not to be ratified; attempt four is owed |
+| this branch | Part 37 (ADR-017 promises option A), the fourth pass's session record | Merge after #36 |
 
 Both merge cleanly onto this `main` and pass (704), except that each one
 appends to the end of `docs/OwnerDecisions.md` or `docs/OperatorChecklist.md`.
@@ -47,7 +50,17 @@ There, keep `main`'s text first and add the branch's text after it.
 
 ## Highest Priority Next Task
 
-1. **Finish the evidence bar the way Part 28e rules.**
+1. **ADR-017 (#36): put the two follow-ups, then build attempt four.**
+   - The fourth independent pass broke attempt three three ways, all posted on #36:
+     the repository and store it trusts are folders the caller picks, record paths
+     escape them with `..`, and prices are not bound to the record.
+   - The owner chose option A (Part 37): guard against honest
+     mistakes and make faking visible in review; not "impossible".
+   - **Next:** put the two follow-ups in `docs/OperatorChecklist.md` to the owner
+     one at a time (a price fingerprint on the record; a link from each metric
+     artifact to its record). Then attempt four on #36, then its own independent
+     pass, then ratification. Not before.
+2. **Finish the evidence bar the way Part 28e rules.**
    - **Step 1, the final text round on #7 and #20, with no redesign:**
      - fix the fourth pass's two blocking findings (F4-3 and F4-1, Issue #21,
        2026-09-25 01:28 UTC);
@@ -68,7 +81,7 @@ There, keep `main`'s text first and add the branch's text after it.
        checks (report binding, the trial cap).
    - **The independent pass** on each step is a fresh session told to
      falsify (Part 30). A different AI is welcome, never waited on.
-2. **Small, when convenient:**
+3. **Small, when convenient:**
    - the gate items #29 left: `fullmatch` on report names, surviving an
      invalid date, and ASCII digits in `REPORT` (`scripts/review_due.py`);
    - a sentence in the review skill (owner-only) saying to write every finding
