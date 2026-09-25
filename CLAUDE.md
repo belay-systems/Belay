@@ -41,7 +41,7 @@ follow its session workflow.** No rule may live only in this file.
 Belay has more than one contributor. Before acting on anything remembered from
 an earlier session, synchronize with GitHub and check it against the repository:
 fetch, read the new commits, read "Highest Priority Next Task" in
-`docs/HANDOFF.md`, and list the open pull requests and Issues. Memory is a dated
+`docs/NOW.md`, and list the open pull requests and Issues. Memory is a dated
 snapshot; the repository overrules it.
 
 Record project state, findings and owner rulings in the repository, never only

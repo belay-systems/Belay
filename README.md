@@ -72,7 +72,7 @@ tests that read that document.
 | `docs/ROADMAP.md` | The stages of the build. |
 | `docs/DECISIONS.md` | Architecture decision records, with their reasoning. |
 | `docs/OwnerDecisions.md` | What the owner has ruled, in the owner's words. |
-| `docs/HANDOFF.md` | Current state, open findings, and the next task. |
+| `docs/NOW.md` | Current state and the next task. Open findings are in `docs/FINDINGS.md`; history in `docs/sessions/` and `docs/HANDOFF.md`. |
 | `docs/research/` | Non-binding research notes. |
 | `CHANGELOG.md` | What changed, and what each change got wrong along the way. |
 | `reports/review/` | Adversarial reviews Belay has run against itself. |
@@ -116,7 +116,7 @@ instructions there are the same for every provider. Work is claimed through
 Issues and lands only through reviewed pull requests.
 
 Belay publishes the defects it finds in itself. The reviews under
-`reports/review/` and the findings register in `docs/HANDOFF.md` are part of the
+`reports/review/` and the findings register in `docs/FINDINGS.md` are part of the
 product, not an embarrassment.
 
 ## Security

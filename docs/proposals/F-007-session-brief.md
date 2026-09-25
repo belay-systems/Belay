@@ -136,11 +136,11 @@ says keep it for the earlier and clearer error message. That is a preference.
    deserialization, that is a design problem with the check, not an acceptable
    cost.
 5. Suite green from 626 with the new tests added.
-6. `docs/HANDOFF.md`: move `A Strategy Can Still Be Signed Into Existence At
-   Production (F-007)` from Open Findings to Closed Findings, remove its table
-   row, and renumber. **And correct the F-001 entry at
-   `docs/HANDOFF.md:2150-2194`,** which currently reads as though the hole is
-   closed — a future session will read that table instead of the code.
+6. `docs/FINDINGS.md`: move `A Strategy Can Still Be Signed Into Existence At
+   Production (F-007)` from Open to Closed, with the date and pull request.
+   **And correct the F-001 entry** (`docs/HANDOFF.md:2150-2194`), which reads
+   as though the hole is closed. That archive is frozen (Part 29): write the
+   correction in this session's `docs/sessions/` record, and name the lines.
 7. `CHANGELOG.md` entry in the existing style.
 
 ## Hard constraints

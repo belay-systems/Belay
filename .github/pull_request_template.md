@@ -21,6 +21,6 @@ or a different model. Paste what it found and what you did about each item.
 - [ ] No change to `constitution/`, `docs/OwnerDecisions.md`, `LICENSE` or an ADR's status, or the owner asked for it (link)
 - [ ] Every line citation I added or moved still points at the line it means
 - [ ] No secrets, account identifiers, personal paths, email addresses or licensed data
-- [ ] `docs/HANDOFF.md` updated, and `docs/OperatorChecklist.md` if the owner now has something to do
+- [ ] At a session close: `docs/NOW.md` rewritten, a `docs/sessions/` record added, `docs/FINDINGS.md` updated for any finding opened or closed, and `docs/OperatorChecklist.md` if the owner now has something to do
 
 **Authored with:** <!-- the AI service and model that did the work, and who directed it -->

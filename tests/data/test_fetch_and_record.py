@@ -504,3 +504,66 @@ def test_a_record_cannot_name_a_file_that_is_not_there(store, repository):
             payload=b'[{"close":"10.75"}]',
             stored=missing,
         )
+
+
+# --------------------------------------------- F-019: two guards the suite never reached
+#
+# `reports/review/2026-09-04-review.md:89` (F-019). Disabling either guard below
+# left the whole suite green. Owner ruling: `docs/OwnerDecisions.md` Part 21.
+
+
+def test_an_unrecorded_version_is_an_orphan_even_when_its_bytes_match_a_recorded_one(
+    store, repository
+):
+    """`orphan_versions` matches on the path *and* the hash. Matching on the hash
+    alone is a regression `framework/data/fetch_record.py` records as having
+    happened once already: a second symbol's identical bytes, stored with no
+    record, look accounted for by the first symbol's record."""
+    shared = b'{"close":"10.75"}'
+    _fetch(store, source=Source(shared), repository=repository)
+    unrecorded = store.store(source="test-source", symbol="MSFT", payload=shared)
+
+    orphans = orphan_versions(store, repository)
+
+    assert [stored.relative_path for stored in orphans] == [unrecorded.relative_path]
+
+
+def test_a_source_with_no_survivorship_answer_is_refused_before_it_is_even_fetched(
+    store,
+):
+    """ADR-013 rule 9 is checked **before** anything is written. The older test
+    above passes without that check: its hollow source has no `calls` attribute,
+    so the fetch itself fails first. This source fetches perfectly well. Only the
+    pre-write check stops its bytes landing in an append-only store with no
+    survivorship answer to attribute them to."""
+
+    class Hollow(Source):
+        def __init__(self):
+            self.payload = b'[{"close":"10.75"}]'
+            self.calls = 0
+
+    source = Hollow()
+    with pytest.raises(TypeError, match="SurvivorshipDisclosure"):
+        _fetch(store, source=source)
+
+    assert source.calls == 0, "the source was fetched before it was refused"
+    assert store.versions(source="test-source", symbol="AAPL") == ()
+
+
+def test_a_recorded_version_whose_bytes_changed_on_disk_is_an_orphan(store, repository):
+    """The hash half of `orphan_versions`' match, which the test above leaves open.
+
+    A record names a stored version by path and by hash. Rewrite the file in
+    place and its path still matches while its hash no longer does, so the
+    version is no longer accounted for. Matching on the path alone reported this
+    store clean (the independent pass on #24, 2026-09-25).
+    """
+    _fetch(store, repository=repository)
+    (stored,) = store.all_versions()
+    on_disk = Path(store.root) / stored.relative_path
+    on_disk.chmod(0o644)
+    on_disk.write_bytes(on_disk.read_bytes() + b" ")
+
+    orphans = orphan_versions(store, repository)
+
+    assert [version.relative_path for version in orphans] == [stored.relative_path]

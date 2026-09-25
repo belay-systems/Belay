@@ -391,3 +391,22 @@ def test_the_record_is_signed():
 
     assert record.integrity_hash is not None
     assert ArtifactIntegrity.verify_hash(record) is True
+
+
+# ------------------------------- F-019: the file on disk, not only the hash it claims
+#
+# `reports/review/2026-09-04-review.md:89` (F-019). The check that the stored
+# version's claimed hash matches the payload was tested; the check that the file
+# on disk still holds those bytes was not, and disabling it left the suite green.
+# Owner ruling: `docs/OwnerDecisions.md` Part 21.
+
+
+def test_a_record_refuses_a_stored_file_whose_bytes_have_changed(tmp_path):
+    """The stored version agrees with the payload on paper, and the file under it
+    holds different data. Signed, that record would verify and be wrong."""
+    store = SeriesStore(root=tmp_path / "market")
+    stored = store.store(source="test-source", symbol="AAPL", payload=PAYLOAD)
+    stored.path.write_bytes(b"not the bytes this record is signed over")
+
+    with pytest.raises(ValueError, match="holding different data"):
+        _record(stored=stored)
