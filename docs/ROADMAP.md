@@ -242,7 +242,14 @@ name as open are closed.
   "Accepted and implemented, 2026-08-02, in all nine rules." It rules where
   artifacts live, which git tracks, that `fetch_and_record` persists, what becomes
   of the one unprovenanced series Belay holds, and what a `.gitignore` comment may
-  assert. **Nothing here gates a bulk backfill.**
+  assert. **The identifier ruling no longer gates a bulk backfill — but the cost
+  that gate was holding back has not been paid.** `Every Fetch Reads Every Stored
+  Record`, below, is that cost: `records_by_stored_version` integrity-verifies
+  every artifact under the root on every call, so a backfill of *n* symbols
+  performs O(n²) record reads. The archive calls it "a defensible trade at today's
+  scale and not at a universe backfill's". Read that finding before planning one.
+  The live path has also never been executed — see Stage 2's note on `dolt` — so
+  nothing here is verified against a real backfill.
 
 **What that implementation left open**, all four carried in `docs/FINDINGS.md` and
 written up in the archive:
@@ -262,6 +269,13 @@ The old wording is described rather than quoted, because
 `test_a_complete_stage_does_not_call_an_implemented_adr_unimplemented` cannot tell
 a quotation from a claim. Same reason `scripts/review_due.py` asks for the
 bracketed `F-[NNN]` form when a finding number is quoted from outside text.
+
+**Corrected again the same day, by the independent pass on that correction.** The
+first rewrite replaced one false absolute with another: it read "Nothing here gates
+a bulk backfill" while citing, as evidence, a list containing the finding that does
+constrain one. That is precisely F-034's failure mode — a complete stage asserting
+something the repository contradicts a few lines below — reintroduced by F-034's
+own fix. The bullet above now names the cost instead of denying it.
 
 **One consequence should be visible rather than absorbed.** Point-in-time
 universe membership is out of budget, and `Research/UniverseDiscovery.md` makes

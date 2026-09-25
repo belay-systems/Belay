@@ -100,8 +100,9 @@ not edited from here: one Issue, one branch, one claimant.
      `docs/OwnerDecisions.md`, `docs/OperatorChecklist.md` and `CHANGELOG.md`,
      once #7 and #20 have landed (`docs/proposals/growing-files.md`);
    - `scripts/verify_clone.py` has not run for five consecutive reviews for
-     want of `dolt`, and it exits 0 when there is no clone — so it reports
-     success having verified nothing.
+     want of `dolt`, so the live data path is still unverified. (It refuses
+     correctly with exit 1 when there is no clone; an earlier draft of this
+     line said otherwise and was wrong.)
 
 ## Working Agreement
 
