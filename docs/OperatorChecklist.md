@@ -852,3 +852,29 @@ the end of `docs/OwnerDecisions.md`. The recommendations you answered
 
 The owner answered "aligned to recommendation" (`docs/OwnerDecisions.md` Part
 31). This closes the Open item "confirm the labeled lines in Parts 25-28".
+
+---
+
+### ADR-015 / Issue #6 carrier state — 2026-09-21
+
+**Append-only.** Placed at EOF so current-main citation targets (`:24`, `:26`,
+`:474-488`, `:490`) stay put. Public carrier: PR #7 / `adr/015-stage-is-carried`.
+
+ADR-015 cannot be ratified until the owner rules the evidence bar. Research is on
+this carrier as `docs/proposals/evidence-bar-per-rung.md`. Section 10 asks seven
+questions; the first is which of **four** options: (1) No floor, (2) Hypothesis,
+(3) Producible-grade, (4) Criterion coverage. ADR-015 rule 4's table stays empty
+until that ruling. ADR-015 remains **PROPOSED**.
+
+**Independent passes.** First proposal pass (2026-09-19): 17 defects, 4 blockers,
+applied (evidence-bar Appendix B). Issue #6 was the second falsification pass on
+both the evidence-bar and sample-adequacy proposals (15/5 on sample-adequacy's
+first pass). Confirmed defects were corrected through **PR #15** (merged with CI
+green; no regression-check record exists, per PR #7's review). Wording finalized
+through **PR #17** (merged). **Issue #6 is CLOSED / completed.**
+
+Neither proposal is doctrine. No evidence floor and no sample-adequacy threshold
+have been selected. Sample adequacy exists on `main`; Issue #6 corrections to
+that proposal live on this PR #7 carrier and are **not yet on `main`**. The
+owner ruling is still required before ADR-015 can be ratified. ADR-015's separate
+pre-implementation third pass on the rule text remains owed after that ruling.
