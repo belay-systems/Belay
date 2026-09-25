@@ -3618,3 +3618,62 @@ sent"; recording adjustments properly can come later, as its own piece of work.
   Part 36's reading chose refusal, and that reading is still the session's.
 - **Follow-up 2** (each metric artifact names its fetch record). Not yet put.
 - **Ratification of ADR-017.** Unchanged from Part 37.
+
+---
+
+# Part 39 — Ruled 2026-09-25: every metric artifact names the fetch record behind its grade
+
+**Follow-up 2 to Part 37**, put on its own after Part 38. Like Parts 37 and 38, it
+reads correctly once #36 has merged, and is a proposal until it is on `main`.
+
+**Why the question arose.** The fourth pass's D3: a genuine Level C metric
+artifact built through `disclosure_from` carries no record identifier, no version
+and no hash of its fetch record. Its grade is checked once, when it is built, and
+cannot be re-checked by anything that reads it later — including the promotion
+gate ADR-017 says the grade exists for.
+
+**Question put**, in the session, with a recommendation:
+
+> Should every result name the fetch record behind its grade, yes or no?
+
+Explained with it: each result would write down which fetch record it came from —
+the record's name, its version, and its fingerprint — so anyone, or any later
+check, could look the record up and confirm the Level C still stands. The cost was
+described as small: every result already has a free-text "provenance" line, which
+today says only how many days of data it used; the record's details would go on
+that line, and the four disclosure fields the constitution's backtesting rules
+require would stay as they are. *Recommended: yes* — without it, the fingerprint
+ruled in Part 38 is checked only once, by the same code that produces the result.
+
+**Owner said: "yes".**
+
+### What it settles
+
+- **39a. Every metric artifact graded Level C names the fetch record behind its
+  grade: the record's identifier, its version, and its fingerprint**, so the grade
+  can be re-checked after the artifact is built.
+
+### Session readings, not the owner's words
+
+- **Where it is written.** The evidence record's existing `provenance` line, as the
+  question described. The owner was shown that as the cost, not asked to rule on
+  it; the next attempt may place it elsewhere if the four `Disclosure` fields stay
+  unchanged.
+- **"Its fingerprint"** is read as the price fingerprint of Part 38. Carrying the
+  record's existing `content_hash` of the raw bytes as well is the next attempt's
+  choice.
+- **A Level D artifact names nothing.** A hand-built disclosure has no fetch record
+  to name. 39a is read as applying to Level C.
+- **Not stated when the question was put:** the `provenance` text is inside the
+  evidence record's hash, so this changes the integrity hash of every metric
+  artifact built after it. No metric artifact is stored in the repository, so
+  nothing existing is affected.
+
+### What it does not settle
+
+- **What a later re-check does** when the named record is missing or no longer
+  matches. Refuse, downgrade or report: not asked.
+- **Who runs the re-check, and when.** A promotion gate is the obvious reader; that
+  belongs with ADR-015 and ADR-016, not here.
+- **Ratification of ADR-017.** Unchanged from Part 37: owed after attempt four and
+  its own independent pass.

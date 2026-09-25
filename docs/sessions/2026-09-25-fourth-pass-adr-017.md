@@ -63,9 +63,16 @@ recorded. The owner said "yes to fingerprint". Recorded as Part 38, together wit
 consequence not stated when it was put: `RPT-0001` has no fingerprint and cannot
 back Level C until re-fetched.
 
+**Follow-up 2, put on its own.** Should every result name the fetch record behind
+its grade — identifier, version and fingerprint — so the grade can be re-checked
+later? Recommended yes, on the existing `provenance` line. The owner said "yes".
+Recorded as Part 39, with the placement kept as a session reading and one
+consequence not stated when it was put: the change alters the integrity hash of
+every metric artifact built after it (none is stored).
+
 ## Files changed
 
-- `docs/OwnerDecisions.md` — Parts 37 and 38.
+- `docs/OwnerDecisions.md` — Parts 37, 38 and 39.
 - `docs/OperatorChecklist.md` — the question as put (Done), the two follow-ups
   (Open), and ratification (Later).
 - `docs/NOW.md` — "In flight" and the next-task list.
@@ -98,11 +105,12 @@ was checked for exactly that.
 
 ## What is open
 
-- **Follow-up 2** to option A, in `docs/OperatorChecklist.md`: a link from each
-  metric artifact to its fetch record. To be put to the owner.
-- **Attempt four of ADR-017**, on #36, built to Parts 37 and 38 and to whatever the
-  owner rules on follow-up 2, then its own independent pass. Not before.
-- **Merge order.** Parts 37 and 38 refer to Parts 35 and 36, so this branch should merge
+- **Attempt four of ADR-017**, on #36, built to Parts 37-39 and the fourth pass's
+  findings, then its own independent pass. Not before.
+- **Left open by Parts 38 and 39:** how an adjustment is recorded; refusal or
+  Level D on a mismatch; what a later re-check does when a named record is missing
+  or has changed.
+- **Merge order.** Parts 37-39 refer to Parts 35 and 36, so this branch should merge
   after #36. Both edit the end of `docs/OwnerDecisions.md` and
   `docs/OperatorChecklist.md`, and both edit `docs/NOW.md`: keep `main`'s text first
   and add this branch's after it.

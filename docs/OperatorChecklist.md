@@ -879,10 +879,16 @@ help; the answer given, no for this problem, is recorded in Part 37.
 fingerprint, so it cannot back a Level C result until re-fetched; recorded there,
 since it was not said when the question was put.
 
-## Open — 2026-09-25: two follow-ups to option A
+## Done — 2026-09-25: each result names its fetch record (follow-up 2)
 
-Named when option A was put, not yet asked on their own. One at a time. Item 1 is
-answered (above, Part 38) and kept here as it was put.
+**Answered. Owner said "yes"** — recorded as `docs/OwnerDecisions.md` **Part 39**.
+What a later re-check does when the record is missing or has changed was not
+asked, and is left open there.
+
+## Done — 2026-09-25: two follow-ups to option A (both answered)
+
+Named when option A was put, then asked one at a time. Both are answered (above,
+Parts 38 and 39) and kept here as they were first written.
 
 1. **Should a fetch record store a fingerprint of the parsed prices?**
    *Recommended: yes.* Today a genuine fetch with its prices replaced on the same
