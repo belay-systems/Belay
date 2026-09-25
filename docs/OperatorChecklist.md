@@ -852,3 +852,17 @@ the end of `docs/OwnerDecisions.md`. The recommendations you answered
 
 The owner answered "aligned to recommendation" (`docs/OwnerDecisions.md` Part
 31). This closes the Open item "confirm the labeled lines in Parts 25-28".
+
+## Open — 2026-09-25: the evidence bar, after step 1
+
+Step 1 of Part 28e is finished, and the text rounds are over (Parts 33a and 34).
+What only you can do next, in order:
+
+1. **Merge #33** (Parts 32-34, `docs/NOW.md`, the session record) once its
+   checks are green. It is owner rulings and docs only.
+2. **Answer five questions**, which a session puts to you one at a time
+   (ADR-016's Required Follow-Up, item 19), and **say "go" for step 2**, the
+   current-stage read built as code, on its own draft branch. Nothing is merged
+   there until you ratify the ADRs.
+3. **Later, ratify or amend ADR-015 and ADR-016**, after step 2 and after a
+   fresh pass on the exact text you are ratifying (Part 32c).

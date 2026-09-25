@@ -14,19 +14,20 @@ said before lives in `docs/sessions/` and in git history
 
 ## Where things stand
 
-Written 2026-09-25, for `main` as it stands once #14, #24, #31 and #32 have
-merged, in that order. #32 is the last of them.
+Written 2026-09-25, for `main` as it stands once #33 has merged. #33 carries
+this file, Parts 32-34, and the session record
+`docs/sessions/2026-09-25-final-text-round.md`.
 
-- **Suite:** 704 passed, 1 skipped, 5 xfailed (`python -m pytest -q`). That was
-  the result of the merge rehearsal on a scratch copy of `main`.
-- **`python scripts/status.py`:** exits 0, 40 open findings. F-019 closed with
-  #24.
+- **Suite:** 704 passed, 1 skipped, 5 xfailed (`python -m pytest -q`), on
+  `main`, on #7 and on #20.
+- **`python scripts/status.py`:** exits 0, 40 open findings.
 - **ADRs on `main`:** 14 (`grep -c "^## ADR-" docs/DECISIONS.md`).
   ADR-015 (#7) and ADR-016 (#20) are drafts on branches, neither ratified.
-- **Owner rulings on `main`:** Parts 1-19, 21 and 23-31. Part 20 (#22) is not
-  adopted (Part 30), and #22 is closed. Part 22 is on #20.
-- **Review gate:** `python scripts/review_due.py` gives the next finding
-  number. The highest number in use anywhere is F-030.
+- **Owner rulings on `main`:** Parts 1-19, 21 and 23-31. Parts 32-34 are
+  on #33. Part 22 is on #20. Part 20 is not adopted (Part 30).
+- **Review gate:** `python scripts/review_due.py` says a review is **due**
+  (the last one is `2026-09-11-review.md`) and gives F-031 as the next finding
+  number. Nothing above F-030 is in use.
 - **Contributors help and never gate** (Part 30). Work lands on the owner's
   word, through the Owner bypass.
 
@@ -38,37 +39,48 @@ open pull requests and Issues on GitHub, `python -m pytest -q`,
 
 | PR | What | State |
 |---|---|---|
-| #7 | ADR-015: a strategy's stage is carried, not asserted (F-007, F-014) | The final text round: item 1 below |
-| #20 | ADR-016 draft, Part 22, the ADR-012 amendment draft (`docs/proposals/ADR-016-evidence-bar-DRAFT.md`) | Moves with ADR-015 |
+| #33 | Parts 32-34, this file, the session record | Ready to merge once green: owner rulings and docs only |
+| #7 | ADR-015: a strategy's stage is carried, not asserted (F-007, F-014) | Step 1 of 28e is done (see below); up to date with `main` |
+| #20 | ADR-016 draft, Part 22, the ADR-012 amendment draft | Same as #7; moves with it |
 
-Both merge cleanly onto this `main` and pass (704), except that each one
-appends to the end of `docs/OwnerDecisions.md` or `docs/OperatorChecklist.md`.
-There, keep `main`'s text first and add the branch's text after it.
+#7 and #20 are drafts and stay unmerged until the owner ratifies both ADRs.
+Each still appends to the end of `docs/OwnerDecisions.md` or
+`docs/OperatorChecklist.md`; when `main` moves, keep `main`'s text first and add
+the branch's text after it.
 
 ## Highest Priority Next Task
 
-1. **Finish the evidence bar the way Part 28e rules.**
-   - **Step 1, the final text round on #7 and #20, with no redesign:**
-     - fix the fourth pass's two blocking findings (F4-3 and F4-1, Issue #21,
-       2026-09-25 01:28 UTC);
-     - apply 28a-28d, which Part 31 confirms as recorded;
-     - settle the three open readings in the notes after Part 28: 25g against
-       26e and 27f, 25h and 26b against 18e, and 28e against 18g. Put each to
-       the owner as one question with a recommendation.
-   - **Step 2, build the current-stage read as code.** Every attack from the
-     passes on Issue #21 becomes a test that passes only when the attack is
-     refused. The plan is **waiting on the owner's "go"**:
-     - the tests are written by a separate model from the review findings,
-       not from the code;
-     - a fresh review then attacks the code;
-     - the ADR text is updated to match what the code does;
-     - it goes on its own branch, for example `claude/stage-read`, as a draft
-       pull request, and is not merged until the owner ratifies the ADRs;
-     - not in this first slice: the save-side checks, and ADR-016's evidence
-       checks (report binding, the trial cap).
-   - **The independent pass** on each step is a fresh session told to
-     falsify (Part 30). A different AI is welcome, never waited on.
-2. **Small, when convenient:**
+1. **Step 2 of Part 28e: build the current-stage read as code.** It is
+   **waiting on the owner's "go"** (33a).
+   - **Step 1 is finished, and the text rounds are over** (Parts 33a and 34).
+     The text is ADR-015 at `c11bf59` (#7) and ADR-016 at `6388254` (#20).
+     - The fifth pass found two blocking holes (F5-2, F5-5), answered by
+       Part 33.
+     - A sixth pass, on this session's own edits, found five more, several of
+       them the author's errors. The owner ruled Part 34: fix those errors,
+       then stop.
+     - The last fixes have had no pass; they say so.
+   - **Put five owner questions first**, one at a time, before any code.
+     They are in ADR-016's Required Follow-Up, item 19. The first asks
+     whether 33c's "file" covers a stored `Demote` or `Retire` review.
+   - **The tests:** every attack from the Issue #21 passes, F5-1 to F5-12 and
+     the open F6 findings included, becomes a test that passes only when the attack
+     is refused. They are written by a separate model from the findings, not
+     from the code.
+   - **Settle in code, then write into the ADR:** how rule 8's backtest report
+     is bound beside the seven records (33b), and rule 10 judging every read by
+     today's bar (32a).
+   - **Then:** a fresh review attacks the code, the ADRs are conformed to what
+     the code does, and a fresh pass attacks the exact text to be ratified,
+     right before the owner ratifies (32c). A different AI is welcome, never
+     waited for (30b).
+   - It goes on its own branch, for example `claude/stage-read`, as a draft
+     pull request, and is not merged until the owner ratifies the ADRs.
+   - **Not in this first slice:** the save-side checks, and ADR-016's evidence
+     checks (report binding, the trial cap).
+2. **The scheduled adversarial review is due.** Run it by
+   `.claude/skills/belay-review/SKILL.md`, starting at F-031.
+3. **Small, when convenient:**
    - the gate items #29 left: `fullmatch` on report names, surviving an
      invalid date, and ASCII digits in `REPORT` (`scripts/review_due.py`);
    - a sentence in the review skill (owner-only) saying to write every finding

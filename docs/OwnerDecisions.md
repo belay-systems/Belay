@@ -3471,3 +3471,203 @@ owner was asked to confirm or correct them.
 Items 2-7 of those notes are not rulings. They are gaps and readings for the
 final text round on ADR-015 and ADR-016 (Part 28e, step 1). The open ones are
 25g against 26e and 27f, 25h and 26b against 18e, and 28e against 18g.
+
+# Part 32 — Ruled 2026-09-25: the three open readings in the notes after Part 28
+
+**Question put.** Part 31 left three readings open for the final text round
+on ADR-015 (#7) and ADR-016 (#20): 25g against 26e and 27f, 25h and 26b
+against 18e, and 28e against 18g. The session put each as one question with
+a recommendation, and a choice of answers.
+
+### 32a. Which bar a stage read uses
+
+**Question.** "When Belay re-checks a strategy's past steps while reading its
+stage, which bar should it judge each step by?" The session recommended "The
+bar of its time", which is what 25g's words say and what ADR-016 rule 10
+already did. The other answer offered was: "Every read re-judges every past
+step against the current bar, so raising the bar immediately drops any
+strategy that no longer meets it. This leans hardest toward less capital
+(25d), but it overrules 25g's \"does not re-judge past steps\", and the text
+would need rewriting (rule 10), which Part 28e's \"no redesign\" forbids for
+this round."
+
+**Owner chose: "Today's bar".**
+
+### 32b. 25h and 26b amend 18e
+
+**Question.** "Should the record say plainly that 25h and 26b amend 18e, so
+the count of variants tried can now block a promotion?" The answer chosen
+read: "The record gets one line: 25h and 26b amend 18e. The count still
+corrects no result, but a count above the cap is refused."
+
+**Owner chose: "Yes, say it amends 18e (Recommended)".**
+
+### 32c. The final pass before ratification
+
+**Question.** "Before you ratify ADR-015 and ADR-016, must a fresh session
+try to break the exact text you are ratifying?" The answer chosen read: "One
+fresh-session attack pass on the final text, after step 2 has rewritten it to
+match the code. It must come right before you ratify. A different AI is
+welcome but never waited for (Part 30b)."
+
+**Owner chose: "Yes, 18g still stands (Recommended)".**
+
+### What it settles
+
+- **32a. A stage read judges every past step by today's bar.** 25g's first
+  two sentences, "A raised bar applies from each strategy's next step. It does
+  not re-judge past steps.", are overruled. A raised bar lowers the stage
+  read of any strategy whose steps no longer meet it, at once, not from its
+  next step. 25g's other words stand: "No strategy holds capital today."
+- **32b. 25h and 26b amend 18e.** The count of variants tried still corrects
+  no result and claims nothing, as 18e says. A count above the cap that 26b
+  defines is refused. 18e's text is not edited; this line is the amendment.
+- **32c. 18g's fresh pass still stands under 28e.** Neither ADR is ratified
+  until a fresh session has tried to break the exact text being ratified,
+  after 28e's step 2 has rewritten the ADRs to match the code. The pass runs
+  right before ratification. A different AI is welcome, never waited for
+  (30b).
+
+### Session readings, not the owner's words
+
+- **32a lifts 28e's "no redesign" for rule 10 only.** The answer chosen said
+  the text "would need rewriting (rule 10)". So ADR-016 rule 10, and the
+  passages in both ADRs that depend on it, are rewritten in this round.
+  Nothing else is redesigned.
+
+### What it does not settle
+
+It does not say how rule 10's mechanism changes; that is drafter's text, on
+#20 and #7, for the fresh pass to attack. It does not ratify either ADR.
+
+# Part 33 — Ruled 2026-09-25: how step 1 finishes, and three answers to the fifth pass
+
+**Question put.** A fifth falsification pass, on ADR-015 at `ddda627` (#7) and
+ADR-016 at `5714814` (#20), posted on Issue #21, found both not ready. It found
+one blocking finding in each ADR: F5-2, capital without a verified yes when
+several repairs exist, and F5-5, capital rungs that need 10 years of paper
+trading. It also raised three questions only the owner can answer. The
+session said that no money can move today, because every capital rung is
+closed by unruled constants, and that this is the fifth text pass in a row to
+find blocking holes. It put four questions, one at a time, each with a
+recommendation.
+
+### 33a. How step 1 finishes
+
+**Question.** "The final text round has blocking holes. How should step 1
+finish?" The answer chosen read: "Close the text round now, in five parts.
+1) Fix only what is wording: F5-2's definition, the two contradicting tests,
+one mislabeled RULED line, and the stale lines. 2) Put your Part 32 edits in
+too. 3) Record every other attack from this pass as a test the code must
+refuse. 4) Put the new questions to you, one at a time (F5-5 first). 5) Push,
+with one fresh pass on the diff. Then step 2 (the code) starts when you say
+go."
+
+**Owner chose: "Small fixes, then code (Recommended)".**
+
+### 33b. F5-5: the 3.0 report on a capital rung is a backtest
+
+**Question.** "On a capital rung, which report must pass the 3.0 test with
+enough data (25b)?" The answer chosen read: "The 3.0
+significance-and-adequacy check always uses a backtest over 10+ years of
+history, bound alongside the seven evidence records rather than as one of
+them. The capital rungs still need the B- or A-grade Statistical performance
+record from paper or live trading, and still wait for the paper and live
+lengths the Committee sets (18d, 25e)."
+
+**Owner chose: "A backtest report (Recommended)".**
+
+### 33c. F5-1: a repair sets aside forgeries only
+
+**Question.** "May a repair set aside a genuine, properly reviewed
+demotion?" The answer chosen read: "A repair may set aside only a file that
+doesn't hold up: one with no valid base, or whose own chain fails the checks.
+A genuine demotion is lifted only by a later review that names it with a
+human yes (28a)."
+
+**Owner chose: "No, forgeries only (Recommended)".**
+
+### 33d. F5-7: a date correction never moves a demotion earlier
+
+**Question.** "May a correction to a demotion's date (28c) move it earlier
+than the day the demotion was actually recorded?" The answer chosen read: "A
+correction can move the date later (for example, fixing a future-dated
+typo), but never before the day the demotion was recorded in Belay."
+
+**Owner chose: "No, never earlier (Recommended)".**
+
+### What it settles
+
+- **33a.** Step 1 of 28e ends with wording fixes, the Part 32 and Part 33
+  edits, and one fresh pass on that diff. Every other finding of the fifth
+  pass becomes a test in step 2 that passes only when the attack is refused.
+  Step 2 still waits on the owner's "go".
+- **33b.** 25b's significance report is a backtest report on the Paper
+  Trading rung and on every capital rung, kept apart from the seven records of
+  18a and 25a. Paper and live lengths stay with 18d and 25e.
+- **33c.** A repair review may set aside only a file that doesn't hold up:
+  one with no valid base, or whose own chain fails the checks. A genuine demotion or retirement
+  is lifted only as 28a says.
+- **33d.** A correction under 28c may move a demotion's date later, never
+  earlier than the day the demotion was recorded in Belay.
+
+### Session readings, not the owner's words
+
+- "The day the demotion was recorded in Belay" (33d) is read as the `created`
+  of the stored version that appended the demotion rung, as the fifth pass
+  proposed for F5-7.
+
+### What it does not settle
+
+It does not ratify either ADR. Under 32c, a fresh pass on the text as
+ratified still comes right before ratification.
+
+# Part 34 — Ruled 2026-09-25: fix the author's errors, then stop the text rounds
+
+**Question put.** A sixth fresh-session pass attacked the edits this session
+made for Parts 32 and 33. It found 5 blocking findings and 15 others. Several
+were the author's own errors: a misquotation of 25g (F6-1), a rule that left
+out supersessions needing no yes (F6-2), and "version" written in Part 33c's
+record where the owner's chosen answer said "file" (F6-15). Others came from
+rulings interacting, and raised five new owner questions. The session said
+that six rounds in a row had each grown new edge cases, the author's
+included, and that no capital rung can open today. It asked: "The text keeps
+growing new holes with every fix. How do we stop the loop?" The answer
+chosen read: "1) Fix only my mistakes: the misquote, the 'version'/'file'
+wording in your record, the missing no-yes supersessions, the one-clause
+demotion guard, and the nits. 2) Record every sixth-pass finding and its five
+questions as open items and step-2 tests, with no more rule rewrites. 3) Push,
+marked plainly as not re-checked. The next attacks happen on the code (step 2)
+and on the final text before you ratify (32c)."
+
+**Owner chose: "Fix my errors, then stop (Recommended)".**
+
+### What it settles
+
+- **34a. The text rounds on ADR-015 and ADR-016 end here.** The author's
+  errors found by the sixth pass are fixed. Every other finding, and the five
+  questions it raised, are open items and step-2 tests. The next attacks are
+  on the code (28e step 2) and on the text as ratified (32c).
+- **34b. These last fixes are pushed without another pass, and say so.**
+
+### Corrections made in this pull request, before merge
+
+- **32a** named only "It does not re-judge past steps" as overruled. The
+  answer the owner chose ("raising the bar immediately drops any strategy")
+  also overrules 25g's first sentence. 32a's "What it settles" now names both
+  sentences (sixth-pass finding F6-14).
+- **33c** said "version" where the owner's chosen answer said "file". It now
+  says "file" (F6-15). Whether "file" also covers a stored `Demote` or
+  `Retire` review is the first of the five open questions.
+
+### Session readings, not the owner's words
+
+- **33d's chosen answer gave a backwards example.** It said a correction "can
+  move the date later (for example, fixing a future-dated typo)". Fixing a
+  future-dated typo moves the date earlier. The operative words, "never before
+  the day the demotion was recorded in Belay", are what ADR-015 implements.
+
+### What it does not settle
+
+The five questions (ADR-016's Required Follow-Up, item 19). They are put when
+step 2 starts. It does not ratify either ADR.
