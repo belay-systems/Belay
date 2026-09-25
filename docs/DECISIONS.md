@@ -3620,15 +3620,45 @@ question of who calls `save()` and when, and nothing here answers it.
 ## ADR-015: A Strategy's Stage Is Carried, Not Asserted — And A Stage Move Without Evidence Is Not A Review
 
 Status:
-**PROPOSED — revised 2026-09-25 after a third falsification pass and the owner's Parts 25, 26 and 27. Not ratified. Not implemented in any part.**
+**PROPOSED — revised 2026-09-25 after a fourth falsification pass and the owner's Parts 25-28. Not ratified. Not implemented in any part.**
 
 Date:
-2026-09-19 (revised 2026-09-24, 2026-09-25, and again 2026-09-25)
+2026-09-19 (revised 2026-09-24, 2026-09-25, and twice more on 2026-09-25)
 
 ---
 
-> **Where the fourth revision stands (2026-09-25). Read this first; where the blocks
+> **Where the fifth revision stands (2026-09-25). Read this first; where the blocks
 > below differ from it, this one is current.**
+>
+> - **A fourth falsification pass found this ADR still not ready** (Issue #21, the
+>   comment "Fourth supplementary pass: ADR-015 at `61789bc` (#7), ADR-016 at
+>   `7855303` (#20)", 2026-09-25). Nothing it tried reached a capital stage without a
+>   verified human yes. It found two blocking liveness defects: rule 5 forbade the
+>   `human_authorization` that rule 3h requires on raising supersessions and repair
+>   reviews (F4-3), and in the C3 shape no repair could unblock promotion (F4-1). It
+>   also found should-fix F4-2 and F4-4 to F4-7, and nits F4-8 to F4-10.
+> - **The owner then ruled Part 28 (28a-28e)**, 2026-09-25: "aligned, yes to the
+>   plan". Part 28 is recorded on branch `claude/kind-knuth-9g7xlr` with Parts 25-27,
+>   and none of them is on `main` yet. 28e rules how this ADR is finished: **this is
+>   the final text round, with no redesign.** The current-stage read is then built as
+>   code, every attack from the Issue #21 passes becomes a test that must fail, and
+>   this ADR is conformed to the code (Required Follow-Up).
+> - **This revision** fixes F4-3 (rule 5) and F4-1 (rules 3e and 5), applies 28a (rule
+>   3h step 5), 28b (rule 3h steps 5 and 6), 28c (rule 4(f)) and 28d (rule 3g), and
+>   the should-fix findings and nits. Where each landed is in "Revision history".
+> - **What blocks ratification now:** Parts 25-28 reaching `main`; the code of 28e;
+>   the owner's chosen different-AI pass on Issue #21; and the owner's ratification of
+>   both ADRs.
+>
+> **Marks in this revision.** The legend at the end of the block headed "Where this
+> revision stood (2026-09-25, first revision of that day)" is current, and now adds
+> **Part 28**: the Parts cited as RULED are 18, 19, 22, 23 and
+> 25-28. Parts 22 and 25-28 are not on `main`.
+>
+> **The next block is the fourth revision's, kept as history.**
+
+> **Where the fourth revision stood (2026-09-25). Kept as history; the block above is
+> current.**
 >
 > - **A third falsification pass found this ADR still not ready** (Issue #21, the
 >   comment "Third supplementary pass: ADR-015 at `26f5d75` (#7), ADR-016 at
@@ -3722,11 +3752,11 @@ Date:
 > **How each rule is marked in this revision.**
 >
 > - **RULED (Part n)** — an owner ruling in `docs/OwnerDecisions.md`, whose words are
->   quoted there. Only Parts 18, 19, 22, 23, 25, 26 and 27 are cited as RULED. Parts
->   18, 19 and 23 are on `main`; Part 22 is on pull request #20's branch; Parts 25, 26
->   and 27 are on `claude/kind-knuth-9g7xlr` (above). None of 22, 25, 26 or 27 is on
->   `main` yet. Part 9e, on `main`, is cited as SELECTED, never as RULED. *(Part 27
->   added in the fourth revision, 2026-09-25.)*
+>   quoted there. Only Parts 18, 19, 22, 23, 25, 26, 27 and 28 are cited as RULED.
+>   Parts 18, 19 and 23 are on `main`; Part 22 is on pull request #20's branch; Parts
+>   25-28 are on `claude/kind-knuth-9g7xlr` (above). None of 22 or 25-28 is on `main`
+>   yet. Part 9e, on `main`, is cited as SELECTED, never as RULED. *(Part 27 added in
+>   the fourth revision, 2026-09-25; Part 28 in the fifth.)*
 > - **SELECTED (9e)** — one of the six shape selections of Part 9e. The owner chose
 >   the shape; 9e says in terms that it is "shape only" and ratifies no text. The
 >   wording that implements it is the drafter's.
@@ -3913,9 +3943,52 @@ Date:
 >   in step 5, and the model runs the attack against it (ATK1: the read stays `Paper
 >   Trading`).
 >
-> **Five independent passes, eleven blocking defects against this ADR, none found by
-> the author** (3, 2, 3, 2 and 1, in the order above; B7, shared with ADR-016, is not
-> counted). *(Was "Four ... ten" until the fourth revision.)* That is the pattern this repository has recorded for every session that
+> - **The fifth revision (2026-09-25).** A fourth pass (named in the Status block)
+>   found two more blocking defects, again not found by the author, and both were
+>   liveness defects rather than grants of capital: rule 5 forbade the
+>   `human_authorization` that rule 3h's repairs and raising supersessions need
+>   (F4-3), and in the C3 shape no repair could unblock promotion (F4-1). The owner
+>   then ruled Part 28. Findings are written "F4-1" to "F4-10", as the pass wrote them.
+>
+>   | Finding or ruling | Resolved in | Rests on |
+>   |---|---|---|
+>   | F4-3 | rule 5 ("Keys that do not apply to an outcome"); ADR-016's "Changes this makes to ADR-015", new row; test 74 | 27d, 27g |
+>   | F4-1 | rule 3e ("Which stored versions count"); rule 3h step 6 (the repair review); rule 5 (the frontier, except a repair review); test 75. 3N2's "the read must agree" is unchanged | 25d, 27g |
+>   | F4-2 | rule 3h step 4a (every leaf whose ladder is a prefix of the tip's); rule 3g (a demoter's confidence at most `StageRead.confidence`); test 76 | 27b, 26c |
+>   | F4-4 | rule 3h steps 5 and 6 (a raise of confidence on a capital stage needs the verifier); test 77 | 28b |
+>   | F4-5 | rule 5 (the save rule: no predating); rule 4(f) (superseded downward reviews in the anchor); test 78 | 27a |
+>   | F4-6 | rule 4(f) ("A wrong date is repairable"); rule 3h step 6; test 79 | 28c |
+>   | F4-7 | rule 3g (the digest over sorted entries; checked on every `Idea` save and the first Append); test 81 | 27e |
+>   | F4-8 | rule 4(f) ("Both of the following must hold") | — |
+>   | F4-9 | rule 3h ("Cost, stated": at least eight versions); rule 4(f) (a visited set; 3N16's cost); test 83 | — |
+>   | F4-10 | rule 3h step 5 (the second case marked DRAFTER and tied to the rung at `k`); rule 5 ("What it cannot do"); test 80 | 28a |
+>   | 28a | rule 3h step 5; rule 3b (an upward review always needs the yes); test 80 | 28a |
+>   | 28b | rule 3h steps 5 and 6; test 77 | 28b |
+>   | 28c | rule 4(f); rule 5 (the one exception to no predating); test 79 | 28c |
+>   | 28d | rule 3g ("A Retired strategy may be re-registered"); test 82 | 28d |
+>   | 28e | Status block; Required Follow-Up ("Implementation"); tests 74-83 | 28e |
+>
+>   **How this revision was checked.** The fourth pass's own abstract model, extended
+>   with this revision's rules as worded. It is a scratch model written by the author,
+>   not in the repository and not an independent pass. Under the hypothetical bar of
+>   the fourth revision's check: a repair review carrying a yes is accepted by rule 5,
+>   and D and X1b are repaired to `Paper Trading` (F4-3); in the C3 shape a repair
+>   review about `v4` makes `v4` the frontier and the promotion from it saves, while
+>   the same promotion with a flag standing is still refused (F4-1, 3N2); the F4-2
+>   store reads `0.3`, and an honest demotion saves at `0.3` and is refused at `0.5`;
+>   a repair raising capital confidence is ignored on a declared yes and applied on a
+>   verified one (F4-4, 28b); a backdated superseding `Demote` is refused, and written
+>   by hand leaves the anchor at the genuine review's date (F4-5); a future-dated
+>   anchor moves to the correction's date only with a yes (28c); a hand-written
+>   `Promote` at a pending `Retire`'s position reads `Retired` unless it names it with
+>   a yes (28a). The honest path still works: X1's two `Demote` reviews, one naming the
+>   other, then a re-climb to `Production`, read `Production` with no flag. F4-7, F4-9
+>   and 28d are not in the model; tests 81-83 are argued from the text.
+>
+> **Six independent passes, thirteen blocking defects against this ADR, none found by
+> the author** (3, 2, 3, 2, 1 and 2, in the order above; B7, shared with ADR-016, is
+> not counted). *(Was "Four ... ten" until the fourth revision, and "Five ... eleven"
+> until the fifth.)* That is the pattern this repository has recorded for every session that
 > has attacked this ADR, and it is why the Required Follow-Up asks for another pass
 > rather than treating this revision as settled.
 
@@ -4160,8 +4233,14 @@ names what it supersedes, and that an older stored downward review stops applyin
 its position or a later one is backed by a resolving review, is RULED (27d); that the
 bar on reuse after a demotion follows a strategy across identifiers is RULED (27e);
 that reading a capital stage verifies the whole chain is RULED (27f); that a repair
-raising the read needs a recorded human yes is RULED (27g). Every mechanism for them is
-DRAFTER. Everything else in rule 3 is DRAFTER.
+raising the read needs a recorded human yes is RULED (27g). *(Added in the fifth
+revision:)* that a hand-written upward step cannot cancel a pending genuine demotion
+or retirement, and the review at that position must name it and carry a recorded
+human yes, is RULED (28a); that a repair or supersession raising a funded strategy's
+confidence needs 26f's verifier is RULED (28b); that a wrong demotion date is
+repairable with a human's approval is RULED (28c); that a Retired strategy may be
+re-registered and climb again is RULED (28d). Every mechanism for them is DRAFTER.
+Everything else in rule 3 is DRAFTER.
 
 **3.0 — the repository validates, and the scope is not the forger's to choose.**
 
@@ -4329,7 +4408,7 @@ returns `version` equal to `P`'s version and `stage` equal to `P`'s stage, **wit
 repairs outstanding** (rule 3h step 6). One exception, and only one. A stored downward
 review that the new rung's review names in `supersedes` (rule 5, 27d) is left out of
 that read, provided the new review may supersede it under rule 3h step 5, including
-the recorded human yes a raise needs (27g). Without this rule, `save()` accepted a
+the recorded human yes a raise needs (27g), which an upward review always needs (28a). Without this rule, `save()` accepted a
 promotion out of `Micro Capital` while the read, lowered by a stored `Demote`, said
 `Paper Trading` (the pass's X3). The promotion then climbed from a stage the strategy
 did not hold. **The cost:** while a flag stands, no promotion saves, so a flag a
@@ -4507,7 +4586,12 @@ the second of those outright.**
 its integrity hash verifies, it is `ArtifactType.STRATEGY`, it passes
 `ArtifactValidator` (which includes rule 2), **and it passes rule 3c** — a version
 with an empty ladder passes 3c trivially. A version that fails is **skipped and
-reported, never raised on**, as in rule 3a.
+reported, never raised on**, as in rule 3a. **A version that a repair review sets
+aside (rule 3h step 6) does not count either** (DRAFTER; fourth-pass finding F4-1).
+Without this, a repair changed the read but not the frontier: in the C3 shape (rule
+3h, "Why the base must end upward") the demoting `v6` passes 3c and stays the frontier,
+so a promotion from `v4` was refused as off the frontier, and one from `v6` because
+the read disagreed. The only way out was a new identifier.
 
 **This replaces the previous revision's first clause, which counted a version whose
 last rung was downward without rule 3c.** That clause was the drafter's mechanism
@@ -4646,8 +4730,13 @@ predecessor, and rule 3h step 4a catches what one level cannot.)*
   re-checks it on read (one more read). On every other Revision the key is absent.
 - **On an Append**, the rung's own review must record `resulting_confidence` equal
   to the new `confidence` and carry ADR-016 rule 9's `human_authorization`. **A
-  demotion is never blocked by this:** the person demoting leaves `confidence`
-  unchanged, and then no authorization is asked for (25d). A later Revision can
+  demotion is never blocked by this:** the person demoting sets `confidence` to **at
+  most `StageRead.confidence`** (`None` when the read raises), and at or below it no
+  authorization is asked for (25d). `save()` refuses a downward Append whose
+  `confidence` is above it (DRAFTER; fourth-pass finding F4-2). *(Was "leaves
+  `confidence` unchanged". A demotion appended to an older frontier sibling that
+  copied that sibling's confidence was then refused as a confidence change, and one
+  written by hand undid a decrease a person had authorized.)* A later Revision can
   lower it with a human yes.
 
 Below the capital stages a Revision may change `confidence` freely (DRAFTER). Today
@@ -4680,16 +4769,34 @@ identifier cannot reset the count of variants tried.
 after a demotion follows a strategy across identifiers, including a re-registered
 unchanged specification."** Third-pass finding 3N6. DRAFTER, the mechanism. A
 **specification digest** is `canonical_digest` over the specification's `content`
-entries, meaning every entry except `ladder` and `confidence_review`. Two identifiers
-carrying the same rules therefore have the same digest whatever their titles. `save()` of a new identifier at `Idea` refuses it
-when a stored STRATEGY of another identifier has the same digest, unless its `Derived
-From` edge names that identifier. It needs a store index by digest, derived from the
+entries, meaning every entry except `ladder` and `confidence_review`, **sorted by
+key**, and by each value's canonical encoding where a key repeats. Two identifiers
+carrying the same rules therefore have the same digest whatever their titles and
+whatever order their entries are in. `save()` of **every version at `Idea`**, a birth
+or an `Idea`-stage revision, **and of the first Append** refuses it when a stored
+STRATEGY of another identifier has the same digest, unless its `Derived From` edge
+names that identifier. *(Changed in the fifth revision, fourth-pass finding F4-7:
+`canonical_digest` of the same pairs in another order differs, so reordering
+`content` evaded the check; and a check at birth alone let a new identifier be born
+with other rules and revised back to the original's at `Idea`.)* It needs a store index by digest, derived from the
 store in the same way as the subject index (rule 3h), and a full scan until one exists.
 Rule 4(f) and ADR-016 rule 6 follow `Derived From`, so the demotion bar and the variant
 count follow the strategy to its new identifier. **What this cannot stop, stated:** a
 copy with any `content` entry changed has another digest. Under 25c it is then a
 different specification, a new strategy with a new count. An exact digest catches only
 an unchanged re-registration, which is what 27e names.
+
+**A Retired strategy may be re-registered and climb again — RULED (28d): "A Retired
+strategy may be re-registered and climb again, carrying its lineage (27e) and every
+bar that follows it. The ADRs say so."** DRAFTER, the mechanism, which is the one
+above. `Retired` has no successor under its own identifier (rule 3d), so the
+specification is saved as a new identifier at `Idea` whose `Derived From` edge names
+the retired one; with the specification unchanged, the digest rule requires the edge.
+The new identifier climbs from `Idea` with its own reviews and evidence, and carries
+every bar that follows lineage: rule 4(f)'s anchor, in which the retiring rung is a
+resolving downward rung, so every climb into `Promotion Review` or above needs paper
+or live evidence gathered after the retirement (27a, 27e); and ADR-016 rule 6 check
+5's count of variants tried.
 
 **3h — the current-stage read: fail toward less capital**
 
@@ -4759,7 +4866,16 @@ every one of them names an `RPT` identifier.)* The read:
    condition. Otherwise it is **the lowest confidence among those versions**, with
    `None` lowest of all. So a Revision that raised confidence on a capital stage
    without a recorded yes cannot supply the read's confidence, even from under an
-   unchanged Revision on top of it (the pass's X5).
+   unchanged Revision on top of it (the pass's X5). **It is then lowered to the
+   lowest `confidence` of every leaf version whose ladder is a prefix of the tip's**
+   (DRAFTER; fourth-pass finding F4-2). A leaf is a readable version, not set aside,
+   that no readable version names as its predecessor; the tip is one. Without this,
+   an authorized decrease to `0.3` at `7.1.0` was undone by a hand-written downward
+   Append of the older sibling `7.0.0` that copied its `0.5`: the Append's ladder is
+   longer, so `7.1.0` was not a tip, and the read was `0.5`, unflagged. **The cost,
+   stated:** a leaf left by an honest Revision that lowered an older sibling (rule 3b
+   condition 2 allows it) keeps capping the read's confidence after later climbs,
+   until a repair review sets it aside (step 6). That errs toward less capital.
 5. **Stored downward reviews lower the read too — second-pass finding 2N2.** Through
    the subject index (below), take every stored REVIEW whose `subject_id` is this
    identifier that passes integrity, whose outcome is `Demote` or `Retire`, and whose
@@ -4775,10 +4891,17 @@ every one of them names an `RPT` identifier.)* The read:
 
    - **It is in the history.** The tip's ladder carries that review as its rung at
      position `k`.
-   - **A later established climb backs its position.** The tip's base (step 3) has a
-     ladder longer than `k`. That is an upward rung at position `k` or later which
-     the read established with every check rule 3c makes, and on a capital stage
-     with the whole chain (27f).
+   - **A later established climb backs its position — only through the review at
+     that position.** The tip's base (step 3) has a ladder longer than `k`, **and the
+     tip's rung at position `k` supersedes the stored review by name**, as the third
+     case defines. An established climb after a rung that does not name it backs
+     nothing. **RULED (28a): "A hand-written upward step cannot cancel a pending
+     genuine demotion or retirement, at any stage. The review at that position must
+     name it in `supersedes` and carry a recorded human yes (25f, 27g)."** Fourth-pass
+     finding F4-10. *(The fourth revision's wording, the base's ladder longer than `k`
+     and nothing more, was the drafter's narrowing of 27d and is DRAFTER, not RULED.
+     It let an upward rung written by hand, which skips rule 5's save rule, cancel a
+     pending `Demote` or `Retire` below the capital stages with no yes.)*
    - **It is superseded by name — RULED (27d): "When two downward reviews, or a
      downward and a Promote, exist about the same version, the later review must
      name the one it supersedes. Once a position, or any later one, is backed by a
@@ -4786,12 +4909,19 @@ every one of them names an `RPT` identifier.)* The read:
      Third-pass finding 3N1. A review names it in `supersedes` (rule 5), and that
      review is either **the tip's rung at position `k`**, resolving as rule 3b
      condition 5 defines; or **a repair review** (step 6) about a readable version
-     whose ladder is a prefix of the tip's and at least `k` long. **If setting the
-     stored review aside raises the read** — the stage read before this step is above
-     its `resulting_stage` — **the naming review must carry ADR-016 rule 9's
-     `human_authorization`, and on a capital stage it must also pass 26f's verifier**
-     (RULED 27g: "Raising a stage is a capital decision"). Otherwise the stored review
-     still applies.
+     whose ladder is a prefix of the tip's and at least `k` long. **If the naming
+     decision raises** — for the tip's rung at `k`, its `resulting_stage` is above
+     the stored review's, which an upward rung's always is (28a) and a milder
+     `Demote`'s is; for a repair review, setting the stored review aside raises the
+     read — **the naming review must carry ADR-016 rule 9's `human_authorization`,
+     and when the stage it raises to is a capital stage it must also pass 26f's
+     verifier** (RULED 27g: "Raising a stage is a capital decision"; 28a). A
+     supersession that raises the read's confidence on a capital stage needs the same
+     verified yes (RULED 28b). Otherwise the stored review still applies. *(Changed in
+     the fifth revision. The tip's rung was tested against the stage read before this
+     step. With the second case tied to the rung at `k`, that test would ask a verified
+     yes, after every later climb, of an honest `Demote` that named a milder one (X1).
+     The rung is now tested against the decision it replaced, at its own position.)*
 
    **Why "backed" is read this way, found while drafting.** The first wording
    followed the pass: "a resolving review at position `k` or later". Anyone can write
@@ -4801,7 +4931,8 @@ every one of them names an `RPT` identifier.)* The read:
    → Micro Capital`, both with resolving reviews. The second rung is "a later
    position", and the read would rise to `Micro Capital`. So a later position backs
    the stored review only through an *upward* rung the read established, which is
-   the second case. A downward rung never raises anything. The model runs this as
+   the second case, and since 28a only when the review at position `k` names it. A
+   downward rung never raises anything. The model runs this as
    ATK1: the read stays `Paper Trading`, flagged.
 
    **What the three cases give the honest histories (executed in the scratch models,
@@ -4852,14 +4983,22 @@ every one of them names an `RPT` identifier.)* The read:
      A downward rung raises nothing. An upward one is a promotion, with every check a
      promotion has, including rule 9 on the capital rungs;
    - **a repair review.** This is a `Remain Current Stage` REVIEW about a readable
-     version of the identifier, the one the strategy is to stand at. It names in
-     `supersedes` the stored versions or stored downward reviews it sets aside, and it
-     carries ADR-016 rule 9's `human_authorization`, as every raise must. The read
-     leaves out each named version (step 1) and each named review (step 5). **If the
-     read with the repair is a capital stage above the read without it, the
-     authorization must also pass 26f's verifier**; until then such a repair review
-     is ignored, and the read stays where it was. Its evidence is the record of the
-     check that justified it (the next paragraph);
+     version of the identifier, the one the strategy is to stand at. **That version
+     need not be at the frontier** (rule 5; fourth-pass finding F4-1): the frontier
+     may be what the repair corrects. It names in `supersedes` the stored versions or
+     stored downward reviews it sets aside, and it carries ADR-016 rule 9's
+     `human_authorization`, as every raise must. The read leaves out each named
+     version (step 1) and each named review (step 5), and **rule 3e does not count a
+     named version** (F4-1). It may also name the review of a resolving downward rung
+     whose date is wrong, which re-anchors rule 4(f) and changes no stage (28c; rule
+     4(f)). **If the read with the repair is a capital stage above the read without
+     it, or is a capital stage whose confidence is above the read's without it, the
+     authorization must also pass 26f's verifier** (27g; RULED 28b: "A repair or
+     supersession that raises a funded strategy's confidence needs the verified human
+     yes of 26f, like any other confidence change on a capital stage (26c)";
+     fourth-pass finding F4-4); until then such a repair review is ignored, and the
+     read stays where it was. Its evidence is the record of the check that justified
+     it (the next paragraph);
    - **restoring a deleted file from git history**, which is not a Belay operation.
 
    **Removing a file from the store is no longer a repair.** The previous revision
@@ -4978,8 +5117,10 @@ each version the walk tries — one in the honest case, two when the tip is an h
 demotion — and reads the stored downward reviews of this identifier through the
 index. 25d, 26a and 26e are the later rulings; the growth is stated here so the owner
 can see it against 9e(iii). **On a capital stage it now does more (27f):** rule 3c's
-reads on every version back to `Idea`, which for a strategy at `Production` is eight
-versions, seven reviews and every report those reviews bind. It also reads the repair
+reads on every version back to `Idea`, which for a strategy at `Production` is at
+least eight versions and seven reviews, and more for every Revision and every
+demotion and re-climb in its history, plus every report those reviews bind
+(fourth-pass nit F4-9: "eight" was a minimum). It also reads the repair
 reviews through the same index. The read already lists every stored version of the
 identifier (step 1), so 27f adds reads in proportion to the length of one strategy's
 history, never to the size of the store. *(Added in the fourth revision; third-pass
@@ -5072,16 +5213,45 @@ already does for its own 2026-07-28 correction.
   bars evidence (second-pass finding 2N4). **The anchor is the latest `created` date
   among the reviews of every resolving downward rung** in the ladder, not only rung
   `d`'s (third-pass nit 3N17). Each date is fixed by its rung's integrity hash when
-  the rung was appended.
+  the rung was appended. **Superseded downward reviews count too** (DRAFTER;
+  fourth-pass finding F4-5): so does the `created` of every stored `Demote` or
+  `Retire` review that the review of one of those rungs names in `supersedes`.
+  Without it, a second `Demote` could name a pending genuine one, carry an earlier
+  `created`, and be appended; the anchor moved back to the earlier date, and paper
+  data from between the two counted, up to `Promotion Review`. Rule 5 also refuses,
+  on `save()`, a review that predates one it supersedes.
+
+  **A wrong date is repairable — RULED (28c): "A mistaken or future-dated demotion
+  date must not ban a strategy and its descendants permanently. A correction of the
+  date, approved by a human, is allowed."** Fourth-pass finding F4-6. DRAFTER, the
+  mechanism. A repair review (rule 3h step 6), which carries rule 9's
+  `human_authorization`, may name in `supersedes` any review whose date is in the
+  anchor. **Where it does, the repair review's own `created` replaces that review's
+  date in the anchor.** Naming a review that the ladder carries sets no rung aside
+  and changes no stage; it only re-anchors. So a correction moves the anchor to when
+  the correction was made. Paper or live evidence gathered after the correction
+  qualifies, and evidence from between a mistaken date and the correction does not,
+  which errs toward less capital. Descendants read an ancestor's anchor the same way,
+  so the correction reaches them. **The residual, stated:** the correcting review's
+  `created` is declared like every date here, so a correction backdated to before
+  the real demotion lets earlier paper data count, as a backdated demotion does (the
+  declared-date residual below). A climb into a capital rung still needs its own
+  verified yes (26f).
 
   **The bar follows lineage (27e).** For each identifier in the strategy's `Derived
   From` ancestry, the ladder is the one that identifier's current-stage read returns,
-  as for ADR-016 rule 6 check 5. Its resolving downward rungs add to the anchor, and
-  the records on their reviews add to the first check below. **If an ancestor's read
-  raises, the promotion is refused**, because its demotions cannot be established
-  (the same rule as ADR-016 rule 6, third-pass nit 3N16). Rule 3g's specification
-  digest makes an unchanged re-registration name its original, so the ancestry
-  cannot simply be left out.
+  as for ADR-016 rule 6 check 5. The ancestry is walked with a visited set: each
+  identifier is read once, and an edge to one already visited ends that branch, so a
+  cycle of `Derived From` edges cannot loop (fourth-pass nit F4-9). Its resolving
+  downward rungs add to the anchor, and the records on their reviews add to the first
+  check below. **If an ancestor's read raises, the promotion is refused**, because its
+  demotions cannot be established (the same rule as ADR-016 rule 6, third-pass nit
+  3N16). **The cost, stated (F4-9):** one forged file under an ancestor, whose
+  `parent_hash` names nothing, makes that ancestor's read raise (rule 3h, `NO_BASE`),
+  and every descendant's climb into `Promotion Review` or above is then refused until
+  a person sets the file aside with a repair review about the ancestor. Rule 3g's
+  specification digest makes an unchanged re-registration name its original, so the
+  ancestry cannot simply be left out.
 
   **Which promotions are a climb back.** Every upward rung into `Promotion Review` or
   above that comes after rung `d` in the subject's ladder. For an inherited anchor,
@@ -5099,14 +5269,15 @@ already does for its own 2026-07-28 correction.
     because ADR-016 rule 3 check 8 fixes it from the module that wrote it. It must
     also have been gathered after the demotion, as below.
 
-  **How "after the demotion" is established.** Two ways, one for when the report was
-  written and one for its data:
+  **How "after the demotion" is established.** Both of the following must hold, one
+  for when the report was written and one for its data (fourth-pass nit F4-8: this
+  said "Two ways", which read as either one):
   - **By the hash chain, for when the report was written.** The report's
     `subject_integrity_hash` names a stored version of this identifier whose ladder
     carries rung `d`. That version commits through its rung to the demotion review's
     hash, so it could only exist after the demotion was recorded. A report that names
     it can only be later still. No date is trusted here. For an inherited anchor
-    this identifier has no rung `d`, so only the second way applies.
+    this identifier has no rung `d`, so only the second applies.
   - **By its dates, for the data.** The report's `sample_period_start` is after the
     anchor, and its `sample_period_end` is **no later than the report's own
     `created`** (third-pass finding 3N5: a window that ends after the report was made
@@ -5126,7 +5297,8 @@ already does for its own 2026-07-28 correction.
   closed until one does, and when one does, it is the module that closes this
   residual. A demoter who backdates their review's `created` moves the anchor earlier
   and lets paper data from between the two dates count. One who post-dates it bars
-  more than 27a requires, which is a denial of capital, not a grant.
+  more than 27a requires, which is a denial of capital, not a grant, and a person
+  corrects it with a re-anchoring repair review (28c, above).
 
   **Backtests may reuse history (27a).** Nothing in this rule compares a backtest's
   data window with the demotion. A climb back rests on a backtest over the same ten
@@ -5334,11 +5506,16 @@ integrity_hash)`, empty when the review supersedes nothing, present on every out
   stored `Promote`, `Demote` or `Retire` review about that version exists, at least
   one of the two is downward, and this review's `supersedes` does not name it. Two
   `Promote` reviews of one version are not covered by 27d, and only one of them can be
-  appended. Each named review must resolve and be about this identifier.
+  appended. Each named review must resolve and be about this identifier. **A review
+  may not predate a review it supersedes:** `save()` refuses one whose `created` is
+  earlier than that of any review it names (DRAFTER; fourth-pass finding F4-5). A
+  repair review re-anchoring a wrong date is the one exception, because moving the
+  date is its purpose (rule 4(f), 28c).
 - **What it does.** Rule 3h step 5 stops applying a stored downward review that the
-  tip's rung at its position names, or that a repair review names. When setting the
-  review aside raises the read, the naming review must carry rule 9's
-  `human_authorization`, and on a capital stage 26f's verifier must pass it (27g). A
+  tip's rung at its position names, or that a repair review names. When the naming
+  decision raises (rule 3h step 5), the naming review must carry rule 9's
+  `human_authorization`, and on a capital stage 26f's verifier must pass it (27g,
+  28a, 28b). A
   `Remain Current Stage` review whose `supersedes` is not empty is a **repair review**
   (rule 3h step 6). It may also name stored STRATEGY versions of its subject's
   identifier, which the read then leaves out.
@@ -5347,18 +5524,29 @@ integrity_hash)`, empty when the review supersedes nothing, present on every out
   at the frontier (rule 5's reconcile, with rule 3b condition 2), so a stored review
   about position `k` predates every rung above `k`. A review written by hand skips
   `save()`. If it is downward it can only lower the read and is flagged, and a
-  person repairs it.
+  person repairs it. If it is upward it cancels no stored downward review unless it
+  names that review and carries a recorded human yes, verified on a capital stage
+  (rule 3h step 5, RULED 28a). *(Fourth-pass nit F4-10: before 28a this sentence did
+  not hold for a hand-written upward rung the read established.)*
 
 **Keys that do not apply to an outcome (DRAFTER; finding N3).** `review_fields()`
 requires every key in `FIELDS` to be present (`framework/artifacts/review.py:193-199`),
 so an outcome-specific key is always there. **Where it does not apply it holds
 `None`, and the validator refuses any other value**: `variants_tried` on anything
 but a `Promote`; `criterion_evidence` on anything but an upward move into a capital
-rung; `human_authorization` on anything but an upward move into a capital rung or a
-review that authorizes a confidence change on a capital stage (rule 3g, 26c);
+rung; `human_authorization` on anything but an upward move into a capital rung, a
+review that authorizes a confidence change on a capital stage (rule 3g, 26c), or a
+review whose `supersedes` is not empty, which covers every repair review and every
+supersession that raises the read (rule 3h steps 5 and 6; 27d, 27g, 28a, 28b);
 `evidence_reports` and `reports_considered` on anything but an upward move into
 `Paper Trading` or above. `supersedes` is never `None`: it is the empty tuple when
-nothing is superseded. A key that carries a value nothing checks would read
+nothing is superseded. *(Fourth-pass finding F4-3: the list of where
+`human_authorization` may be set left out supersessions and repair reviews, so the
+validator refused the authorization that rule 3h step 5 and step 6 require, and
+every repair and every raising supersession was refused. Whether a supersession
+raises depends on the store, which the validator cannot read, so the validator
+allows the key on any review that names something, and rule 3h decides whether it
+is required.)* A key that carries a value nothing checks would read
 as evidence while being none. `resizing_note` keeps its present meaning (ADR-004's
 re-sizing prose, `None` where there is none).
 
@@ -5383,7 +5571,10 @@ REVIEW the repository resolves `subject_id` at `subject_version` and requires th
 stored artifact's `integrity_hash` to equal `subject_integrity_hash`, its
 `strategy_stage` to equal `stage_at_review`, and its ladder length to equal
 `subject_ladder_length`. **It also requires the subject to be at the frontier** (rule
-3e; DRAFTER, added in the fourth revision). A review of a version the history has
+3e; DRAFTER, added in the fourth revision), **except for a repair review** (rule 3h
+step 6), whose subject need only be readable and not among the versions it sets
+aside (DRAFTER; fourth-pass finding F4-1: a repair may be correcting the frontier
+itself, as in the C3 shape). A review of a version the history has
 already moved past records a decision nobody can append. This rule is what orders
 stored reviews by position for `supersedes` (above). For a `Demote` or `Retire` the
 subject is counted as rule 3b's downward append counts `P`: on integrity and the
@@ -5841,6 +6032,66 @@ all.*
     honest ladder: the read raises, `NO_BASE`, and the test's docstring says this is
     a denial of capital that a repair review clears.
 
+*The fourth pass (F4-1 to F4-10) and Part 28. Tests 74-80 were run in the fifth
+revision's scratch model (revision history); 81-83 are argued from the text. The capital scenarios run under the same
+hypothetical bar as tests 61-73, and each test's docstring says so. 28e makes each of
+these, and every attack before it, a test that must fail against the code before the
+code is written.*
+
+74. **F4-3.** A repair review carrying rule 9's `human_authorization` passes the
+    validator, and so does a `Demote` that names a stored `Retire` and carries one. A
+    `Remain Current Stage` review that names nothing and carries one is refused,
+    naming rule 5. Then test 58's store (model D) and test 62's (X1b): the repair
+    review saves, the read is `Paper Trading` with no flag, and the honest promotion
+    saves. The test fails if `human_authorization` is dropped from rule 5's list for
+    reviews that name something: tests 62, 63 and 71 then cannot pass either.
+75. **F4-1, the C3 repair.** Test 55's store. A promotion from `v4` is refused as off
+    the frontier, and one from `v6` because the read disagrees (3N2). A repair review
+    about `v4`, which is not at the frontier, naming `v5` and `v6` and carrying a
+    recorded yes, saves. Then `v6` is not counted, `v4` is the frontier, the read is
+    `Paper Trading` from `v4` with no flag, and the promotion from `v4` saves. The
+    same store with the flag left standing: `v4` at the frontier is not enough, and
+    the promotion is refused naming the read (3N2 kept).
+76. **F4-2.** An authorized decrease from `0.5` to `0.3` at `7.1.0` on `Limited
+    Capital`; a hand-written downward Append of `7.0.0` that copies `0.5`. The read's
+    confidence is `0.3`; under the fourth revision it was `0.5`, unflagged. Through
+    `save()`, that demotion is refused naming `StageRead.confidence`, and the same
+    demotion at `0.3` saves with no authorization.
+77. **28b, F4-4.** The same decrease; a repair review naming `7.1.0`, which would raise
+    the read's confidence to `0.5` on `Limited Capital`. With a declared yes only it
+    is ignored and the confidence stays `0.3`; with a yes that passes the test
+    verifier the confidence is `0.5`.
+78. **F4-5.** A pending `Demote` of a version at `Promotion Review` dated day 200; a
+    second `Demote` naming it and dated day 150 is refused by `save()`, naming the
+    review it predates. Written by hand and appended, the anchor is day 200, not
+    150.
+79. **28c, F4-6.** A demotion whose review is dated in the future. The anchor is that
+    date, and a climb back binding paper evidence from after today's correction is
+    refused. A repair review naming the demotion review without a yes changes
+    nothing; with a yes, the anchor is the repair review's `created`, the read's stage
+    is unchanged, and the climb back saves. A descendant's anchor moves with it.
+80. **28a, F4-10.** A pending `Retire` of a version at `Paper Trading`; an upward rung
+    to `Promotion Review` at that position, written by hand with a resolving review
+    that does not name the `Retire`. The read is `Retired`, flagged
+    `STORED_DEMOTION_NOT_IN_LADDER`; under the fourth revision it was `Promotion
+    Review`. Naming it without a yes: still `Retired`. With a yes: `Promotion Review`.
+    The same at a capital stage needs a yes that passes the verifier.
+81. **F4-7.** A new identifier at `Idea` whose `content` holds the same entries as a
+    stored strategy's in another order is refused, naming that identifier. So is a
+    new identifier born with other rules and revised at `Idea` back to the original's,
+    and a first Append from a hand-written `Idea` version carrying the original's.
+82. **28d.** A strategy retired from `Paper Trading`, and its unchanged specification
+    re-registered as a new identifier whose `Derived From` names it. It saves at
+    `Idea` and climbs. Its climb into `Promotion Review` is refused without paper
+    evidence gathered after the `Retire`'s date, and a `Promote` whose
+    `variants_tried` is below the retired identifier's value is refused (ADR-016 rule
+    6 check 5).
+83. **F4-9.** Two identifiers whose `Derived From` edges name each other: the ancestry
+    walk ends, and each is read once. One forged file with a `parent_hash` naming
+    nothing under an ancestor: a descendant's climb into `Promotion Review` is
+    refused naming 3N16, and saves once a repair review about the ancestor sets the
+    file aside.
+
 ---
 
 ## Consequences
@@ -6156,15 +6407,27 @@ in favour of declare-and-reconcile — rule 5.
   regression check"; nothing on GitHub records such a check. #15, #17 and #18 have
   no reviews, and the second review posted on PR #7 on 2026-09-22 found none. What
   is evidenced is CI, and that later review.)*
-- **Parts 25, 26 and 27 on `main`.** The owner's 25a-25j, 26a-26f and 27a-27g are
+- **Implementation — RULED (28e): "The current-stage read is then built as code.
+  Every attack from the falsification passes on Issue #21 becomes a test that must
+  fail, and the ADRs describe what the code does."** This revision is 28e's final
+  text round. Next, rule 3h's current-stage read, with what it depends on, is built
+  as code. Every attack from the Issue #21 passes (the first pass's B1-B3, the second's
+  models A to F, the third's X1-X6, ATK1 and ATK2, and the fourth's F4-1 to F4-10) is
+  written first as a test that fails by design against the unchanged code, beside
+  tests 1-83. Where the code and this text then disagree, this ADR is conformed to
+  the code in a later change, and the disagreement is recorded. The code is
+  capital-path code: it lands through review like any other and opens no capital
+  rung, which stay closed by their unruled constants (28, "What it does not settle")
+- **Parts 25-28 on `main`.** The owner's 25a-25j, 26a-26f, 27a-27g and 28a-28e are
   recorded on branch `claude/kind-knuth-9g7xlr` and not yet merged. Rules here that
-  cite 25x, 26x or 27x rest on that record
+  cite 25x, 26x, 27x or 28x rest on that record
 - **ratify or amend**, after ADR-016 is revised and a fresh independent pass has
   tried to break both
 - **a fresh independent pass, BEFORE implementation, on this ADR and ADR-016
-  together.** The owner's chosen different-AI pass on Issue #21 is still owed. Four
-  passes have now found ten blocking defects in this ADR, in drafts whose citations
-  and measurements were each time correct —
+  together.** The owner's chosen different-AI pass on Issue #21 is still owed. *(28e
+  now has it run in parallel with the code, on the current text.)* Six passes have
+  now found thirteen blocking defects in this ADR, in drafts whose citations and
+  measurements were each time correct —
   which is the standing lesson that verifying an ADR's *facts* is not attacking its
   *rules*. ADR-014's Status block records what happened when the ordering was reversed:
   19 defect-grade errors across 93 claims, eight in committed code
@@ -6261,6 +6524,23 @@ rulings:**
 17. The specification digest over `content` only, and refusing an unnamed duplicate
     (rule 3g, 27e).
 18. A review's subject must be at the frontier (rule 5).
+19. *(Items 19-25 added in the fifth revision.)* A version a repair review sets
+    aside does not count toward the frontier, and a repair review's subject need not
+    be at the frontier (rules 3e and 5, F4-1).
+20. The read's confidence lowered to that of every leaf whose ladder is a prefix of
+    the tip's, with its stated cost, and a demoter's confidence at most
+    `StageRead.confidence` (rules 3h step 4a and 3g, F4-2).
+21. `human_authorization` allowed on any review whose `supersedes` is not empty, with
+    rule 3h deciding whether it is required (rule 5, F4-3).
+22. Superseded downward reviews counted in the anchor, and no review predating one it
+    supersedes (rules 4(f) and 5, F4-5).
+23. 28c's mechanism: a repair review naming a review whose date is in the anchor
+    replaces that date with its own `created` (rule 4(f)).
+24. The specification digest over entries sorted by key, checked on every `Idea`
+    save and on the first Append (rule 3g, F4-7).
+25. 28a's mechanism: step 5's second case needs the rung at position `k` to name the
+    stored review, and that rung is tested against the decision it replaced (rule 3h
+    step 5).
 
 **What happens to a strategy whose authorizing review is later found to be wrong.**
 Owner selection 6 settles the *direction* — correction is forward, by appending a
