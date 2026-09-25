@@ -2919,3 +2919,43 @@ files before then"), which is recorded in `docs/HANDOFF.md` on #20's branch.
 **Phase 2 is not settled.** That is the same split for `docs/DECISIONS.md`,
 this file, `docs/OperatorChecklist.md` and `CHANGELOG.md`. It waits until #7,
 #20 and #31 have landed, and it comes back to the owner as its own questions.
+
+---
+
+# Part 30 — Ruled 2026-09-25: contributors help; they never gate
+
+**Stated, not asked.** While this session was getting the open pull requests
+ready, the owner said: **"leave nothing for [the second contributor]"**, and
+then: **"contributors help where/when we cant. never need them for review,
+this was a solo project before and should be able to continue as such with
+help from others".** (Family wording is redacted as in Part 11a.)
+
+### What it settles
+
+- **30a. No contributor's review or approval is ever required for work to
+  land.** The owner, or a session acting on the owner's explicit word, may
+  land work alone. Contributors help where and when the owner cannot.
+- **30b. The independent pass stays** (`AGENTS.md`, "How work is claimed and
+  landed", point 4). A fresh session told to falsify the work satisfies it. A
+  pass by a different AI is welcome, never a gate. This covers Issue #21's
+  different-AI pass, which is no longer something the evidence bar waits on.
+- **30c. Part 20 is not adopted.** Part 20 is recorded only on #22's branch,
+  never on `main`. It required a second review for every merge and removed the
+  Owner bypass. The bypass stays as the solo merge path, and #22 is closed as
+  superseded.
+
+### Session readings, not the owner's words
+
+- **Issue #16 is moot.** It asked how to restore an enforced second review
+  once both contributors were organization Owners. Under 30a no second review
+  is wanted. The second contributor's permissions are unchanged: Part 17
+  stands.
+- **`.github/CODEOWNERS` is unchanged.** On `main` it already names only the
+  owner on the governance paths. The catch-all line naming both contributors
+  asks GitHub for a code-owner review, which the Owner bypass satisfies.
+
+### What it does not settle
+
+- Whether the rulesets should stop asking for a review at all, rather than
+  having it bypassed each time. That is a repository setting, and only the
+  owner changes those.

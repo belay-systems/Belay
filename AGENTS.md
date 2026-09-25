@@ -447,6 +447,9 @@ current state and the history, and the history buried the state.
   F-number, or a Part or ADR number. Never cite `docs/NOW.md` or
   `docs/FINDINGS.md` by line number, because both are rewritten. The line
   citations into the frozen archive stay valid, because it never changes.
+- **The archive is corrected by a later record, never edited.** A session that
+  finds something wrong in `docs/HANDOFF.md` writes the correction in its own
+  `docs/sessions/` record and names the lines it corrects.
 - **A test holds each rule** (`tests/test_handoff_files.py`). In this repository
   a convention alone has not held (Issue #9).
 
@@ -454,3 +457,12 @@ current state and the history, and the history buried the state.
 `docs/OperatorChecklist.md` and `CHANGELOG.md` have the same shape. They are
 split the same way once the pull requests appending to them have landed. See
 `docs/proposals/growing-files.md`, phase 2. Until then, append to them as before.
+
+# Contributors help; they never gate
+
+The owner ruled this on 2026-09-25 (`docs/OwnerDecisions.md` Part 30). Belay
+was a solo project and must be able to continue as one. Other contributors
+help where and when the owner cannot. **No contributor's review or approval is
+ever required for work to land.** The independent pass in "How work is claimed
+and landed", point 4, is still required, and a fresh session told to falsify
+the work satisfies it. A pass by a different AI is welcome, never a gate.

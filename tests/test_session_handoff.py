@@ -122,9 +122,9 @@ def test_no_session_brief_is_orphaned():
 
     pointers = "".join(
         read(p)
-        for p in [HANDOFF, NOW, FINDINGS, CHECKLIST, REPO / "docs" / "OwnerDecisions.md"]
+        for p in [HANDOFF, NOW, CHECKLIST, REPO / "docs" / "OwnerDecisions.md"]
         if p.exists()
-    ) + "".join(read(p) for p in [*(REPO / "docs" / "proposals").glob("*.md"), *SESSIONS.glob("*.md")])
+    ) + "".join(read(p) for p in (REPO / "docs" / "proposals").glob("*.md"))
 
     orphans = sorted(b.name for b in briefs if b.name not in pointers)
     assert not orphans, (
@@ -163,8 +163,8 @@ def test_agents_md_still_requires_both_close_out_steps():
     """
     text = read(REPO / "AGENTS.md")
 
-    assert "docs/NOW.md at session close" in text and "docs/sessions/" in text, (
-        "AGENTS.md no longer requires rewriting docs/NOW.md and a docs/sessions/ record"
+    assert re.search(r"^13\. Rewrite docs/NOW\.md at session close\b.*docs/sessions/", text, re.M), (
+        "AGENTS.md step 13 no longer requires rewriting docs/NOW.md and a docs/sessions/ record"
     )
     assert "docs/OperatorChecklist.md" in text, (
         "AGENTS.md no longer requires recording owner-only actions in "

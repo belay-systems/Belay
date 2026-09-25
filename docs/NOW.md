@@ -20,8 +20,9 @@ Written 2026-09-25 against `origin/main` at `1c8eb1c`.
 - **`python scripts/status.py`:** exits 0, 41 open findings.
 - **ADRs on `main`:** 14 (`grep -c "^## ADR-" docs/DECISIONS.md`).
   ADR-015 (#7) and ADR-016 (#20) are drafts on branches, neither ratified.
-- **Owner rulings on `main`:** Parts 1-15, 18, 19 and 23. Parts 16-17, 20-22 and
-  24-28 are on open pull requests' branches. Part 29 is on this change's branch.
+- **Owner rulings on `main`:** Parts 1-15, 18, 19 and 23. Parts 16-17 (#14),
+  21 (#24), 22 (#20), 24-28 (#31) and 29-30 (#32) are on open pull requests.
+  Part 20 (#22) is not adopted (Part 30).
 - **Review gate:** `python scripts/review_due.py` gives the next finding
   number. On this commit, and on every branch, the highest number in use is
   F-030.
@@ -32,31 +33,32 @@ open pull requests and Issues on GitHub, `python -m pytest -q`,
 
 ## In flight
 
-As listed on GitHub at 2026-09-25. Each pull request's own description is the
-record of what it needs.
+As listed on GitHub at 2026-09-25. **No contributor's review is needed for any
+of these (Part 30).** Each one lands on the owner's word, through the Owner
+bypass.
 
-| PR | What | Waiting on |
+| PR | What | State |
 |---|---|---|
-| #7 | ADR-015: a strategy's stage is carried, not asserted (F-007, F-014) | Blocking findings F4-1 and F4-3 from the fourth pass on Issue #21, then the owner's questions |
-| #20 | ADR-016 draft (the evidence bar), Part 22, the ADR-012 amendment draft | ADR-015 first; the different-AI pass on Issue #21 |
-| #31 | Parts 24-28: `markdown-it-py`, and the evidence-bar principles | Second contributor's review |
-| #22 | Part 20: no one merges alone; removes the Owner bypass | Second contributor's review, then the owner's apply steps in `docs/OperatorChecklist.md` |
-| #24 | F-019: seven regression tests for guards on the capital path | Second contributor's review |
-| #14 | Records the second contributor's access (Parts 16-17) | Second contributor's review |
-| this one | Splits the handoff: this file, `docs/FINDINGS.md`, `docs/sessions/` (Part 29) | Owner review |
+| #32 | Splits the handoff: this file, `docs/FINDINGS.md`, `docs/sessions/` (Parts 29-30) | Independent pass done, findings fixed |
+| #14 | Records the second contributor's access (Parts 16-17) | Independent pass done, findings fixed |
+| #31 | Parts 24-28: `markdown-it-py`, and the evidence-bar principles | Independent pass done. Parts 25-28 are labeled where the record says more than the question put |
+| #24 | F-019: seven regression tests for guards on the capital path | Independent pass done, brought up to date with `main` |
+| #22 | Part 20: a second review for every merge | **Close as superseded** by Part 30 |
+| #7 | ADR-015: a strategy's stage is carried, not asserted (F-007, F-014) | The real work: item 2 below |
+| #20 | ADR-016 draft, Part 22, the ADR-012 amendment draft (`docs/proposals/ADR-016-evidence-bar-DRAFT.md`) | Waits on ADR-015 |
 
-**Merge conflicts to expect.** Every open branch that adds a Part appends to the
-end of `docs/OwnerDecisions.md`, so each one conflicts with the others there.
-Resolve by keeping both blocks, in Part order. #20 and #22 append to
-`docs/HANDOFF.md`, which is now frozen. After this change is on `main`, their
-appended text moves to a `docs/sessions/` record, and anything still current
-moves into this file. The freeze test says so when it fails.
+**Merge order**, rehearsed on a scratch copy of `main`: #14, #24, #31, #32.
+Each one after the first conflicts only at the end of
+`docs/OwnerDecisions.md`, because every one of them appends a Part there. Keep
+`main`'s text, then the branch's Part. After #32, a branch that still edits
+`docs/HANDOFF.md` fails the freeze test, and its message says where the text
+goes.
 
 ## Highest Priority Next Task
 
-1. **Owner, quick decisions.** Review this change, because it alters how every
-   session starts. Then #31, #14 and #22, which wait on the second
-   contributor's review.
+1. **Owner: say "merge" for #14, #24, #31 and #32, in that order, and "close"
+   for #22 and Issue #16** (moot under Part 30). A session does the merging
+   and records it.
 2. **Finish the evidence bar the way Part 28e rules** (on #31's branch):
    first, one final text round on #7 and #20. It fixes the fourth pass's two
    blocking findings (F4-3 and F4-1, Issue #21, 2026-09-25 01:28 UTC) and
@@ -68,24 +70,23 @@ moves into this file. The freeze test says so when it fails.
      the review findings, not from the code, so the author doesn't grade itself;
    - a fresh review then attacks the code;
    - the ADR text is updated to match what the code does;
-   - it opens as a draft pull request for the second contributor, on its own
-     branch (for example `claude/stage-read`), not on #31. It is not merged
-     until the owner ratifies the ADRs;
+   - it opens as a draft pull request on its own branch (for example
+     `claude/stage-read`), not on #31. It is not merged until the owner
+     ratifies the ADRs;
    - not in this first slice: the save-side checks, and ADR-016's evidence
      checks (report binding, the trial cap). Those follow once it is solid.
-3. **Issue #21: the different-AI pass is still owed** by the second
-   contributor, and runs in parallel (28e). Four same-provider passes do not
-   replace it. Its scope covers ADR-015, ADR-016 and the ADR-012 amendment
-   draft on #20.
-4. **#24 (F-019)**, once reviewed.
-5. **Small, when convenient:**
+3. **Before that text round, the owner confirms the labeled lines in Parts
+   25-28** (#31). The independent pass found wording there that goes beyond
+   the questions put. The recommendations the owner answered "aligned" to are
+   in the archived session "Belay threads status", not in this repository.
+4. **Small, when convenient:**
    - the gate items #29 left: `fullmatch` on report names, surviving an
      invalid date, and ASCII digits in `REPORT` (`scripts/review_due.py`);
    - a sentence in the review skill (owner-only) saying to write every finding
      number in full ASCII (`F-NNN`), because the gate cannot read other shapes;
    - phase 2 of the file split, for `docs/DECISIONS.md`,
-     `docs/OwnerDecisions.md`, `docs/OperatorChecklist.md` and `CHANGELOG.md`.
-     It waits until #7, #20 and #31 have landed (`docs/proposals/growing-files.md`).
+     `docs/OwnerDecisions.md`, `docs/OperatorChecklist.md` and `CHANGELOG.md`,
+     once #7, #20 and #31 have landed (`docs/proposals/growing-files.md`).
 
 ## Working Agreement
 

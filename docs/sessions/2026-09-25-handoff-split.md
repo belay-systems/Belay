@@ -68,8 +68,45 @@ its last message, the plan, into this session. The plan is carried into
   Citations into those regions (`:187-213` and `:198-199` of `status.py`,
   `:99` and `:116` of the dashboard tests) are in dated records, and they
   describe the code as it was.
-- An independent fresh-context pass ran before pushing. Its findings and what
-  was done about each are on the pull request.
+- **The independent pass on #32** found one blocking defect. This record had
+  written the gate's next number out in full, so the gate answered one higher
+  on every branch. It now says "the number after F-030", and the gate is back.
+  The pass also found eight defects, all fixed with a test that goes red on
+  the pass's own mutation:
+  - a register row could be deleted silently;
+  - a priority could drift from the archive;
+  - one test was vacuous;
+  - the Closed heading was not checked;
+  - the next-task heading check was too narrow;
+  - session records had no date or byte check;
+  - the citation scan read untracked files;
+  - a Part number was wrong.
+
+## The other open pull requests (owner: "leave nothing for [the second contributor]")
+
+Fresh-context falsification passes ran on #31, #24 and #14. The one on #22
+was stopped, because Part 30 supersedes it.
+- **#14:** nothing blocking. Four statements said more than their evidence;
+  17a labels them, and family wording is redacted as in Part 11a.
+- **#24:** every guard mutation and deletion turned exactly its own test red.
+  The missing hash-half test for `orphan_versions` is added, a misleading
+  comment is corrected, and `main` is merged in.
+- **#31:** the recommendations answered "aligned" in Parts 25-28 are not on
+  file. A notes block labels each line that goes beyond the record, for the
+  owner to confirm.
+- **#20:** its `docs/HANDOFF.md` appendix moved word for word to
+  `docs/sessions/2026-09-22-adr-016-and-sample-adequacy.md`.
+
+**Part 30** records the owner's rule that contributors help and never gate.
+
+## Corrections to the archive
+
+- `docs/HANDOFF.md:5768` and `:5842` list the `markdown-it-py` decision as
+  pending. It is ruled: Part 24, on #31.
+- Branch `claude/nice-fermat-pdyywp` (closed #28) appends 50 lines to the
+  archive. All 43 non-blank lines of it are already on `main`
+  (`git diff origin/main...origin/claude/nice-fermat-pdyywp`, with each line
+  checked against the archive). The branch is left in place.
 
 ## Open
 

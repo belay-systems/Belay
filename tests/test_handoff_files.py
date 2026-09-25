@@ -23,8 +23,10 @@ repository (Issue #9 is the measured case). So each one fails the build.
 
 from __future__ import annotations
 
+import datetime
 import hashlib
 import re
+import subprocess
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
@@ -41,7 +43,12 @@ FROZEN_HANDOFF_SHA256 = "ab73c9d3ad1669b414eb37d3100dab3eb15926abc7708ca1e4d81cb
 NOW_MAX_LINES = 200
 NOW_MAX_BYTES = 16_000
 SESSION_MAX_LINES = 300
-SESSION_NAME = re.compile(r"\d{4}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*\.md")
+SESSION_MAX_BYTES = 40_000
+SESSION_NAME = re.compile(r"(\d{4}-\d{2}-\d{2})-[a-z0-9]+(?:-[a-z0-9]+)*\.md")
+
+#: Any line that reads as a next-task heading: `#` of any level or a bold line,
+#: "task" or "tasks", spaces or hyphens between the words.
+NEXT_TASK_LINE = re.compile(r"^\s*(?:#+|\*\*)\s*highest[\s-]+priority[\s-]+next[\s-]+tasks?\b", re.I)
 
 
 def _lf_bytes(path: Path) -> bytes:
@@ -52,8 +59,9 @@ def test_the_archive_is_frozen():
     """`docs/HANDOFF.md` never changes again, so no citation into it moves.
 
     Two hundred and forty-one `path:line` citations point into this file and
-    its three large neighbours, many of them from review reports that may not
-    be edited. Freezing the archive is what keeps every one of them true.
+    its four large neighbours, many of them from review reports that may not
+    be edited. A correction to the archive is written in a later session
+    record that names the lines it corrects, never into the archive. Freezing the archive is what keeps every one of them true.
     """
     digest = hashlib.sha256(_lf_bytes(HANDOFF)).hexdigest()
     assert digest == FROZEN_HANDOFF_SHA256, (
@@ -84,9 +92,8 @@ def test_now_has_exactly_one_next_task_list():
     The archive ended with six next-task headings, and the rule for which one
     counted ("top-most") was the opposite of the practice ("bottom-most").
     """
-    headings = re.findall(
-        r"^#+\s*highest priority next task\b.*$", NOW.read_text(encoding="utf-8"), re.M | re.I
-    )
+    lines = NOW.read_text(encoding="utf-8").splitlines()
+    headings = [line.rstrip() for line in lines if NEXT_TASK_LINE.match(line)]
     assert headings == ["## Highest Priority Next Task"], (
         f"docs/NOW.md must have exactly one '## Highest Priority Next Task'; found {headings}. "
         "Replace the list at session close; do not add another below it."
@@ -103,15 +110,16 @@ def test_session_records_are_named_by_date_and_capped():
     """One file per session, found by date, and too short to become a monolith."""
     bad_names, too_long = [], []
     for path in sorted(SESSIONS.glob("*")):
-        if path.name == "README.md":
-            continue
-        if not SESSION_NAME.fullmatch(path.name):
+        match = SESSION_NAME.fullmatch(path.name)
+        if path.name != "README.md" and not (match and _is_date(match.group(1))):
             bad_names.append(path.name)
-        elif _lf_bytes(path).count(b"\n") > SESSION_MAX_LINES:
-            too_long.append(path.name)
+        elif path.is_file():
+            body = _lf_bytes(path)
+            if len(body.splitlines()) > SESSION_MAX_LINES or len(body) > SESSION_MAX_BYTES:
+                too_long.append(path.name)
     assert not bad_names, f"docs/sessions/ files must be named YYYY-MM-DD-short-name.md: {bad_names}"
     assert not too_long, (
-        f"session records over {SESSION_MAX_LINES} lines: {too_long}. Split the "
+        f"session records over {SESSION_MAX_LINES} lines or {SESSION_MAX_BYTES} bytes: {too_long}. Split the "
         "work, or put the long part in docs/proposals/."
     )
 
@@ -122,11 +130,30 @@ def test_nothing_cites_a_rewritten_file_by_line_number():
     Cite them by heading or by a finding's title instead. The pattern is built
     from pieces so this file does not match itself.
     """
-    pattern = re.compile(r"docs/(?:NOW|FINDINGS)\.md" + r":\d")
+    pattern = re.compile(r"(?:NOW|FINDINGS)\.md" + r"(?::|#L)\d")
     offenders = []
-    for path in REPO.rglob("*"):
-        if ".git" in path.parts or not path.is_file() or path.suffix not in {".md", ".py", ".yml", ".yaml", ".toml"}:
-            continue
+    for path in _tracked_text_files():
         if pattern.search(path.read_text(encoding="utf-8", errors="replace")):
             offenders.append(str(path.relative_to(REPO)))
     assert not offenders, f"line citations into a rewritten file: {offenders}"
+
+
+def _is_date(text: str) -> bool:
+    try:
+        datetime.date.fromisoformat(text)
+    except ValueError:
+        return False
+    return True
+
+
+def _tracked_text_files() -> list[Path]:
+    """Files git tracks, so a local `.venv/` or build output is never scanned."""
+    suffixes = {".md", ".py", ".yml", ".yaml", ".toml", ".txt", ".json", ".cfg", ".ini"}
+    try:
+        listed = subprocess.run(
+            ["git", "ls-files", "-z"], cwd=REPO, capture_output=True, check=True
+        ).stdout.decode("utf-8").split("\0")
+        paths = [REPO / name for name in listed if name]
+    except (OSError, subprocess.CalledProcessError):
+        paths = [p for p in REPO.rglob("*") if ".git" not in p.parts]
+    return [p for p in paths if p.suffix in suffixes and p.is_file()]

@@ -69,8 +69,8 @@ below it. That is why:
 
 - text has kept being "appended here so no line citation moves", even when it
   belonged in the middle;
-- the findings register grew five stacked "Corrected again on this commit"
-  paragraphs;
+- the findings register grew four stacked "Corrected … on this commit"
+  paragraphs, each superseding the count above it;
 - Issue #9 exists, and #7 and #14 each carried a citation-repair table.
 
 **5. Parallel work collides in one file.** On 2026-09-25, Parts 24 to 28 of
@@ -162,9 +162,11 @@ changed in place, so the line count stayed at 5,857 and nothing moved.
 
 ## Phase 2: the other three growing files (proposed, not ruled)
 
-**Wait until #7, #20 and #31 have landed.** Those branches append thousands of
-lines to `docs/DECISIONS.md` (ADR-015 alone is 2,665) and Parts 16-17, 20-22
-and 24-28 to `docs/OwnerDecisions.md`. Splitting either file now would put every one of
+**Wait until the open pull requests that add to these files have landed.** Those
+branches append thousands of
+lines to `docs/DECISIONS.md` (#7's branch has 6,564 lines against `main`'s
+3,619) and add Parts to `docs/OwnerDecisions.md`: 16-17 on #14, 21 on #24, 22
+on #20 and 24-28 on #31. Splitting either file now would put every one of
 those pull requests into conflict, and it would land in the middle of the
 evidence-bar work.
 
