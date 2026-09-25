@@ -3471,3 +3471,295 @@ owner was asked to confirm or correct them.
 Items 2-7 of those notes are not rulings. They are gaps and readings for the
 final text round on ADR-015 and ADR-016 (Part 28e, step 1). The open ones are
 25g against 26e and 27f, 25h and 26b against 18e, and 28e against 18g.
+
+# Part 22 — Ruled 2026-09-23: sample adequacy, "how much data is enough" (F-004's numbers)
+
+The seven questions of the sample-adequacy proposal, as corrected on pull
+request #7's branch after Issue #6 (not the uncorrected copy on `main`). Put
+one at a time, each with a recommendation. Parts 20 and 21 are on pull
+requests #22 and #24 and not yet on `main`; this Part is numbered after them.
+The owner's words are quoted exactly.
+
+**Two facts established before the first question, by the session:**
+
+- **The proposal's recession-containment figures reproduce exactly.** They
+  were marked unverified after Issue #6. Recomputed from NBER's post-1945
+  peak and trough months (contraction months counted from the month after
+  the peak through the trough, windows inside Nov 1945 to Apr 2020), they
+  give 27.7% at 1 year, 55.3% at 3, 73.2% at 5, 81.2% at 74 months, 98.7% at
+  10, and a longest run of 128 months with no contraction. The dates were
+  typed from NBER's published table, not fetched.
+- **Belay's data begins 2011-01-03** (`framework/data/dolthub.py:23`). The only
+  contraction since then is March–April 2020, so a backtest window ending in
+  2026 contains no downturn unless it reaches back past mid-2020.
+
+## 22a. Backtest adequacy and paper-trading length are two rulings, not one
+
+**Question put.** The proposal's question 7, asked first because it changes
+what every other answer costs. Backtest data costs seconds to fetch, and a
+paper track record costs the same span in real time. Part 18d already
+referred paper-trading length to the Investment Committee. Options: (1) two
+rulings, where these questions set the backtest requirement only; (2) one
+ruling, where the span chosen here also sets paper length, overriding 18d.
+The session recommended (1). The proposal's independent reviewer recommended
+the same, and its author had preferred one ruling before 18d existed.
+
+**Owner said: "1".**
+
+### What it settles
+
+- **These questions set the requirement for historical (backtest) data only.**
+- **Paper-trading length stays where 18d put it**, with the Investment
+  Committee, and `Micro Capital` stays closed until it is set.
+
+## 22b. A backtest must span at least 10 years
+
+**Question put.** The proposal's question 1, the span floor, now for backtest
+data only (22a). Options: (a) 3 years, (b) 5, (c) 6.2, (d) no span floor, and
+(e) 10 years, which the session added from the same table. The session showed
+that on Belay's data, which begins 2011-01-03, a window ending in 2026 of 3, 5
+or 6.2 years contains no downturn at all, while 10 years includes the 2020
+contraction and covered 98.7% of post-1945 windows. The session recommended
+(e). The proposal's reviewers had recommended 3 years on the assumption that
+the span would also set paper-trading time, which 22a removed.
+
+**Owner said: "e".**
+
+### What it settles
+
+- **A backtest is not adequate unless its data spans at least 10 calendar
+  years, first observation to last.**
+- **The cost is accepted:** an instrument with less than 10 years of history
+  cannot be judged adequate yet.
+
+### What it does not settle
+
+- **Regime coverage.** A span is a probabilistic stand-in for having faced a
+  downturn, not a measurement of it. The longest post-1945 stretch with no
+  contraction was 128 months, longer than 10 years. Regime classification
+  stays an open gap (`framework/services/regime.py`).
+- **Which window.** Nothing yet pins where the 10 years sit. An author could
+  choose one. Not asked.
+
+## 22c. A declared target can only add to the 10-year span
+
+**Question put.** The proposal's question 2: may the observation requirement
+depend on a target the strategy declares in advance, through the minimum
+track record length formula (Bailey and López de Prado)? Under 22b, the
+formula can only add to the 10 years. The session computed that it requires
+more than 10 years for any declared annual target below about 0.62, at daily
+and at monthly frequency alike: target 0.5 needs 3,875 daily observations
+(15.4 years), or 187 monthly (15.6 years), at z = 1.96, with no skew, normal
+tails and a zero reference. Options: (1) yes, with the requirement being
+whichever is longer, the span or the formula's answer; (2) no, 10 years for
+every strategy. The session recommended (1) and noted that the proposal's
+gaming concern, a high target declared to shrink the requirement, buys
+nothing under a 10-year floor.
+
+**Owner said: "1".**
+
+### What it settles
+
+- **Required data = the longer of 10 years and the formula's answer at the
+  series' own frequency**, computed from a target declared before the test and
+  sealed into the artifact.
+- **No declaration can lower the requirement below 22b.**
+- **This replaces the proposal's Candidate 2H with a 756-observation floor**,
+  which would have required 63 years of monthly data.
+
+### What it does not settle
+
+- **The formula's other inputs:** the hurdle (the proposal's question 5), the
+  reference `c` (proposed: the caller's own null), and declared skew and
+  kurtosis.
+- **What happens when the formula has no valid answer** (the proposal's §5g:
+  target equal to the reference, or a non-positive leading factor).
+- **Nothing holds a strategy to its declared target afterwards.** An author
+  who declares high faces only the span. Recorded, not solved.
+
+## 22d. No flat minimum count; a thin record is caught by completeness instead
+
+**Question put.** The proposal's question 3, the flat observation count:
+(1) no flat count, with thin records caught by a completeness rule (the next
+question), on the condition that a completeness rule is then adopted;
+(2) 756 observations; (3) 1,260; (4) refer it to the Investment Committee.
+Under 22b and 22c, a flat count is inert for dense daily data (10 years is
+about 2,520 observations) and rules out monthly strategies entirely (10 years
+is 120 monthly observations). The session recommended (1).
+
+**Owner said: "1".**
+
+### What it settles
+
+- **There is no flat minimum number of observations.** The requirement is
+  22b's span and 22c's formula, at the series' own frequency.
+
+### What it does not settle
+
+- **Thin records.** 22d is safe only with a completeness rule, which is the
+  next question. Until one is ruled, a 10-year series that is mostly holes is
+  not caught by anything in this Part.
+
+## 22e. A permanent completeness rule
+
+**Question put.** The proposal's question 4. After 22d there is no flat
+count, and Part 10g's refusal of unexplained gaps waits on a trading calendar
+that does not exist. Options: (a) no completeness rule; (b) a rule only until
+the calendar exists; (c) a permanent rule, which also catches a record whose
+gaps are all explained (a halt, a delisting) but which is still too thin to
+conclude from. The session recommended (c) as the only option that keeps 22d
+safe. The proposal's author had leaned (b) before 22d removed the flat count.
+
+**Owner said: "c".**
+
+### What it settles
+
+- **Every backtest review checks completeness, permanently**: the share of
+  the observations that should exist in the window which actually do.
+  Explained gaps count as missing for this purpose; 10g decides whether a gap
+  is allowed, and this rule decides whether what remains is enough.
+
+### What it does not settle
+
+- **The threshold.** Put to the owner as the next question.
+- **How the expected count is known before a calendar exists.**
+
+## 22f. Completeness threshold: 95%
+
+**Question put.** The threshold for 22e. Over a 10-year daily window about
+2,520 trading days are expected: 99% allows about 25 missing, 95% about 126
+(half a year), 90% about 252 (a full year), 80% about 504. Until a trading
+calendar exists the expected count is an estimate of about 252 a year, and
+the true count differs by a day or two a year, so 99% would sometimes refuse
+sound data. The session recommended 95%.
+
+**Owner said: "95".**
+
+### What it settles
+
+- **A backtest's data must contain at least 95% of the observations expected
+  in its window.**
+
+### What it does not settle
+
+- **Where the missing 5% falls.** Completeness counts the total, not the
+  place. March 2020 is under 1% of a 10-year window, so a record missing
+  exactly the one downturn in Belay's data passes 95%. Put to the owner as its
+  own question: a limit on the longest single gap.
+
+## 22g. No single gap longer than one week
+
+**Question put.** Added by the session to close the hole named in 22f; it is
+not one of the proposal's seven. The market's 2020 fall ran from 20 February
+to 23 March, about 23 trading days, so a record missing that stretch still
+passes 95% completeness while never facing the one downturn 22b exists to
+include. The longest ordinary gap between trading days in Belay's data since
+2011 is about five calendar days (the 2012 hurricane closure over a
+weekend). Options: 1 week, 2 weeks, 1 month, no limit. The session
+recommended 1 week.
+
+**Owner said: "1wk".**
+
+### What it settles
+
+- **For daily data, no two consecutive observations may be more than 7
+  calendar days apart.** Measured in calendar days, so it needs no trading
+  calendar.
+- **The cost is accepted:** an instrument with a genuine halt longer than a
+  week inside its window is not adequate over that window.
+
+### What it does not settle
+
+- **Other frequencies.** Belay holds daily data only. The equivalent rule for
+  weekly or monthly data is settled when Belay has any.
+
+## 22h. Belay's minimum hurdle is 3.0, for significance and adequacy alike
+
+**Question put.** The proposal's question 5, reopened by Part 19. ADR-012
+rule 3 (`docs/DECISIONS.md:2190-2194`) leaves the significance level to the
+caller and sets no minimum. Under Part 19 the caller is a user's AI, and 19c
+rules that Belay sets minimums users may only raise. Harvey, Liu and Zhu
+(NBER Working Paper 20592, 2014) argue that a newly found factor needs a
+t-ratio above 3.0, because so many are tried. Options: (1) the caller supplies
+it with no Belay minimum, which was the proposal's recommendation, written
+before Part 19; (2) a Belay minimum of 3.0 for the adequacy formula only; (3)
+a Belay minimum of 3.0 for both the significance test and the adequacy
+formula, callers stricter and never looser. The session recommended (3). At
+3.0 the formula requires more than 10 years for any declared annual target
+below about 0.95, against about 0.62 at 1.96.
+
+**Owner said: "3".**
+
+### What it settles
+
+- **The critical value Belay tests against is never below 3.0**, in the
+  significance test and in the adequacy formula alike. A caller may require
+  more, never less. It is stated as a critical value rather than as an alpha,
+  because the t critical value for a given alpha depends on the sample size.
+- **This amends ADR-012 rule 3.** A caller still supplies the level, and it
+  is now bounded below.
+
+### What it does not settle
+
+- **The text of the ADR-012 amendment.** It is drafted and put to the owner,
+  as any ADR change is. It is not written here.
+- **The reference point `c`** ("better than what?"). The proposal's position
+  is the caller's own null (ADR-012 rule 2). It has not been put as a question.
+
+## 22i. When the formula has no answer, adequacy fails closed; the reference is the test's own null
+
+**Question put.** Two parts. First, the proposal's §5g: the formula in 22c has
+no valid answer when a declared target equals the reference, or when declared
+skew and kurtosis make its leading factor zero or negative. Options: (1) fail
+closed, recording that adequacy could not be established and treating the
+record as not adequate; (2) fall back to the 10-year span alone, which would
+let a deliberately extreme declaration remove 22c's requirement. The session
+recommended (1). Second, the reference point `c`: the same null the
+significance test already uses, supplied by the caller under ADR-012 rule 2.
+The session recommended yes.
+
+**Owner said: "1 - ywa".** Read as "1 - yes", "ywa" being a typing slip for
+"yes"; recorded as written.
+
+### What it settles
+
+- **Inputs outside the formula's range make a record not adequate**, with the
+  reason recorded. They are never turned into a number, and never fall back
+  to the span alone.
+- **The formula's reference is the significance test's own null**, converted
+  to the same per-period units, so the two checks cannot disagree about what
+  "no edge" means.
+
+## 22j. The rules are written as an amendment to ADR-012
+
+**Question put.** The proposal's question 6. Options: (1) amend ADR-012, the
+statistical review decision, whose rule 8 already defines sample adequacy as
+its own question and whose rule 3 22h already changes; (2) a new ADR-017
+(the proposal said "ADR-016", which 18g has since given to the evidence bar).
+The session recommended (1), as both of the proposal's reviewers had.
+
+**Owner said: "1".**
+
+### What it settles
+
+- **22a–22i are drafted as an amendment to ADR-012**: rule 8 gains the
+  adequacy definition and rule 3 gains the 3.0 minimum. The draft marks each
+  line RULED or DRAFTER, and it is not ratified until an independent pass has
+  tried to break it.
+
+---
+
+**What Part 22 settles, in one place.** For backtest data only (22a): a
+review is adequate when its data spans at least 10 years (22b); holds at least
+as many observations as the minimum track record length formula requires for
+the target declared before the test, whichever is longer (22c); has no flat
+minimum count (22d); is at least 95% complete (22e, 22f); has no gap longer
+than 7 calendar days in daily data (22g); and is tested against a critical
+value of at least 3.0 (22h). If the formula has no valid answer, the record is
+not adequate, and the formula's reference is the test's own null (22i).
+Paper-trading length stays with the Investment Committee (18d).
+
+**What Part 22 does not touch.** No ADR changes status. F-004 is not closed.
+Its numbers are now ruled, and it closes when the ADR-012 amendment is
+ratified and implemented, together with F-027 (the proposal's §9). No code
+changes.
