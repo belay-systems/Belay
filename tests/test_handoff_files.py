@@ -138,6 +138,52 @@ def test_nothing_cites_a_rewritten_file_by_line_number():
     assert not offenders, f"line citations into a rewritten file: {offenders}"
 
 
+#: The gate's own pattern, rebuilt here rather than imported, so that a change to
+#: `scripts/review_due.py` that widened what it counts would show up as a
+#: disagreement between two files instead of being silently adopted by this test.
+#: ASCII digits only, and the bracketed `F-[NNN]` quoting form is not matched —
+#: `scripts/review_due.py` does not count it and neither does this.
+_FINDING_NUMBER = re.compile(r"(?<![A-Za-z0-9])F-([0-9]{3})(?![A-Za-z0-9])")
+
+
+def test_no_doc_names_a_finding_number_above_the_register():
+    """F-035: writing the review gate's *next* number in prose consumes it.
+
+    `scripts/review_due.py` issues one more than the highest `F-NNN` in any `.md`
+    under `reports/` or `docs/` on any `origin` ref. So a session that writes the
+    number the gate just gave it — in `docs/NOW.md`, in its own session record —
+    burns it on the push, permanently, and the number then names no finding. It
+    has happened twice; `e788cac` fixed it in two files and recorded no rule.
+
+    This fails on the branch that would burn the number, rather than a fortnight
+    later. `docs/FINDINGS.md` is the register and so is exempt: it is where a
+    number legitimately becomes highest. `reports/` is exempt too — a review report
+    is where new numbers are allocated and is frozen once written.
+    """
+    register = (REPO / "docs" / "FINDINGS.md").read_text(encoding="utf-8")
+    registered = [int(n) for n in _FINDING_NUMBER.findall(register)]
+    assert registered, "no F-NNN found in docs/FINDINGS.md"
+    highest = max(registered)
+
+    offenders = []
+    for path in sorted((REPO / "docs").rglob("*.md")):
+        if path.name == "FINDINGS.md":
+            continue
+        for number in sorted({int(n) for n in _FINDING_NUMBER.findall(
+            path.read_text(encoding="utf-8", errors="replace")
+        )}):
+            if number > highest:
+                offenders.append(f"{path.relative_to(REPO)} names F-{number:03d}")
+
+    assert not offenders, (
+        f"the highest finding registered in docs/FINDINGS.md is F-{highest:03d}, but "
+        + "; ".join(offenders)
+        + ". Writing the gate's next number in prose consumes it — write \"the "
+        "number after F-NNN\" instead, or the bracketed form F-[NNN] when quoting. "
+        "See AGENTS.md, \"Files that grow\"."
+    )
+
+
 def _is_date(text: str) -> bool:
     try:
         datetime.date.fromisoformat(text)

@@ -193,6 +193,18 @@ def test_a_demotion_moves_down_the_ladder():
 
 
 def test_a_demotion_that_climbs_is_refused():
+    """Two things refuse this, so it does **not** assert the outcome guard.
+
+    `Micro Capital -> Production` also skips `Limited Capital`. The
+    `DEMOTE`-on-a-climb guard rejects it first, but with that guard removed
+    `validate_transition` rejects the same movement, so this test passes either
+    way and cannot detect the guard's loss. Left unpinned deliberately: pinning
+    it to either message would make it a second test failing on one mutation.
+
+    Noted because the name reads as if it covered that guard, which is part of
+    how F-019's closure left it looking covered (F-032). The guard itself is
+    asserted by `test_a_demotion_recorded_on_a_legal_climb_is_refused` below.
+    """
     with pytest.raises(ValueError):
         a_review(
             outcome=ReviewOutcome.DEMOTE,
@@ -435,4 +447,52 @@ def test_a_promotion_that_descends_the_ladder_is_refused():
             outcome=ReviewOutcome.PROMOTE,
             stage_at_review=StrategyLifecycle.PRODUCTION,
             resulting_stage=StrategyLifecycle.PAPER_TRADING,
+        )
+
+
+# ------------------- F-032: two more guards of the same shape, on the same path
+#
+# `reports/review/2026-09-25-review.md` (F-032). F-019 was closed against the
+# seven guards it happened to enumerate, so these two — six and thirty-six lines
+# from the ones `#24` tested — were still asserted by nothing the next day.
+# Disabling either left the whole suite green at 704 passing. Same fix shape as
+# above: owner ruling `docs/OwnerDecisions.md` Part 21b, one test per guard,
+# each built so that **only that guard** can refuse it.
+
+
+def test_a_demotion_recorded_on_a_legal_climb_is_refused():
+    """The mirror of `test_a_promotion_that_descends_the_ladder_is_refused`.
+
+    `Micro Capital -> Limited Capital` is a legal forward transition — it is the
+    movement `test_a_promotion_climbs_one_stage` records as a promotion — so the
+    transition table admits it and only the outcome check stands between the
+    caller and a signed record reading `Demote: Micro Capital -> Limited
+    Capital`: a demotion that doubles the capital stage.
+
+    Distinct from `test_a_demotion_that_climbs_is_refused` above, which names
+    this guard but cannot fail for it — that movement skips a stage, so
+    `validate_transition` refuses it first.
+    """
+    with pytest.raises(ValueError, match="a demotion descends the ladder"):
+        a_review(
+            outcome=ReviewOutcome.DEMOTE,
+            stage_at_review=StrategyLifecycle.MICRO_CAPITAL,
+            resulting_stage=StrategyLifecycle.LIMITED_CAPITAL,
+        )
+
+
+def test_remaining_at_retired_is_refused():
+    """`Retired -> Retired` under `Remain Current Stage`.
+
+    The one shape the `STRATEGY_LADDER.index()` backstop cannot catch: because
+    the two stages are equal, `Remain`'s own check returns early and no ladder
+    position is ever taken. `Demote` and `Promote` to `RETIRED` reach `.index()`
+    and raise `tuple.index(x): x not in tuple`, which names nothing; this one
+    would simply be accepted and signed.
+    """
+    with pytest.raises(ValueError, match="is not a stage of maturity"):
+        a_review(
+            outcome=ReviewOutcome.REMAIN_CURRENT_STAGE,
+            stage_at_review=StrategyLifecycle.RETIRED,
+            resulting_stage=StrategyLifecycle.RETIRED,
         )

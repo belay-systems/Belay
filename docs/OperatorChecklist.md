@@ -852,3 +852,103 @@ the end of `docs/OwnerDecisions.md`. The recommendations you answered
 
 The owner answered "aligned to recommendation" (`docs/OwnerDecisions.md` Part
 31). This closes the Open item "confirm the labeled lines in Parts 25-28".
+
+## Open — 2026-09-25: what should Level C mean? (F-033)
+
+**Appended at the end rather than at the top, so no line citation into this file
+moves.** Raised by `reports/review/2026-09-25-review.md` (F-033) and confirmed by
+the independent pass on it.
+
+**What is wrong.** When Belay computes a number like a Sharpe ratio, it stamps the
+result "Level C — historical simulation". It stamps that on *every* such number,
+and nothing checks where the numbers came from. A session can type eight figures
+by hand, label the source "I made these up", and get back a signed, valid record
+graded Level C. Constructed and run on `main`:
+
+```
+validates:         True
+evidence_level:    EvidenceLevel.HISTORICAL   <- Level C
+data_source:       I made these up
+known_limitations: none
+```
+
+The grade is the one field a promotion gate is meant to trust without reading the
+rest of the record. Right now it only says "arithmetic happened", not "this came
+from real data".
+
+**The question, and it is yours because it decides what Level C means in Belay,
+and `constitution/Evidence_Standards.md` is frozen by ADR-002:**
+
+> Should a computed number be graded Level C only when its input series came from
+> a recorded fetch, and Level D otherwise?
+
+**Recommendation: yes.** Reasons:
+
+- It is the smallest change that makes the grade mean something a gate can rely
+  on. One value, threaded through one function — no new machinery.
+- It fails in the unflattering direction. Today an unsourced number is graded one
+  rung too high, which is the direction that buys capital it has not earned.
+- Belay already has the honest path built: `disclosure_from` derives the source
+  and the date window from the fetch itself. Nothing currently requires it, which
+  is open finding F-003.
+
+**The cost, stated plainly, because it is not small.** Nothing in Belay uses
+`disclosure_from` today. So on the day this lands, **every** metric artifact
+becomes Level D until the fetch path is wired through — and under ADR-016's draft
+evidence floor, that would block promotion above `Paper Trading` until it is. That
+is arguably correct (evidence before capital) but it is a real gate, not a
+formality, and you should choose it knowingly.
+
+**One wrinkle worth your eye.** `constitution/Evidence_Standards.md` defines Level
+D as "Hypothesis. Research only." A calculation over invented numbers is not
+really a hypothesis either — neither class fits it exactly. If you say yes, the
+wording may need to be "Level D is the floor for a computation whose inputs have
+no recorded provenance" rather than calling such a number a hypothesis. That
+phrasing is a follow-up, not part of this answer.
+
+**This is a ruling and probably an ADR, not an edit. It has not been
+implemented, and this recommendation is not a decision.**
+
+## Open — 2026-09-25: drop three unused dependencies? (F-036)
+
+Raised by `reports/review/2026-09-25-review.md` (F-036) and confirmed by the
+independent pass. `AGENTS.md`, "Decisions that are the owner's alone", makes any
+change to `pyproject.toml`'s dependencies yours.
+
+**What is wrong.** Belay declares seven pieces of third-party software it needs.
+Three of them are used by no file in the repository:
+
+```
+$ grep -rn "import pandas\|from pandas"   --include='*.py' framework/ scripts/ tests/ departments/
+$ grep -rn "import jinja2\|from jinja2"   --include='*.py' framework/ scripts/ tests/ departments/
+$ grep -rn "import dateutil\|from dateutil" --include='*.py' framework/ scripts/ tests/ departments/
+(no output from any of the three)
+```
+
+The other four are all really used: `pyyaml`, `networkx`, `rich`, `typer`.
+
+**The question:**
+
+> Should `pandas`, `jinja2` and `python-dateutil` be removed from
+> `pyproject.toml`?
+
+**Recommendation: yes, remove all three.** Reasons:
+
+- Nothing imports them, so nothing breaks today. Verified: `numpy` — the package
+  that arrives *with* `pandas` — is imported nowhere either.
+- They are not free. Installing Belay currently downloads `pandas` and `numpy`,
+  which are large, for no benefit.
+- Leaving them invites a real bug. `pandas` quietly installs `numpy`, so a future
+  session sees `numpy` available and uses it — and Belay has already ruled against
+  exactly that, on the reasoning that a package nobody declared is not a
+  dependency (`docs/HANDOFF.md:1157-1159`; the same reasoning is in the code, at
+  `framework/metrics/distributions.py:11-15`). If `pandas` were later removed,
+  that code would break with no declared cause.
+
+**If you would rather keep the option open:** the alternative is to declare
+`numpy` explicitly and drop only `jinja2` and `python-dateutil`. That is worse in
+my view — it adds a dependency Belay does not use yet — but it is a coherent
+choice if you expect numerical work soon.
+
+**No code changes either way. Nothing has been implemented, and this
+recommendation is not a decision.**

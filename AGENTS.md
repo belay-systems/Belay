@@ -447,6 +447,15 @@ current state and the history, and the history buried the state.
   F-number, or a Part or ADR number. Never cite `docs/NOW.md` or
   `docs/FINDINGS.md` by line number, because both are rewritten. The line
   citations into the frozen archive stay valid, because it never changes.
+- **Never write the review gate's *next* finding number in prose. Write "the
+  number after F-NNN".** `scripts/review_due.py` issues one more than the highest
+  `F-NNN` it finds in any `.md` under `reports/` or `docs/` on any `origin` ref,
+  so a document that names the next number consumes it — permanently, on the push,
+  and the number then names no finding. This has happened twice: `e788cac` fixed
+  it in two files and wrote no rule, and F-035 is the same mistake a fortnight
+  later. Quoting a number from outside text is the one exception, and it uses the
+  bracketed form `F-[NNN]`, which `scripts/review_due.py` does not count.
+  `tests/test_handoff_files.py` holds this.
 - **The archive is corrected by a later record, never edited.** A session that
   finds something wrong in `docs/HANDOFF.md` writes the correction in its own
   `docs/sessions/` record and names the lines it corrects.

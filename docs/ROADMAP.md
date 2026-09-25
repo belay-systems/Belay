@@ -166,9 +166,22 @@ instrument.
 ten rules.** `framework/data/` carries the contract, the survivorship disclosure,
 the fetch record, the versioned store and two adapters. Suite 388 → 520.
 
-**This stage is complete, and the gap it shipped with is now closed too.** The
-boundary works and a metric's `data_source` and `sample_period` are derived from
-the fetch rather than typed at the call site — the deliverable this stage names.
+**This stage is complete, and the gap it shipped with is half closed.** The
+boundary works, and `disclosure_from` (`framework/data/fetch_record.py`) derives a
+metric's `data_source` and `sample_period` from the fetch rather than from the
+call site. **No metric emitter requires it.** Every emitter still takes a
+caller-built `Disclosure`, and `significance_artifact` still takes a bare
+`data_source: str` — which is open finding F-003. So the capability this stage
+names exists and nothing obliges a caller to use it:
+
+```
+$ grep -rn 'disclosure_from' --include='*.py' . | grep -v '^./tests'
+./framework/data/fetch_record.py:446:def disclosure_from(
+```
+
+Corrected 2026-09-25 (F-034). This paragraph previously claimed the derivation
+was how metrics actually get their disclosure, which would have told a Stage 3
+author that provenance arrives from the fetch when it does not.
 
 What it originally did not deliver was *bulk* data: the chosen source's hosted
 SQL API serves a novel month-sized query in 35–55 seconds and frequently exceeds
@@ -218,18 +231,37 @@ ruling does that — but they remove the guesswork from what it is built against
   express "this source does not know past universe membership" cannot record the
   answer on the day a better source does.
 
-**The stage is complete and half of its own deliverable is not yet durable, which
-is F-002.** Stage 2 promises "provenance recorded on the resulting evidence". The
-provenance is built and signed; it has never been written to disk, so the record
-of every fetch that has ever run is gone and `.gitignore:46-49` rests on the
-belief that it is not. **ADR-014 was accepted 2026-08-02 and is implemented in no
-part** — it rules where artifacts live, which git tracks, that
-`fetch_and_record` persists, what becomes of the one unprovenanced series Belay
-holds, and what a `.gitignore` comment may assert. **Its rule 4 is blocked on the
-identifier ruling** (`docs/HANDOFF.md`, "The Identifier Space Cannot Fund One
-Record Per Fetch"), because identifiers are permanent and a wrong answer cannot be
-corrected after the first record lands. **This gates any bulk backfill**, and the
-clone transport above is what made backfills cheap enough to matter.
+**Stage 2's close-out, as of 2026-09-25.** Both of the gaps this section used to
+name as open are closed.
+
+- **Provenance is durable. F-002 is closed** (`docs/HANDOFF.md`, "No Fetch Record
+  Is Ever Written To Disk (F-002) — CLOSED 2026-08-02"). Stage 2 promises
+  "provenance recorded on the resulting evidence", and `artifacts/RPT-0001/1.0.0.yaml`
+  is a fetch record on disk.
+- **ADR-014 is implemented.** `docs/DECISIONS.md`, ADR-014's Status block:
+  "Accepted and implemented, 2026-08-02, in all nine rules." It rules where
+  artifacts live, which git tracks, that `fetch_and_record` persists, what becomes
+  of the one unprovenanced series Belay holds, and what a `.gitignore` comment may
+  assert. **Nothing here gates a bulk backfill.**
+
+**What that implementation left open**, all four carried in `docs/FINDINGS.md` and
+written up in the archive:
+
+- ADR-014 Rules 5 And 8 Cannot Both Be Executed As Written
+- Rule 7's Orphan Check Is Vacuous On Every Machine But The One That Fetched
+- The Store's Version Filenames Carry The Four-Digit Cap The Identifiers Shed
+- Every Fetch Reads Every Stored Record
+
+Corrected 2026-09-25 (F-034). This block previously cited F-002 as open and denied
+ADR-014's implementation outright — both false since 2026-08-02, and both read as
+current fact by every session `AGENTS.md` sends here. The identifier ruling it
+named as blocking ADR-014 rule 4 is also settled — `docs/HANDOFF.md`, "The
+Identifier Space Cannot Fund One Record Per Fetch — CLOSED 2026-08-02".
+
+The old wording is described rather than quoted, because
+`test_a_complete_stage_does_not_call_an_implemented_adr_unimplemented` cannot tell
+a quotation from a claim. Same reason `scripts/review_due.py` asks for the
+bracketed `F-[NNN]` form when a finding number is quoted from outside text.
 
 **One consequence should be visible rather than absorbed.** Point-in-time
 universe membership is out of budget, and `Research/UniverseDiscovery.md` makes

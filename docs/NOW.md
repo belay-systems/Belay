@@ -14,19 +14,26 @@ said before lives in `docs/sessions/` and in git history
 
 ## Where things stand
 
-Written 2026-09-25, for `main` as it stands once #14, #24, #31 and #32 have
-merged, in that order. #32 is the last of them.
+Written 2026-09-25, for `main` at `95e5a4a`, plus this branch
+(`claude/brave-pascal-e7401x`, Issue #35) which is not yet merged.
 
-- **Suite:** 704 passed, 1 skipped, 5 xfailed (`python -m pytest -q`). That was
-  the result of the merge rehearsal on a scratch copy of `main`.
-- **`python scripts/status.py`:** exits 0, 40 open findings. F-019 closed with
-  #24.
+- **Suite:** 709 passed, 1 skipped, 5 xfailed (`python -m pytest -q`) on this
+  branch. `main` at `95e5a4a` is 704.
+- **`python scripts/status.py`:** exits 0, 45 open findings on this branch.
+- **The 2026-09-25 review has merged** (#34) and raised F-032 to F-036. All
+  five were independently attacked on this branch and **all five survive**;
+  none was overturned. They are now registered in `docs/FINDINGS.md`, and
+  **none is marked closed** — closure waits on an independent pass over this
+  branch, the precedent `bdeffe8` set for F-019.
 - **ADRs on `main`:** 14 (`grep -c "^## ADR-" docs/DECISIONS.md`).
   ADR-015 (#7) and ADR-016 (#20) are drafts on branches, neither ratified.
 - **Owner rulings on `main`:** Parts 1-19, 21 and 23-31. Part 20 (#22) is not
   adopted (Part 30), and #22 is closed. Part 22 is on #20.
 - **Review gate:** `python scripts/review_due.py` gives the next finding
-  number. The highest number in use anywhere is F-030.
+  number. It is the only authority on that; this file does not restate its
+  answer (F-035). It returns `SKIP` until 2026-10-07.
+- **Two owner rulings are owed** and block F-033 and F-036 —
+  `docs/OperatorChecklist.md`, the two 2026-09-25 items.
 - **Contributors help and never gate** (Part 30). Work lands on the owner's
   word, through the Owner bypass.
 
@@ -38,44 +45,63 @@ open pull requests and Issues on GitHub, `python -m pytest -q`,
 
 | PR | What | State |
 |---|---|---|
-| #7 | ADR-015: a strategy's stage is carried, not asserted (F-007, F-014) | The final text round: item 1 below |
-| #20 | ADR-016 draft, Part 22, the ADR-012 amendment draft (`docs/proposals/ADR-016-evidence-bar-DRAFT.md`) | Moves with ADR-015 |
+| #7 | ADR-015: a strategy's stage is carried, not asserted (F-007, F-014) | The final text round: item 2 below |
+| #20 | ADR-016 draft, Part 22, the ADR-012 amendment draft | Moves with ADR-015 |
+| #33 | Parts 32-34 and the final-text-round session close | Open; see the warning below |
+| Issue #35 | This branch: the pass on the 2026-09-25 review, and its fixes | Needs an independent pass before it lands |
 
-Both merge cleanly onto this `main` and pass (704), except that each one
-appends to the end of `docs/OwnerDecisions.md` or `docs/OperatorChecklist.md`.
-There, keep `main`'s text first and add the branch's text after it.
+**#33 will go red against this branch's new test, and that is the test working.**
+`test_no_doc_names_a_finding_number_above_the_register` forbids any `.md` under
+`docs/` from naming a finding number above the highest registered in
+`docs/FINDINGS.md`. #33's branch names the burned number in four places, in
+`docs/NOW.md` and its session record. The fix on that branch is to write "the
+number after F-030" instead, or the bracketed `F-[NNN]` form when quoting. It was
+not edited from here: one Issue, one branch, one claimant.
 
 ## Highest Priority Next Task
 
-1. **Finish the evidence bar the way Part 28e rules.**
-   - **Step 1, the final text round on #7 and #20, with no redesign:**
-     - fix the fourth pass's two blocking findings (F4-3 and F4-1, Issue #21,
-       2026-09-25 01:28 UTC);
-     - apply 28a-28d, which Part 31 confirms as recorded;
-     - settle the three open readings in the notes after Part 28: 25g against
-       26e and 27f, 25h and 26b against 18e, and 28e against 18g. Put each to
-       the owner as one question with a recommendation.
-   - **Step 2, build the current-stage read as code.** Every attack from the
-     passes on Issue #21 becomes a test that passes only when the attack is
-     refused. The plan is **waiting on the owner's "go"**:
-     - the tests are written by a separate model from the review findings,
-       not from the code;
-     - a fresh review then attacks the code;
-     - the ADR text is updated to match what the code does;
-     - it goes on its own branch, for example `claude/stage-read`, as a draft
-       pull request, and is not merged until the owner ratifies the ADRs;
-     - not in this first slice: the save-side checks, and ADR-016's evidence
-       checks (report binding, the trial cap).
-   - **The independent pass** on each step is a fresh session told to
-     falsify (Part 30). A different AI is welcome, never waited on.
-2. **Small, when convenient:**
+1. **An independent pass on Issue #35's branch, before it merges.** A fresh
+   session told to falsify it. It registers five findings and changes three
+   test files, `AGENTS.md`, `docs/ROADMAP.md` and `docs/FINDINGS.md`. Where to
+   aim: whether the three new F-032 tests really isolate their guards (re-apply
+   each mutation and confirm exactly one test fails); whether the two new
+   conformance tests can be satisfied without fixing the thing they check; and
+   whether the rewritten `docs/ROADMAP.md` Stage 2 prose is now true.
+2. **Finish the evidence bar the way Part 28e rules.**
+   - **Step 1, the final text round on #7 and #20, with no redesign:** fix the
+     fourth pass's two blocking findings (F4-3 and F4-1, Issue #21); apply
+     28a-28d; settle the three open readings in the notes after Part 28, each
+     as one question to the owner with a recommendation.
+   - **Step 2, build the current-stage read as code**, once the owner says
+     "go": tests written by a separate model from the review findings, a fresh
+     review attacking the code, the ADR text updated to match what the code
+     does, on its own branch as a draft, not merged until the ADRs are
+     ratified. Not in this slice: the save-side checks, ADR-016's evidence
+     checks.
+3. **Two guards found by this session's pass, awaiting a finding number.**
+   Both survive the suite at `704 passed`, and neither has a number because the
+   gate allocates none until 2026-10-07 — inventing one is the mistake F-035 is
+   about. Written up in `docs/sessions/2026-09-25-review-falsification.md`:
+   - `framework/data/dolt_clone.py:376` — with the `isinstance(body, dict)`
+     check removed, a bare `null` envelope from `dolt` yields a signed
+     `FetchedSeries` with zero bars asserting success. The failure that
+     function's own docstring says the module exists to prevent.
+   - `framework/data/contract.py:244` — the inverted-window check on
+     `fetch_daily_bars`.
+4. **Small, when convenient:**
+   - a full tautological-test survey over `tests/`; 22 of 143 `pytest.raises`
+     calls are bare `pytest.raises(ValueError)` with no `match=`, 14 of them in
+     `tests/artifacts/test_review_decision.py`;
    - the gate items #29 left: `fullmatch` on report names, surviving an
      invalid date, and ASCII digits in `REPORT` (`scripts/review_due.py`);
    - a sentence in the review skill (owner-only) saying to write every finding
      number in full ASCII (`F-NNN`), because the gate cannot read other shapes;
    - phase 2 of the file split, for `docs/DECISIONS.md`,
      `docs/OwnerDecisions.md`, `docs/OperatorChecklist.md` and `CHANGELOG.md`,
-     once #7 and #20 have landed (`docs/proposals/growing-files.md`).
+     once #7 and #20 have landed (`docs/proposals/growing-files.md`);
+   - `scripts/verify_clone.py` has not run for five consecutive reviews for
+     want of `dolt`, and it exits 0 when there is no clone — so it reports
+     success having verified nothing.
 
 ## Working Agreement
 
