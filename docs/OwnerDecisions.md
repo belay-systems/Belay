@@ -3078,3 +3078,53 @@ wording in Part 16's quotation is redacted, as in Part 11a.
 - **Part 16's sentence** that the owner's account "is no longer the only one
   that can recover the organization" was untrue for repository Admin, and
   16a did not correct it. It became true only under Part 17.
+
+# Part 21 — Ruled 2026-09-22/23: step 2 of the Stage 3 order starts now, and how F-019 is fixed
+
+Part 20 is on pull request #22 and not yet on `main`; this Part is numbered
+after it. The owner's words are quoted exactly.
+
+## 21a. Step 2 may start while step 1 waits for review
+
+**Question put.** Part 9a orders the Stage 3 blockers in five steps. Step 1
+(F-007 and F-014) waits on the independent pass on ADR-015 and ADR-016
+(Issue #21), and nothing else in the build could move until it cleared. Step 2
+(F-019) changes no rule and does not touch ADR-015. The session recommended
+letting step 2 start now, with step 1 still first the moment its review clears.
+
+**Owner said: "aligned. let step 2 start now, while step 1 waits for review."**
+
+### What it settles
+
+- **Part 9a's order now reads "step 1 first when it is ready".** A later step
+  may proceed while an earlier one is blocked on review rather than on work,
+  for step 2 as ruled here.
+
+### What it does not settle
+
+- Whether step 3 (F-003, F-008, F-016) may also start before step 1. Not asked.
+
+## 21b. F-019 is fixed with seven tests and no change to behaviour
+
+**Question put.** F-019 was registered under Part 9b, and no fix was ruled. The
+session re-applied the report's mutations to `main` at `1590b34`. All seven
+that belong to F-019 still left the suite green: 659 passed with each one
+applied. The eighth row, `framework/data/survivorship.py:138`, is F-016 and
+belongs to step 3. Two options were put: (1) seven regression tests, one per
+guard, each shown red against its mutation first, and no production code
+change; (2) the same, plus the report's two optional boundary tests on
+`framework/metrics/statistics.py`, which would pin cut-offs that belong to
+F-004's unruled numbers. The session recommended (1).
+
+**Owner said: "Seven tests, one per guard, with no change to how Belay
+behaves".**
+
+### What it settles
+
+- **Seven regression tests, one per guard, and no production code change.**
+- **The two boundary cases are not pinned.** They wait for F-004's numbers.
+
+### What it does not settle
+
+- F-019's closure. It closes when those tests are merged after an independent
+  pass, per `AGENTS.md` point 4, not when they are written.
