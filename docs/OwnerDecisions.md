@@ -3471,3 +3471,70 @@ owner was asked to confirm or correct them.
 Items 2-7 of those notes are not rulings. They are gaps and readings for the
 final text round on ADR-015 and ADR-016 (Part 28e, step 1). The open ones are
 25g against 26e and 27f, 25h and 26b against 18e, and 28e against 18g.
+
+# Part 32 — Ruled 2026-09-25: the three open readings in the notes after Part 28
+
+**Question put.** Part 31 left three readings open for the final text round
+on ADR-015 (#7) and ADR-016 (#20): 25g against 26e and 27f, 25h and 26b
+against 18e, and 28e against 18g. The session put each as one question with
+a recommendation, and a choice of answers.
+
+### 32a. Which bar a stage read uses
+
+**Question.** "When Belay re-checks a strategy's past steps while reading its
+stage, which bar should it judge each step by?" The session recommended "The
+bar of its time", which is what 25g's words say and what ADR-016 rule 10
+already did. The other answer offered was: "Every read re-judges every past
+step against the current bar, so raising the bar immediately drops any
+strategy that no longer meets it. This leans hardest toward less capital
+(25d), but it overrules 25g's \"does not re-judge past steps\", and the text
+would need rewriting (rule 10), which Part 28e's \"no redesign\" forbids for
+this round."
+
+**Owner chose: "Today's bar".**
+
+### 32b. 25h and 26b amend 18e
+
+**Question.** "Should the record say plainly that 25h and 26b amend 18e, so
+the count of variants tried can now block a promotion?" The answer chosen
+read: "The record gets one line: 25h and 26b amend 18e. The count still
+corrects no result, but a count above the cap is refused."
+
+**Owner chose: "Yes, say it amends 18e (Recommended)".**
+
+### 32c. The final pass before ratification
+
+**Question.** "Before you ratify ADR-015 and ADR-016, must a fresh session
+try to break the exact text you are ratifying?" The answer chosen read: "One
+fresh-session attack pass on the final text, after step 2 has rewritten it to
+match the code. It must come right before you ratify. A different AI is
+welcome but never waited for (Part 30b)."
+
+**Owner chose: "Yes, 18g still stands (Recommended)".**
+
+### What it settles
+
+- **32a. A stage read judges every past step by today's bar.** 25g's "It
+  does not re-judge past steps" is overruled. A raised bar lowers the stage
+  read of any strategy whose steps no longer meet it, at once, not from its
+  next step. 25g's other words stand: "No strategy holds capital today."
+- **32b. 25h and 26b amend 18e.** The count of variants tried still corrects
+  no result and claims nothing, as 18e says. A count above the cap that 26b
+  defines is refused. 18e's text is not edited; this line is the amendment.
+- **32c. 18g's fresh pass still stands under 28e.** Neither ADR is ratified
+  until a fresh session has tried to break the exact text being ratified,
+  after 28e's step 2 has rewritten the ADRs to match the code. The pass runs
+  right before ratification. A different AI is welcome, never waited for
+  (30b).
+
+### Session readings, not the owner's words
+
+- **32a lifts 28e's "no redesign" for rule 10 only.** The answer chosen said
+  the text "would need rewriting (rule 10)". So ADR-016 rule 10, and the
+  passages in both ADRs that depend on it, are rewritten in this round.
+  Nothing else is redesigned.
+
+### What it does not settle
+
+It does not say how rule 10's mechanism changes; that is drafter's text, on
+#20 and #7, for the fresh pass to attack. It does not ratify either ADR.
