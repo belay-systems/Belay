@@ -862,3 +862,10 @@ The owner answered "aligned to recommendation" (`docs/OwnerDecisions.md` Part
   PR has merged.
 - #20 (`docs/proposals/ADR-016-evidence-bar-DRAFT.md`) waits on his independent
   pass (Issue #21). #7 and #14 wait on his reply.
+
+## Closed 2026-09-25 — the 2026-09-22 list "what the owner needs to chase"
+
+Events overtook every line of it. #23 merged on 2026-09-24. #14 merged on
+2026-09-25. #22 is closed and Part 20 is not adopted (`docs/OwnerDecisions.md`
+Part 30c). Nothing waits on the second contributor's pass or reply any more
+(Part 30a and 30b). What #7 and #20 still need is in `docs/NOW.md`.
