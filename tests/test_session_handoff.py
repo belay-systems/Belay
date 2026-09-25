@@ -449,7 +449,7 @@ def test_the_review_skill_says_what_to_do_when_the_gate_does_not_answer():
 # ------------------------------------------------- the review skill and outside text
 #
 # These tests read the skill the way a renderer does, with a CommonMark parser
-# (`markdown-it-py`, which `rich`, a declared runtime dependency, requires). An
+# (`markdown-it-py`, a declared dev dependency since Part 24; `rich` needs it too). An
 # earlier version used a hand-written line scanner, and an independent pass on
 # pull request #27 hid the rule from it 19 ways a real parser does not fall for:
 # a fence closed by a line with trailing text, `<pre>` and `<script>` blocks,

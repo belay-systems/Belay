@@ -3128,3 +3128,226 @@ behaves".**
 
 - F-019's closure. It closes when those tests are merged after an independent
   pass, per `AGENTS.md` point 4, not when they are written.
+
+# Part 24 — Ruled 2026-09-24: `markdown-it-py` is a declared dev dependency
+
+**Question put.** The tests of #23 parse the review skill with `markdown-it-py`.
+It was installed only because `rich`, a runtime dependency, requires it. If a
+future `rich` dropped it, those tests would fail to import, for a reason nobody
+could see from `pyproject.toml`. The session recommended declaring it.
+
+**Owner said: "Declare it".**
+
+### What it settles
+
+- `pyproject.toml`'s `dev` extra lists `markdown-it-py>=2.2.0`. The tests that
+  import it were run against 3.0.0 and 2.2.0 (the floor `rich` requires), and
+  both pass.
+
+# Part 25 — Ruled 2026-09-24: ten principles for the evidence bar (ADR-015, ADR-016)
+
+**Question put.** A falsification pass on ADR-015 (#7) and ADR-016 (#20),
+posted on Issue #21, found that neither is ready. As drafted, one made-up
+evidence record passes every rule for a capital rung. A stage can be read
+without its evidence being checked. A funded strategy's rules can be swapped,
+and a demotion undone by deleting one file. The pass listed ten questions only
+the owner can answer. The session put each one with a recommendation, and all
+of them follow one principle: when in doubt, less capital.
+
+**Owner said: "aligned to all 10 recommendations".**
+
+### What it settles
+
+- **25a. Distinct evidence.** "One evidence record per promotion criterion"
+  (18a) means seven distinct records. Each is backed by its own stored report,
+  of a kind suited to its criterion.
+- **25b. Part 22 is joined to the ladder.** The Paper Trading rung and every
+  capital rung rest on a significance report that passed at a critical value
+  of at least 3.0. It must also have enough data, as amended ADR-012 defines.
+- **25c. The specification is fixed on a capital stage.** A strategy's rules
+  cannot change while it holds a capital stage. A changed specification is a
+  new strategy with a new identifier, and it starts at Idea.
+- **25d. Fail toward less capital.** When the record is damaged or the
+  versions disagree, Belay reads the lowest stage it can establish. It never
+  refuses in a way that would block a demotion.
+- **25e. The live rungs stay closed until a duration is ruled.** Limited
+  Capital and Production stay closed until a minimum live duration is ruled,
+  in the same way as Part 18d's minimum for paper trading.
+- **25f. A human authorizes capital.** A recorded human yes is required
+  before any capital rung, and an AI is never the approving reviewer of one.
+- **25g. A raised bar applies from each strategy's next step.** It does not
+  re-judge past steps. No strategy holds capital today.
+- **25h. Refuse trial counts beyond the hurdle.** A `variants_tried` count
+  above what the 3.0 hurdle covers is refused until the owner rules on a
+  correction. This does not contradict 18e, which applies no correction.
+- **25i. No reuse after a demotion.** Evidence gathered before a demotion
+  cannot be reused to climb back.
+- **25j. Trading outside Belay is out of scope, and says so.** Trading done
+  outside Belay, for example by a user's own connected AI, is out of scope
+  for these ADRs. Belay's documents state that limitation plainly.
+
+### What it does not settle
+
+The numbers: the live duration minimums in 25e, and the correction for trial
+counts in 25h. It also does not ratify either ADR. Both stay PROPOSED until
+they are revised, a fresh independent pass has tried to break them, and the
+owner ratifies them. The owner's chosen different-AI pass on Issue #21 is
+still owed.
+
+# Part 26 — Ruled 2026-09-24: six more principles for the evidence bar
+
+**Question put.** A second falsification pass on the redrafts of ADR-015 (#7)
+and ADR-016 (#20), posted on Issue #21, found two new blocking holes in how
+ADR-015 reads a strategy's stage after a downward step. It also found six
+questions only the owner can answer. The session put each one with a
+recommendation.
+
+**Owner said: "Aligned".**
+
+### What it settles
+
+- **26a. A downward step whose review does not resolve lowers the stage read
+  now, and nothing more.** It never makes a Retire final and never bars
+  earlier evidence under 25i. It is flagged for a human to repair.
+- **26b. The trial cap uses an overall false-positive rate of 5%.** It is
+  computed from each significance report's own degrees of freedom, not from a
+  fixed count. It applies only where 25b's 3.0 hurdle applies: Paper Trading
+  and the capital rungs.
+- **26c. Confidence on a capital stage is a capital decision.** Changing a
+  funded strategy's confidence needs a recorded human yes, as in 25f.
+- **26d. 25i's "evidence" means the data.** A report computed after a
+  demotion over data from before it is still evidence from before the
+  demotion.
+- **26e. Reading a stage re-checks its evidence.** The current-stage read
+  resolves the last review's bound reports and applies ADR-016 rule 8, not
+  only the validator.
+- **26f. Capital waits for verification.** The capital rungs stay closed
+  until a human authorization can be verified, not only declared.
+
+### What it does not settle
+
+How a human authorization is verified. It also does not ratify either ADR;
+both stay PROPOSED until they are revised, a fresh independent pass has tried
+to break them, and the owner ratifies them.
+
+# Part 27 — Ruled 2026-09-25: seven more principles for the evidence bar
+
+**Question put.** A third falsification pass on ADR-015 (#7) and ADR-016
+(#20), posted on Issue #21, found nothing left that grants capital. It found
+one blocking way the lock jams shut on an honest strategy, and seven questions
+only the owner can answer. The session put each one with a recommendation.
+
+**Owner said: "aligned".**
+
+### What it settles
+
+- **27a. This replaces 26d.** After a demotion, a climb back requires new paper
+  or live trading evidence gathered after the demotion. A backtest may reuse
+  historical data. 26d, read as covering all data dated before the demotion,
+  would have barred about ten years of history: a permanent ban in effect.
+  27a supersedes it.
+- **27b.** Keep the current-stage read (`current_stage`). It also reports the
+  confidence that was approved.
+- **27c. Unsaved trials are a stated gap in the evidence bar, not a 25j
+  matter.** A trial run but never stored is a stated residual of ADR-016.
+  Follow-up: Belay's own tools store every run automatically.
+- **27d. A later review names what it supersedes.** When two downward reviews,
+  or a downward and a Promote, exist about the same version, the later review
+  must name the one it supersedes. Once a position, or any later one, is backed
+  by a resolving review, an older stored downward review about it stops
+  applying.
+- **27e.** 25i's bar on reuse after a demotion follows a strategy across
+  identifiers, including a re-registered unchanged specification.
+- **27f.** Reading a capital stage verifies the whole chain, not only the
+  last step.
+- **27g. Raising a stage is a capital decision.** A repair that raises the
+  stage read needs a recorded human yes, as in 25f.
+
+### What it does not settle
+
+It does not ratify either ADR. Both stay PROPOSED until they are revised, a
+fresh independent pass has tried to break them, and the owner ratifies them.
+The owner is asking the second contributor for the different-AI pass on
+Issue #21.
+
+# Part 28 — Ruled 2026-09-25: four more principles, and how the evidence bar is finished
+
+**Question put.** A fourth falsification pass on ADR-015 (#7) and ADR-016
+(#20), posted on Issue #21, found nothing that reaches capital without a
+verified human yes. It did find ADR-015 contradicting itself: one rule
+requires a human authorization on repair reviews, and another forbids that
+field there. It also found a forged file that blocks promotion permanently,
+and four questions only the owner can answer. The session also said that four
+rounds of prose had each added rules with new edge cases, and that every
+important finding was caught by running a model of the rules, not by reading
+them. It proposed a different way to finish.
+
+**Owner said: "aligned, yes to the plan".**
+
+### What it settles
+
+- **28a.** A hand-written upward step cannot cancel a pending genuine demotion
+  or retirement, at any stage. The review at that position must name it in
+  `supersedes` and carry a recorded human yes (25f, 27g).
+- **28b.** A repair or supersession that raises a funded strategy's confidence
+  needs the verified human yes of 26f, like any other confidence change on a
+  capital stage (26c).
+- **28c. A wrong date is repairable.** A mistaken or future-dated demotion date
+  must not ban a strategy and its descendants permanently. A correction of the
+  date, approved by a human, is allowed.
+- **28d.** A Retired strategy may be re-registered and climb again, carrying
+  its lineage (27e) and every bar that follows it. The ADRs say so.
+- **28e. How it is finished.**
+  1. One final text round fixes the two blocking findings and applies 28a-28d,
+     with no redesign.
+  2. The current-stage read is then built as code. Every attack from the
+     falsification passes on Issue #21 becomes a test that must fail, and the
+     ADRs describe what the code does.
+  3. The second contributor's different-AI pass on Issue #21 runs in parallel,
+     on the current text.
+
+### What it does not settle
+
+It does not ratify either ADR. The code in 28e is capital-path code: it lands
+through review like any other, and it opens no capital rung. Every rung stays
+closed by its unruled constants.
+
+## Notes on Parts 24-28 from the independent pass, 2026-09-25, made before merge
+
+A fresh-context falsification pass on this pull request found the following.
+None of it changes what the owner said. It marks where the record goes beyond
+what is on file, so the owner can confirm or correct it.
+
+1. **The recommendations the owner answered "aligned" to are not on file.**
+   Parts 25-28 say each question was put with a recommendation. The questions
+   are in the pass comments on Issue #21, but the recommendations were put in
+   the session's chat, and that chat is not part of this repository. These
+   lines go beyond the questions as recorded on Issue #21, so they are **the
+   session's wording until the owner confirms them**:
+   - 25b's "at least" 3.0;
+   - 25c's "starts at Idea";
+   - 26a's "flagged for a human to repair" and "never makes a Retire final";
+   - 27b's second sentence;
+   - 27c's follow-up that Belay's own tools store every run;
+   - 27d taking both of the pass's alternatives;
+   - 28a's "at any stage" and its recorded human yes;
+   - the plan in 28e.
+2. **Part 28's premise is overstated.** Not every important finding came from
+   running a model: pass 1's B1-B3 and pass 4's F4-3 were argued from the
+   text.
+3. **25g against 26e and 27f is not reconciled.** 25g says a raised bar does
+   not re-judge past steps. 26e and 27f re-check evidence when a stage is
+   read. Neither says whether that check uses the bar in force at each step or
+   today's bar. It is open.
+4. **25h and 26b change 18e's role**, from a count that "corrects nothing" to a
+   refusal gate, without saying they amend 18e.
+5. **28e and 18g.** Part 28 does not say whether a fresh pass on the final
+   text is still required before ratification. `AGENTS.md` point 4 requires
+   one. Under Part 30 (on #32), a fresh session satisfies it, and the
+   different-AI pass is welcome but not waited on.
+6. **"Every attack becomes a test that must fail"** in 28e means the attack
+   must fail: the test passes when the attack is refused.
+7. **Part 24's floor is the session's choice.** It is lowered here from 3.0
+   to 2.2.0, the floor `rich` requires; the tests pass at both. 27a no longer
+   puts quotation marks around words 26d did not use.
+
