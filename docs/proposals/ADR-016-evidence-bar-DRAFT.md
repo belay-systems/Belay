@@ -4,11 +4,12 @@ Status:
 **PROPOSED — drafted from owner rulings, revised 2026-09-24 after a falsification
 pass and the owner's Part 25, 2026-09-25 after a second pass and the owner's Part 26,
 again 2026-09-25 after a third pass and the owner's Part 27, and a last time
-2026-09-25 after a fourth pass and the owner's Part 28. Not ratified. Not implemented
-in any part.**
+2026-09-25 after a fourth pass and the owner's Part 28, then for the owner's Part 32
+(rule 10 and the passages that depend on it). Not ratified. Not implemented in any
+part.**
 
 Date:
-2026-09-22 (revised 2026-09-24, 2026-09-25, and twice more on 2026-09-25)
+2026-09-22 (revised 2026-09-24, 2026-09-25, and three more times on 2026-09-25)
 
 ---
 
@@ -26,6 +27,16 @@ Date:
 > purpose: the file on this branch is `main`'s, where ADR-015 does not exist, and the
 > repository's citation test would read them against the wrong file. They go stale when that
 > branch changes; repoint them when it does.
+
+> **What changed for Part 32 (2026-09-25).** The three readings Part 31 left open
+> were put to the owner, who ruled **Part 32** (on branch `claude/great-turing-v2d0x8`
+> until it merges). **32a, "Today's bar"**, overrules 25g's "It does not re-judge past
+> steps": rule 10 now judges every stored review by the current version's constants,
+> so a raised bar lowers a strategy's read at once, with its cost stated; test 24 is
+> rewritten to match, and ADR-015 rule 4's "Which ADR-016 version applies" is
+> rewritten line for line (Changes rows 36-38). **32b**: rule 6 says 25h and 26b amend
+> 18e. **32c**: item 12 of "Put to the owner at ratification" requires the fresh pass
+> on the text as ratified. Nothing else is redesigned (32, "Session readings").
 
 > **What changed in the fifth revision (2026-09-25).** A fourth pass (Issue #21, the
 > comment "Fourth supplementary pass: ADR-015 at `61789bc` (#7), ADR-016 at `7855303`
@@ -128,9 +139,8 @@ Date:
 
 > **Nothing in this revision has had an independent pass.** The scratch model below
 > was written by the author, so it is not one. `AGENTS.md` (How work is
-> claimed and landed, point 4) requires one before anything is called verified. The
-> owner's chosen different-AI pass on Issue #21 is still owed (Part 25, "What it
-> does not settle").
+> claimed and landed, point 4) requires one before anything is called verified. A
+> fresh session satisfies it; a different AI is welcome, never waited for (Part 30b).
 
 ---
 
@@ -511,6 +521,11 @@ promotion that leaves it blank is refused." **Every `Promote` is RULED, not a dr
 choice** (finding N2: the previous revision marked it DRAFTER). The count corrects
 nothing; ADR-012 rule 10 (`docs/DECISIONS.md:2244-2250`) is unchanged.
 
+**RULED (32b): 25h and 26b amend 18e.** The owner chose "Yes, say it amends 18e",
+whose text was: "The count still corrects no result, but a count above the cap is
+refused." 18e's "The count corrects nothing and claims nothing" still holds of the
+result; it no longer holds of the promotion, which the count can now block.
+
 **RULED (25h): "A `variants_tried` count above what the 3.0 hurdle covers is refused
 until the owner rules on a correction."**
 
@@ -791,30 +806,48 @@ that writes `"human"` is refused by nothing but the record it leaves. What Belay
 record about a human decision is itself unruled beyond 19c item 2 (Required
 Follow-Up item 1).
 
-### Rule 10 — The bar has a version, and a raised bar applies from each strategy's next step
+### Rule 10 — The bar has a version, and every read judges every step by today's bar
 
-**RULED (25g): "A raised bar applies from each strategy's next step. It does not
-re-judge past steps. No strategy holds capital today."** Finding S1.
+**RULED (32a), overruling 25g's "It does not re-judge past steps".** Asked which
+bar a stage read judges each past step by, the owner chose **"Today's bar"**, whose
+text was: "Every read re-judges every past step against the current bar, so raising
+the bar immediately drops any strategy that no longer meets it." **RULED (25g), the
+words that stand:** "A raised bar applies from each strategy's next step. [...] No
+strategy holds capital today." Finding S1.
 
 **DRAFTER — the mechanism.**
 
-- A module constant `BAR_VERSION`, starting at `1` on ratification, and a table of
-  every ratified version's constants (rules 1, 2, 5, 6, 8). Every amendment of this
-  ADR that changes a constant adds a version; none edits an old one.
-- **Every review records `bar_version`**, on every outcome. `save()` accepts only the
-  current version. A stored review is validated against the constants of the version
-  it records — never against a later one — so raising a floor does not make an old
-  review unreadable, and does not re-judge the step it bought (25g). An unknown
-  version is refused.
+- A module constant `BAR_VERSION`, starting at `1` on ratification. Every amendment
+  of this ADR that changes a constant (rules 1, 2, 5, 6, 8) adds a version. The code
+  holds the current version's constants only; an earlier version's are in the text
+  of the amendment that replaced them.
+- **Every review records `bar_version`**, on every outcome: the version it was saved
+  under, kept as a record. `save()` accepts only the current version. A version the
+  code does not know, or one above the current version, is refused.
+- **Every stored review is judged by the current version's constants**, on every
+  read (ADR-015 rule 3c) and in every sweep (ADR-015 rule 3f), never by the version
+  it records (32a). A raised floor therefore lowers a strategy's read at once: a
+  review that no longer meets it fails 3c, and the read falls to the lowest stage it
+  can establish, as for any review that fails (25d). The strategy climbs back only
+  through new reviews that meet today's bar. A lowered bar also applies at once; the
+  conformance test below is what makes a lowering visible. *(Replaced 2026-09-25 by
+  32a: the previous text judged each review by the version it records, so a raised
+  bar applied only from each strategy's next step.)*
+- **The cost, stated (32a).** Raising any constant can take a strategy off its
+  stage, a capital stage included, as soon as code carrying the new constant runs.
+  No strategy holds capital today (25g). Downward moves carry no bar (rule 1), so a
+  raised bar never blocks a demotion.
 - **`bar_version` never decreases along a ladder's reviews** (second-pass finding
   2N7). A review is refused when its `bar_version` is below that of any review named
-  by an earlier rung of the subject's ladder. Without it, a hand-written review
-  (which never passes through `save()`'s "current version only") could claim an
-  older, laxer version of the bar. It reads other reviews, so it runs in `save()`
-  and the sweep, not in ADR-015 rule 3c. **Limit, stated:** it cannot stop a
-  forged review at the first rung of a ladder from naming an old version; while
-  only version 1 exists there is nothing older to name.
-- **A conformance test pins each version's constants to the ratified text** of this
+  by an earlier rung of the subject's ladder. **Under 32a it no longer decides which
+  bar applies**, because every review is judged by today's. It is kept as a check
+  on the record: `save()` accepts only the current version, so only a hand-written
+  file can break the order, and the sweep then names it. It reads other reviews, so
+  it runs in `save()` and the sweep, not in ADR-015 rule 3c. *(The previous text's
+  "Limit, stated", that a forged first-rung review could name an older, laxer
+  version, no longer applies: a review naming an older version is judged by
+  today's constants all the same.)*
+- **A conformance test pins the current version's constants to the ratified text** of this
   ADR, parsed from `docs/DECISIONS.md` once it lands there. A constant changed in
   code without an amendment turns the suite red, which is how a *lowered* bar is
   detected. **That test, not a promotion test, is what catches a `D` floor removed
@@ -889,8 +922,8 @@ column.
 Every row is applied on pull request #7's branch. **"Now" is ADR-015 at `ddda627`**,
 checked line by line against that commit for this revision (`git show
 ddda627:docs/DECISIONS.md`). Rows 1-17 are the 2026-09-24 revision's changes, rows
-18-26 the first 2026-09-25 revision's, rows 27-31 the fourth revision's, and rows
-32-35 this revision's; the lines of the earlier rows moved and are repointed. "Was" is where the first pass found the
+18-26 the first 2026-09-25 revision's, rows 27-31 the fourth revision's, rows
+32-35 the fifth revision's, and rows 36-38 the Part 32 revision's; the lines of the earlier rows moved and are repointed. "Was" is where the first pass found the
 text (its "PR7:" citations); "—" where the text is new.
 
 | # | Change | Was (PR7:) | Now (lines) |
@@ -930,6 +963,9 @@ text (its "PR7:" citations); "—" where the text is new.
 | 33 | Rule 3h step 5: an upward rung cancels a pending stored `Demote` or `Retire` only when its review names it and carries rule 9's `human_authorization`, passing rule 5's verifier on a capital stage (28a, F4-10) | — | 4894-4924 |
 | 34 | Rule 3h steps 5 and 6: a supersession or repair that raises a capital-stage confidence passes rule 5's verifier (28b, F4-4) | — | 4916-4920, 4993-5001 |
 | 35 | Rule 4(f): a repair review carrying rule 9's `human_authorization` re-anchors a mistaken or future-dated demotion date (28c, F4-6) | — | 5224-5239 |
+| 36 | Rule 4, "Which ADR-016 version applies": every read and every sweep judges every stored review by the current version's constants, and a raised bar lowers the read at once; the non-decreasing `bar_version` is kept as a check on the record (32a, rule 10). Same lines as row 23, rewritten line for line | — | 5358-5367 |
+| 37 | The Status line: revised once more, for Part 32 | — | 3623 |
+| 38 | Required Follow-Up: Part 32 is the record not yet on `main` (Parts 25-28 merged with #31); a fresh session satisfies the independent pass, a different AI is never waited for (30b), and 32c adds one on the text as ratified | — | 6421-6423, 6427-6428 |
 
 ## Tests this implies
 
@@ -1072,13 +1108,18 @@ refusal, never a bare exception type.
 23. A demotion from `Limited Capital` into `Micro Capital` with no
     `human_authorization`: **accepted** (25d, 18b).
 
-**Rule 10 (25g, S1, N4)**
+**Rule 10 (32a, 25g, S1, N4)**
 
-24. A review stored under bar version 1 still validates after a hypothetical version
-    2 raises a floor; a new review saved under version 1 is refused naming the current
+24. **32a.** A strategy at `Micro Capital` whose reviews met version 1: under a
+    hypothetical version 2 that raises `Micro Capital`'s floor above that review's
+    grade, the current-stage read falls to the lowest stage it can establish below
+    `Micro Capital`, with no new file written. The same strategy under version 1
+    reads `Micro Capital` (the mutation: judging by the recorded version keeps it
+    there). A new review saved under version 1 is refused naming the current
     version; an unknown version is refused.
 24a. **2N7.** Under a hypothetical version 2, a review at the second rung that records
-    version 1 while the first rung's review records version 2: refused naming both.
+    version 1 while the first rung's review records version 2: refused naming both,
+    by `save()` and by the sweep.
 25. **Mutation check, through the conformance test.** Changing any constant — a floor
     by one grade, **the `D` floor removed**, a criterion deleted, an allowlist
     widened or an entry's grade changed, a rule 5 constant filled (including
@@ -1162,7 +1203,8 @@ every rule now, while nothing in production does.
 - **Binding every stored report**, as the previous revision did. One stored junk
   report blocked every promotion (2N5). Listing without binding keeps the disclosure
   and drops the veto.
-- **Re-judging past promotions when the bar is raised.** 25g ruled against it.
+- **Judging each step by the bar of its time.** The previous revision did this,
+  on 25g's words. 32a ruled against it: every read uses today's bar.
 - **A single report binding several criteria.** 25a rules seven distinct reports.
 
 ---
@@ -1237,9 +1279,10 @@ every rule now, while nothing in production does.
     ADR-012 amendment's reported conditions (rule 8).
 11. **Parts 25-28 merged to `main`**, and this draft revised again if any
     changes.
-12. **A fresh independent pass** on this ADR and ADR-015 together. The owner's chosen
-    different-AI pass on Issue #21 is still owed; 28e has it run in parallel with the
-    code, on the current text.
+12. **A fresh independent pass** on this ADR and ADR-015 together, on the exact text
+    to be ratified, after 28e's step 2 has conformed both to the code, and right
+    before ratification (18g, confirmed by 32c). A fresh session satisfies it; a
+    different AI is welcome, never waited for (30b).
 13. **`README.md` states 25j's limit** (second-pass finding 2N13). 25j requires that
     "Belay's documents state that limitation plainly", and the README, the first
     document a buyer reads, does not. It is not edited by this draft; the change that
@@ -1317,7 +1360,7 @@ finding sits in this revision.
 | 25d Fail toward less capital | rule 3 (no binding on downward moves); rule 9 (no authorization on downward moves) | rules 3b, 3e, 3h, 8 |
 | 25e Live rungs closed | rule 5 | rule 3c runs it (B3) |
 | 25f A human authorizes capital | rule 9 | residual risk note |
-| 25g Raised bar applies from next step | rule 10 | rule 4, "Which ADR-016 version applies" |
+| 25g Raised bar applies from next step; "does not re-judge past steps" overruled by 32a | rule 10 | rule 4, "Which ADR-016 version applies" |
 | 25h Refuse trial counts beyond the hurdle | rule 6 | — |
 | 25i No reuse after a demotion | rule 3 check 5 (report subject position); rule 3 check 8 (the grade that makes a report paper or live, for 27a) | rule 4(f) |
 | 25j Trading outside Belay out of scope | "What these rules do not reach" | rule 8 |
@@ -1393,6 +1436,9 @@ here, because the first pass used N1-N7.
 | 28c A wrong date is repairable | rule 9 | rule 4(f) (lines 5224-5239); test 79 |
 | 28d A Retired strategy may be re-registered | rule 6 check 5 | rule 3g; test 82 |
 | 28e How it is finished | the Status block; Required Follow-Up item 18 | Status block; Required Follow-Up ("Implementation") |
+| 32a Today's bar: every read judges every step by the current constants | rule 10; test 24 | rule 4, "Which ADR-016 version applies" (lines 5358-5367) |
+| 32b 25h and 26b amend 18e | rule 6 | — |
+| 32c 18g's fresh pass stands, on the text as ratified | Put to the owner at ratification, item 12 | Required Follow-Up (lines 6427-6428) |
 
 **How the fifth revision was checked.** The fourth pass's own abstract model of
 ADR-015, extended with both ADRs' fifth-revision rules as worded, and run under the
