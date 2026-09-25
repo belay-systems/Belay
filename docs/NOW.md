@@ -26,7 +26,7 @@ merged, in that order. #32 is the last of them.
 - **Owner rulings on `main`:** Parts 1-19, 21 and 23-31. Part 20 (#22) is not
   adopted (Part 30), and #22 is closed. Part 22 is on #20.
 - **Review gate:** `python scripts/review_due.py` gives the next finding
-  number. The highest number in use anywhere is F-030.
+  number and is the only authority on it. Do not restate its answer here.
 - **Contributors help and never gate** (Part 30). Work lands on the owner's
   word, through the Owner bypass.
 
@@ -40,31 +40,38 @@ open pull requests and Issues on GitHub, `python -m pytest -q`,
 |---|---|---|
 | #7 | ADR-015: a strategy's stage is carried, not asserted (F-007, F-014) | The final text round: item 1 below |
 | #20 | ADR-016 draft, Part 22, the ADR-012 amendment draft (`docs/proposals/ADR-016-evidence-bar-DRAFT.md`) | Moves with ADR-015 |
-| #33 | Parts 32-34 and the final-text-round session close | Open |
+| #33 | Parts 32-34 and the final-text-round session close | Open. Goes red against #36's finding-number test if #36 merges first (#36's `docs/NOW.md` says how to fix it) |
 | #36 | F-032 to F-036 fixes, Parts 35-36, ADR-017's draft (grade from provenance) | **The fourth pass broke attempt three** (four blocking). Not to be ratified; attempt four is owed |
 | #37 | Parts 37-39 (ADR-017 promises option A; price fingerprint; results name their record), the fourth pass's session record | Merge after #36 |
 
-Both merge cleanly onto this `main` and pass (704), except that each one
-appends to the end of `docs/OwnerDecisions.md` or `docs/OperatorChecklist.md`.
-There, keep `main`'s text first and add the branch's text after it.
+#7 and #20 merge cleanly onto this `main` and pass (704), except that each
+appends to the end of `docs/OwnerDecisions.md` or `docs/OperatorChecklist.md`:
+there, keep `main`'s text first and add the branch's text after it. **That rule
+does not hold for `docs/NOW.md`**, which #33, #36 and #37 each rewrite: keeping
+both sides gives two next-task lists and fails the build. Resolve `docs/NOW.md`
+to the branch merging second's own intent, with one list.
 
 ## Highest Priority Next Task
 
-1. **ADR-017 (#36): put the two follow-ups, then build attempt four.**
-   - The fourth independent pass broke attempt three three ways, all posted on #36:
+1. **ADR-017 (#36): one question to the owner, then attempt four.**
+   - The fourth independent pass on #36 broke attempt three three ways, all posted there:
      the repository and store it trusts are folders the caller picks, record paths
      escape them with `..`, and prices are not bound to the record.
    - The owner chose option A (Part 37): guard against honest
      mistakes and make faking visible in review; not "impossible".
-   - The owner then ruled both follow-ups: Level C needs the series to match a
-     fingerprint of the prices the fetch received (Part 38), and every Level C
+   - The owner then ruled both follow-ups: Level C needs the prices used to match
+     what the fetch received (Part 38, by a stored fingerprint), and every Level C
      metric artifact names the fetch record behind its grade (Part 39).
-   - **Next:** attempt four on #36, built to Parts 37-39 and to the fourth pass's
+   - **Open with the owner:** the owner was told the fingerprint was the only
+     method, which was wrong; re-parsing the stored bytes is a second. Whether to
+     keep the fingerprint or let attempt four choose is in
+     `docs/OperatorChecklist.md`.
+   - **Then:** attempt four on #36, built to Parts 37-39 and the fourth pass's
      findings; then its own independent pass; then ratification. Not before.
 2. **Finish the evidence bar the way Part 28e rules.**
    - **Step 1, the final text round on #7 and #20, with no redesign:**
-     - fix the fourth pass's two blocking findings (F4-3 and F4-1, Issue #21,
-       2026-09-25 01:28 UTC);
+     - fix the two blocking findings of Issue #21's fourth pass (F4-3 and
+       F4-1, 2026-09-25 01:28 UTC) — not the fourth pass on #36 in item 1;
      - apply 28a-28d, which Part 31 confirms as recorded;
      - settle the three open readings in the notes after Part 28: 25g against
        26e and 27f, 25h and 26b against 18e, and 28e against 18g. Put each to

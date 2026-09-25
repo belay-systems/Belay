@@ -855,6 +855,37 @@ The owner answered "aligned to recommendation" (`docs/OwnerDecisions.md` Part
 
 # 2026-09-25 — owner items from the fourth pass on ADR-017 (#36)
 
+## Open — 2026-09-25: the fingerprint, or either method that binds the prices?
+
+**Why this is back with you.** When you ruled Part 38 ("yes to fingerprint") you
+had been told the fingerprint was *the only thing* that catches prices changed after
+the fetch. That was wrong, and the independent pass on these records found it.
+There is a second way: Belay already keeps the raw bytes the vendor sent and checks
+their hash, and every data source has code that turns those bytes into prices. So
+the next attempt could re-read the bytes, turn them into prices again, and compare
+— binding the prices without adding anything to the fetch record.
+
+**The difference that matters.**
+
+- *A stored fingerprint* changes what every fetch record carries. Under ADR-014 that
+  makes the one saved record, `RPT-0001`, a migration of a permanent record. It is
+  fixed at fetch time, so a later change to the parsing code cannot move it.
+- *Re-reading the bytes* changes no record and needs no migration. But it depends on
+  the parsing code at the time of the check: if that code changes, old data could
+  stop matching, or match differently.
+
+Either way the rule you ruled holds: Level C only when the prices used are the ones
+the vendor sent; adjusted prices are Level D until the adjustment is recorded.
+
+**The question:** keep the stored fingerprint as the method, or rule only the rule
+and let the next attempt choose the method, with its independent pass checking the
+choice?
+
+*Recommended: rule only the rule.* The method is repository mechanics, which you
+delegate, and both methods have a real weakness the next attempt should weigh with
+the code in front of it. Your Part 38 answer is recorded exactly as given until you
+say otherwise.
+
 ## Done — 2026-09-25: what should ADR-017 promise? (option A)
 
 **Answered. Owner said "A - per your recommendations"** — recorded as
@@ -875,9 +906,10 @@ help; the answer given, no for this problem, is recorded in Part 37.
 ## Done — 2026-09-25: a fingerprint of the prices (follow-up 1)
 
 **Answered. Owner said "yes to fingerprint"** — recorded as
-`docs/OwnerDecisions.md` **Part 38**. The existing record `RPT-0001` has no
-fingerprint, so it cannot back a Level C result until re-fetched; recorded there,
-since it was not said when the question was put.
+`docs/OwnerDecisions.md` **Part 38**, with two things the owner was told wrong and
+one cost not stated, all recorded there: the fingerprint is not the only method
+(the open question above), the ADR-014 cost to the saved record `RPT-0001` was not
+stated, and re-fetching would not give `RPT-0001` a fingerprint.
 
 ## Done — 2026-09-25: each result names its fetch record (follow-up 2)
 
@@ -885,25 +917,7 @@ since it was not said when the question was put.
 What a later re-check does when the record is missing or has changed was not
 asked, and is left open there.
 
-## Done — 2026-09-25: two follow-ups to option A (both answered)
-
-Named when option A was put, then asked one at a time. Both are answered (above,
-Parts 38 and 39) and kept here as they were first written.
-
-1. **Should a fetch record store a fingerprint of the parsed prices?**
-   *Recommended: yes.* Today a genuine fetch with its prices replaced on the same
-   dates is still graded Level C; this is the only check that catches it, and it
-   catches the honest mistake as well as the fake. **Cost:** a backtest that
-   adjusts prices for splits or dividends after fetching drops to Level D until
-   the adjustment step is itself recorded. It changes what a fetch record carries,
-   which touches ADR-014.
-2. **Should every metric artifact name the fetch record behind its grade?**
-   *Recommended: yes.* Today a Level C result carries no record identifier, so its
-   grade can never be re-checked after it is built. The evidence record's existing
-   free-text `provenance` line could carry it, so the four `Disclosure` fields the
-   constitution's conformance test holds would not change.
-
 ## Later — ratify or reject ADR-017
 
-After attempt four is built to Part 37 and has had its own independent pass. Not on
-attempt three.
+After attempt four is built to Parts 37-39 and has had its own independent pass.
+Not on attempt three.

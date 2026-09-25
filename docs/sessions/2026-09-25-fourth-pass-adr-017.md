@@ -1,8 +1,8 @@
-# 2026-09-25 — the fourth falsification pass on ADR-017, and Part 37
+# 2026-09-25 — the fourth falsification pass on ADR-017, and Parts 37-39
 
 ## What was asked
 
-"Lets do the fourth falsification pass before ADR-017's ratification." That pass
+"lets do the fourth falsification pass before ADR-017's ratification." That pass
 was item 1 of the next-task list on #36 (`claude/brave-pascal-e7401x`), with three
 aims:
 
@@ -12,7 +12,8 @@ aims:
 3. check that Part 36 and ADR-017 claim nothing more than the owner ruled.
 
 Then, after the pass, the owner asked for help choosing between the two threat
-models it raised, and chose option A (Part 37).
+models it raised, chose option A (Part 37), and answered the two follow-ups
+(Parts 38 and 39).
 
 ## What was done
 
@@ -54,14 +55,13 @@ which mutation cannot find.
 asked first whether a blockchain or web3 design would help; the answer given was no,
 for this problem, with the reasons recorded in Part 37. The owner then said "A - per
 your recommendations". Recorded as Part 37, with "per your recommendations" read as
-covering A only, since the two follow-ups had not yet been put with their costs.
+covering A only: the follow-ups' costs had been stated, but the session had said it
+would bring them one at a time and had asked only "do you choose A?".
 
 **Follow-up 1, put on its own.** Should a fetch record store a fingerprint of the
 prices, with Level C requiring the series to match it? Recommended yes, with the
 cost stated: prices adjusted after the fetch are Level D until the adjustment is
-recorded. The owner said "yes to fingerprint". Recorded as Part 38, together with a
-consequence not stated when it was put: `RPT-0001` has no fingerprint and cannot
-back Level C until re-fetched.
+recorded. The owner said "yes to fingerprint". Recorded as Part 38.
 
 **Follow-up 2, put on its own.** Should every result name the fetch record behind
 its grade — identifier, version and fingerprint — so the grade can be re-checked
@@ -73,9 +73,10 @@ every metric artifact built after it (none is stored).
 ## Files changed
 
 - `docs/OwnerDecisions.md` — Parts 37, 38 and 39.
-- `docs/OperatorChecklist.md` — the question as put (Done), the two follow-ups
-  (Open), and ratification (Later).
-- `docs/NOW.md` — "In flight" and the next-task list.
+- `docs/OperatorChecklist.md` — one open question (fingerprint, or either method),
+  three Done entries (option A and the two follow-ups), and ratification (Later).
+- `docs/NOW.md` — "Where things stand" (the review-gate line), "In flight", and the
+  next-task list.
 - This record.
 
 No code changed.
@@ -97,20 +98,59 @@ clean before the next. Every line citation in the posted pass was re-read agains
 the file after writing; one (`reporting.py`) was wrong by a line and was corrected
 before posting.
 
-On this branch, the suite was run after the edits (see the pull request).
+Part 39's claim that the `provenance` text is inside the evidence hash was checked
+by building two evidence records that differ only in it: the hashes differ.
 
-**Independent pass on this record and Part 37:** see the pull request. Part 37 is
-the kind of text three passes on #36 caught claiming more than the owner said, so it
-was checked for exactly that.
+On this branch after every change: `704 passed, 1 skipped, 5 xfailed`, and CI green
+on #37.
+
+## The independent pass on these records, and what it changed
+
+A fresh agent was told to falsify Parts 37-38 and these records against a verbatim
+transcript of the owner exchange. It edited nothing. It found 2 blocking, 7 defects
+and 11 notes; every item checked here was real. The ones that changed a ruling's
+record or what the owner must hear:
+
+- **The fingerprint is not the only method.** The owner was told it was "the only
+  thing that catches" changed prices. Re-parsing the stored bytes, already
+  hash-checked, is a second method that changes no fetch record. Verified: each
+  source has a parser (`_parse` in `framework/data/dolthub.py` on #36). Recorded in
+  Part 38 and put back to the owner as one question.
+- **Re-fetching does not give `RPT-0001` a fingerprint.** Identical bytes return the
+  existing record (ADR-014 rule 5, and `fetch_and_record` on #36), and changing a
+  saved record's signed content is a migration under ADR-014. The ADR-014 cost was
+  not stated to the owner. Recorded in Part 38.
+- **The reason for reading "per your recommendations" narrowly was false** (costs
+  had been stated); the true reason and the ambiguity are now in Part 37.
+- **Option A depends on Parts 38 and 39**, and on the named record being committed;
+  Part 37 had presented them as add-ons.
+- **The blockchain answer was wrong about B3**, which is a genuine record with prices
+  changed afterwards. The conclusion stands; the correction is in Part 37.
+- **The merge rule for `docs/NOW.md` was wrong.** Keeping both sides gives two
+  next-task lists and fails the build (`2 failed, 718 passed` in its rehearsal on
+  top of #36). Corrected here and in `docs/NOW.md`.
+
+Also fixed: 37a in the future tense rather than as delivered; 38b says "prices",
+not "series"; a claim that the Part 36 recommendation had already named the ADR-014
+cost (it had named it for metric artifacts, not fetch records); stale checklist and
+`docs/NOW.md` text after Part 38; the #33 row's missing warning; a stale
+finding-number sentence in `docs/NOW.md`; the owner's quote, which begins "lets".
+
+Every correction to a ruling's record says so in the Part itself ("Corrected before
+merge"), rather than being edited away.
 
 ## What is open
 
+- **One question with the owner:** keep the stored fingerprint as the method, or
+  rule only that prices must match what was received and let attempt four choose.
+  In `docs/OperatorChecklist.md`.
 - **Attempt four of ADR-017**, on #36, built to Parts 37-39 and the fourth pass's
   findings, then its own independent pass. Not before.
 - **Left open by Parts 38 and 39:** how an adjustment is recorded; refusal or
   Level D on a mismatch; what a later re-check does when a named record is missing
-  or has changed.
-- **Merge order.** Parts 37-39 refer to Parts 35 and 36, so this branch should merge
-  after #36. Both edit the end of `docs/OwnerDecisions.md` and
-  `docs/OperatorChecklist.md`, and both edit `docs/NOW.md`: keep `main`'s text first
-  and add this branch's after it.
+  or has changed; that the named record is committed.
+- **Merge order.** Parts 37-39 refer to Parts 35 and 36, so this branch merges
+  after #36. For `docs/OwnerDecisions.md` and `docs/OperatorChecklist.md`, keep the
+  text already on `main` first and add this branch's after it. **Not for
+  `docs/NOW.md`:** keeping both sides fails the build. Take #36's `docs/NOW.md` and
+  add this branch's ADR-017 item and the #37 row to its one next-task list.
