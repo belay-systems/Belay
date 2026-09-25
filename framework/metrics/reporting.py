@@ -245,11 +245,15 @@ def metric_artifact(
     Pass `timestamp` to make the result byte-for-byte reproducible; it defaults
     to now, which makes each call unique.
 
-    Evidence is graded HISTORICAL — Level C, `constitution/Evidence_Standards.md`
-    "historical simulation". The number is computed from observed values, which
-    is stronger than a hypothesis and weaker than a paper or live result. The
-    evidence confidence is 1.0 and expresses certainty in the *arithmetic*, not
-    a forward-looking claim about the strategy the series came from.
+    **The evidence grade is read from `disclosure`, not chosen here.** A
+    `FetchedDisclosure` yields HISTORICAL (Level C); a hand-built `Disclosure`
+    yields RESEARCH (Level D). Until 2026-09-25 this function hardcoded
+    HISTORICAL for every caller, and that line was F-033 — eight figures typed at
+    a keyboard signed as historical simulation. See `Disclosure.evidence_level`
+    and ADR-017's draft; the owner ruled it as `docs/OwnerDecisions.md` Part 35.
+
+    The evidence confidence is 1.0 and expresses certainty in the *arithmetic*,
+    not a forward-looking claim about the strategy the series came from.
 
     The artifact is signed because `ArtifactFactory` signs everything it emits,
     so that is a property of the creation path rather than something each metric

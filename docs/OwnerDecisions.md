@@ -3523,9 +3523,20 @@ and both survived an independent falsification pass.
   requires — a document frozen by ADR-002 — so a fifth field on `Disclosure`
   would turn the constitution's own validation conformance red. The provenance is
   therefore carried by a subclass and read through a property, which changes no
-  signed content. **The substance ruled is unaffected; the mechanism was not
+  signed `content`. **The substance ruled is unaffected; the mechanism was not
   what the owner was shown**, and that is this session's reading rather than a
   ruling. ADR-017 records it in full.
+- **The implementation does not deliver 35a, and 35a is the ruling rather than
+  the error.** Added 2026-09-25 after the independent pass on the change. The code
+  enforces "the disclosure came through `disclosure_from`", not "the series came
+  from a recorded fetch": that function takes a `DailyBarSeries` any caller can
+  build by hand, so eight invented bars passed with a real `MarketDataSource`
+  yield a Level C artifact carrying that vendor's name. Nothing in 35a is
+  withdrawn or softened by this note — **the ruling stands and the code is short
+  of it.** Closing the gap decides what a metric artifact must carry and touches
+  ADR-014, so it is put to the owner rather than chosen here
+  (`docs/OperatorChecklist.md`, 2026-09-25, "Level C does not yet mean what
+  Part 35a rules"). ADR-017 must not be ratified until that is answered.
 
 ### What it does not settle
 

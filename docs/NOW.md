@@ -17,8 +17,11 @@ said before lives in `docs/sessions/` and in git history
 Written 2026-09-25, for `main` at `95e5a4a`, plus this branch
 (`claude/brave-pascal-e7401x`, Issue #35) which is not yet merged.
 
-- **Suite:** 709 passed, 1 skipped, 5 xfailed (`python -m pytest -q`) on this
-  branch. `main` at `95e5a4a` is 704.
+- **Suite:** 710 passed, 1 skipped, 5 xfailed (`python -m pytest -q`) at
+  `9d91870`. `main` at `95e5a4a` is 704. This line read "709" through two
+  consecutive commits, which was the *passing* count of a red run — 709 passed
+  plus 1 failed — so fixing the failure turned it into 710 while the sentence
+  stayed still. Re-derive it rather than carrying it forward.
 - **`python scripts/status.py`:** exits 0, 45 open findings on this branch.
 - **The 2026-09-25 review has merged** (#34) and raised F-032 to F-036. All
   five were independently attacked on this branch and **all five survive**;
@@ -37,10 +40,15 @@ Written 2026-09-25, for `main` at `95e5a4a`, plus this branch
   series came from a recorded fetch (F-033, drafted as ADR-017, **not ratified**),
   and `pandas`/`jinja2`/`python-dateutil` are removed with `numpy` not declared
   (F-036). Both are implemented on this branch.
-- **F-033's suite run is incomplete.** The sandbox blocked `python -m pytest`
-  after the test edits, so **CI on #36 is the first full verification** of it.
-  F-036 was verified in a fresh virtual environment (709 passing with none of the
-  four packages installed). See
+- **F-033's implementation is short of the ruling, and that is the live item.**
+  The code enforces "came through `disclosure_from`", not Part 35a's "came from a
+  recorded fetch" — eight hand-typed bars with a real source yield Level C
+  carrying that vendor's name. Found by the independent pass. **One owner question
+  is open on it** (`docs/OperatorChecklist.md`, "Level C does not yet mean what
+  Part 35a rules"), and **ADR-017 must not be ratified until it is answered.**
+- **F-036 is verified** in a fresh virtual environment: the install pulls none of
+  the four packages, the suite passes, `status.py` exits 0, all six `scripts/` run
+  and the dashboard renders. See
   `docs/sessions/2026-09-25-owner-rulings-f033-f036.md`.
 - **Contributors help and never gate** (Part 30). Work lands on the owner's
   word, through the Owner bypass.

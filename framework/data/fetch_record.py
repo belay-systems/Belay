@@ -475,9 +475,24 @@ def disclosure_from(
         limitations = f"{limitations} {additional_limitations.strip()}"
 
     # `FetchedDisclosure`, not `Disclosure`: the return type is what grades the
-    # metric. F-033, owner ruling Part 35 — a computed number is Level C only when
-    # its series came from a recorded fetch, and this function is the only thing in
-    # Belay that can say so. A hand-built `Disclosure` answers Level D.
+    # metric. F-033, owner ruling Part 35 — a hand-built `Disclosure` answers
+    # Level D and only this function answers Level C.
+    #
+    # **What that buys, stated exactly, because an earlier version of this comment
+    # overclaimed it.** This enforces "came through this function", NOT "came from
+    # a recorded fetch". `series` is a `DailyBarSeries`, a frozen dataclass any
+    # caller can build by hand, and nothing here touches a payload, a
+    # `content_hash`, a stored version or a fetch record. So eight bars typed into
+    # a Python file, passed with a real `MarketDataSource`, yield a Level C
+    # artifact carrying that vendor's name — which is the same substitution the
+    # `source` parameter was designed to prevent, arriving through the `series`
+    # door. Found by the independent pass on this change, not by its author.
+    #
+    # Part 35a rules the stronger thing, so the gap is between the ruling and this
+    # code rather than in the ruling. Closing it means binding to a stored fetch
+    # record, which is `docs/OperatorChecklist.md`'s open question of 2026-09-25
+    # and touches ADR-014's persistence rules. Until it is answered, read this
+    # grade as "a fetch-shaped disclosure", not as proof of a fetch.
     return FetchedDisclosure(
         assumptions=assumptions,
         data_source=source.name,

@@ -7,7 +7,7 @@ version: 1.0.0
 author: Belay
 created: 2026-09-25
 updated: 2026-09-25
-evidence: C
+evidence: D
 ---
 
 # ADR-017 (PROPOSED): a computed number is Level C only when its series came from a recorded fetch
@@ -51,7 +51,7 @@ Eight figures typed by hand, a `Disclosure` whose `data_source` says so, and a s
 valid Level C artifact carrying a Sharpe ratio over a declared 36-year window.
 
 **Why this is the grade that matters.** `constitution/Evidence_Standards.md:25`
-defines Level C as historical simulation and `:33` defines Level D as "Hypothesis.
+defines Level C as historical simulation and `:33-35` defines Level D as "Hypothesis.
 Research only." `:39` says the hierarchy may never be reversed, and the review
 procedure's own checklist names the test:
 
@@ -80,13 +80,19 @@ error was made twice in the same direction: toward the comfortable reading.
 
 **Nothing has been decided on such an artifact.** No strategy and no capital exist.
 The cost arrives at Stage 3, when the backtester's first job is to emit exactly these
-artifacts and `constitution/Capital_Authority.md:11-14` makes statistical edge one of
+artifacts and `constitution/Capital_Authority.md:13-18` makes statistical edge one of
 six inputs determining capital.
 
 ## Decision
 
-**A computed number carries Level C only when its input series came from a recorded
-fetch. Otherwise it carries Level D.**
+**Ruled (Part 35a): a computed number carries Level C only when its input series came
+from a recorded fetch. Otherwise it carries Level D.**
+
+**Built, and it is weaker: a computed number carries Level C only when its disclosure
+came through `disclosure_from`.** The gap is stated here rather than in a footnote
+because an earlier draft of this document asserted the ruled sentence as the built
+behaviour, and it is not. See "The hole this does not close" below. The independent pass
+on this change found it; its author did not.
 
 The grade is read from the disclosure's provenance rather than stamped by the emitter:
 
@@ -113,9 +119,28 @@ assert {name.lower().replace(" ", "_") for name in documented} == fields
 That document is frozen by ADR-002. **A fifth field on `Disclosure` would turn the
 constitution's own validation conformance red**, and the only ways round that are to
 change a frozen document or to weaken the test — neither of which an agent may do.
-Carrying the provenance on the type instead satisfies the test literally and has a
-second benefit: no new field enters the signed content, so **every artifact's
-integrity hash is byte-identical to what it was before this change.**
+Carrying the provenance on the type instead satisfies the test literally, and no new
+field enters an artifact's `content`.
+
+**Correcting a false claim an earlier draft made here.** It said "every artifact's
+integrity hash is byte-identical to what it was before this change". That is wrong.
+`content` is unchanged — verified, `a.content == b.content` — but the grade is
+deliberately *inside* the integrity hash: `ArtifactIntegrity.canonical_payload` covers
+`artifact.evidence_level` and each `evidence.hash`, and `EvidenceRecord.hash` covers
+`level`. The comment beside those lines says why, and it was put there by ADR-005 on
+purpose. The same artifact over a hand-built disclosure, built under each commit with a
+fixed timestamp:
+
+```
+PRE  (cbc4d20)  f31a486f…  Level C
+POST (0367c46)  b21db6ed…  Level D
+```
+
+**Consequence, which is the reason this correction matters:** any artifact built before
+this change over a hand-built disclosure no longer reproduces its stored hash. Nothing
+in the repository is affected today — `git ls-files artifacts/` holds one record and it
+is a fetch record, not a metric — but a stored metric artifact would have been
+invalidated silently, and the false sentence would have been the reason nobody looked.
 
 This constraint was **not** surfaced when the recommendation was put to the owner. The
 recommendation described "`Disclosure` gains a constructor split" without checking
@@ -138,22 +163,61 @@ described, and that is recorded rather than quietly reshaped.
   (`framework/metrics/statistics.py`), builds a `Disclosure` from it, and so answers
   Level D. That is F-003 made visible in the grade rather than a new defect.
 
-**Two tests changed, and both had encoded the defect.** `test_the_evidence_is_graded_historical`
-asserted Level C on a fixture whose own `data_source` reads "unit test fixture,
-supplied by hand"; `tests/metrics/test_drawdown.py` did the same. Both now assert Level
-D and say in their docstrings what they used to claim.
+**Two tests changed, and both had encoded the defect.** The test formerly named
+`test_the_evidence_is_graded_historical` — renamed by this change to
+`test_a_hand_built_disclosure_is_graded_research`, so the old name is findable only in
+git — asserted Level C on a fixture whose own `data_source` reads "unit test fixture,
+supplied by hand". `tests/metrics/test_drawdown.py` did the same. Both now assert Level D
+and say in their docstrings what they used to claim.
 
-## What this deliberately does not do
+**`significance_artifact`'s Level D is asserted by nothing.** The consequence above is
+true today and held by no test: `grep -n "EvidenceLevel\|\.level" tests/metrics/test_significance.py`
+returns nothing. That is the shape of F-019 and F-032 and it is owed a test, which this
+document should not be ratified without.
 
-**Nothing stops a caller constructing a `FetchedDisclosure` by hand.** This change
-makes the honest path the default and the dishonest path an explicit, greppable claim.
-That is what one enum value threaded through one function can buy, and it is the scope
-the owner ruled.
+## The hole this does not close, and it is larger than first admitted
 
-**The stronger form, recorded as the follow-up rather than smuggled in here:** bind the
-grade to a stored fetch record's `content_hash`, so Level C cannot be claimed without
-the bytes that earn it. That needs a ruling of its own about what a metric artifact
-must carry, and it touches ADR-014's persistence rules.
+**`disclosure_from` proves nothing about a fetch.** It takes a `DailyBarSeries` — a
+frozen dataclass any caller can construct — and never touches a `FetchedSeries`, a
+payload, a `content_hash`, a stored version or a fetch record. Reproduced against the
+committed code, using Belay's own `DoltHubStocksSource`, no subclass and no network:
+
+```
+disclosure type:  FetchedDisclosure
+evidence_level:   EvidenceLevel.HISTORICAL   <- Level C
+data_source:      DoltHub post-no-preference/stocks (CC BY-SA 4.0)
+sample_period:    2024-01-02 -> 2024-01-09
+validates:        True
+```
+
+Eight bars typed into a Python file. **This is worse than F-033 in one respect:** the
+construction that raised F-033 printed `data_source: I made these up`, so the artifact
+disclosed its own worthlessness. This one carries a real vendor's name and licence
+attribution, so the grade and the source string agree and both are wrong.
+
+It is the same substitution the `source` parameter was explicitly designed to prevent —
+`fetch_record`'s docstring says "taking the name rather than the source let a fabricated
+disclosure be paired with a real source's identity" — arriving through the unguarded
+`series` door.
+
+**An earlier draft's defence of this does not survive.** It admitted only that a caller
+could hand-construct a `FetchedDisclosure`, and argued the dishonest path was therefore
+"an explicit, greppable claim". The route above never names `FetchedDisclosure` at all.
+
+**What is genuinely bounded.** A hand-built `Disclosure` cannot reach Level C; the grade
+survives serialisation, `dataclasses.replace`, pickle and deepcopy; and the mutation
+below is asserted by a test. The default is unflattering and every existing caller gets
+Level D. What is not bounded is a caller who calls the sanctioned function with invented
+bars.
+
+**Closing it, which is an owner question and is open.** Bind the grade to a stored fetch
+record's `content_hash`, so Level C cannot be claimed without the bytes that earn it.
+That decides what a metric artifact must carry and touches ADR-014's persistence rules,
+so it is not an agent's to choose. It is put to the owner in
+`docs/OperatorChecklist.md` (2026-09-25, "Level C does not yet mean what Part 35a
+rules"). **Until it is answered, this ADR must not be ratified as written**, because
+Part 35a rules the stronger thing and this document would otherwise certify a weaker one
+as delivering it.
 
 **It does not change `constitution/Evidence_Standards.md`.** The four classes are
 untouched. One wrinkle the owner was shown and which is still open: Level D is defined
@@ -175,12 +239,29 @@ proposed by this ADR.**
   against `AGENTS.md`'s determinism rules and its "no hidden shared state" architecture
   rule.
 
-## Verification owed before this is ratified
+## Verification
 
-- `python -m pytest -q` green, and the two changed tests confirmed to fail against the
-  pre-change code rather than passing vacuously.
-- A mutation check: `disclosure_from` returning a plain `Disclosure` must turn the
-  suite red. **If it does not, this ADR's guard is asserted by nothing** — which is
-  F-019's and F-032's shape, and this document should not be ratified until that test
-  exists.
-- An independent pass told to falsify it, before it lands (`AGENTS.md` point 4).
+**Discharged by the independent pass of 2026-09-25 16:35 UTC** (on #36), which ran what
+this section previously listed as owed:
+
+- **The mutation.** `disclosure_from` returning a plain `Disclosure` turns the suite red
+  with **exactly one** extra failure,
+  `test_a_derived_disclosure_grades_the_metric_historical_and_a_hand_built_one_does_not`.
+  The guard is asserted, not assumed.
+- **Vacuity.** Reverting `metric_artifact` to `level=EvidenceLevel.HISTORICAL` fails both
+  changed tests. Neither passes vacuously.
+- **The conformance claim.** A real fifth field (`from_fetch: bool = False`) added to
+  `Disclosure` does fail
+  `test_the_disclosure_block_names_everything_a_backtest_must_document`. The
+  property/subclass design is forced, as claimed.
+- **Round-trip and copies.** `ArtifactSerializer.dump`/`load`, `dataclasses.replace`,
+  `pickle` and `deepcopy` all preserve the grade; the subclass loses no inherited
+  validation.
+- **The suite.** 710 passed, 1 skipped, 5 xfailed at `9d91870`.
+
+**Still owed before ratification:**
+
+- **The owner's answer on the hole above.** Part 35a rules more than this delivers.
+- **A test for `significance_artifact`'s Level D**, which nothing asserts.
+- An independent pass over *this* revision, since the corrections above were written
+  after the pass that found them.

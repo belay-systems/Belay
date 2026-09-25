@@ -977,3 +977,61 @@ choice if you expect numerical work soon.
 
 **No code changes either way. Nothing has been implemented, and this
 recommendation is not a decision.**
+
+## Open — 2026-09-25: Level C does not yet mean what Part 35a rules (F-033 follow-up)
+
+**This is the one thing from today's work that needs you, and it exists because the
+implementation of your ruling falls short of the ruling.** Found by the independent
+pass on the change, not by the session that wrote it.
+
+**What you ruled** (Part 35a): a computed number is Level C only when its series came
+from **a recorded fetch**.
+
+**What the code enforces:** Level C only when the disclosure came through the function
+`disclosure_from`. Those are not the same thing, because that function accepts a series
+of price bars that anyone can type by hand. Eight invented bars, passed in with the real
+data source, produce this:
+
+```
+evidence_level:   EvidenceLevel.HISTORICAL   <- Level C
+data_source:      DoltHub post-no-preference/stocks (CC BY-SA 4.0)
+validates:        True
+```
+
+**Why that is worse than the original problem, not merely equal to it.** The finding
+that started this (F-033) produced an artifact whose source field read "I made these
+up" — it disclosed its own worthlessness. This one carries a real vendor's name and
+licence. The grade and the source agree, and both are wrong, so nothing on the artifact
+looks odd.
+
+Nothing is decided on such an artifact today: no strategy and no capital exist, and no
+metric artifact is stored anywhere in the repository. The cost arrives at Stage 3.
+
+**The question:**
+
+> Should Level C require the stored fetch record — the bytes on disk — rather than
+> just having gone through the fetch-shaped function?
+
+**Recommendation: yes.** Reasons:
+
+- It is what you already ruled. Part 35a says "recorded fetch"; this would make the code
+  say it too, rather than the documents being softened to match weaker code.
+- The grade is the one field a promotion gate is meant to trust without reading the rest.
+  A grade that can be earned by typing numbers is the defect we just spent a day on,
+  reappearing one door along.
+- It is checkable. A fetch record already carries a hash of the bytes it fetched, so
+  "prove the bytes exist" is a comparison, not a new mechanism.
+
+**The cost, stated plainly.** This is larger than the change you already approved. It
+decides what a metric artifact must carry, and it touches ADR-014, which rules how
+records are stored — so it is a second ADR rather than an edit. Until it is done, Level C
+means "fetch-shaped", and that is now written into the code comment, ADR-017's draft and
+the session record so no one reads it as more.
+
+**If you would rather not:** the alternative is to accept the weaker guarantee and say
+so — which means amending Part 35a's wording, since the code cannot be made to match it.
+I recommend against that: it would move a ruling to fit an implementation.
+
+**Nothing has been implemented either way, and ADR-017 must not be ratified until this
+is answered** — as written it would certify the weaker behaviour as delivering your
+ruling.
