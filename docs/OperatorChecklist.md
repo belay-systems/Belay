@@ -852,3 +852,129 @@ the end of `docs/OwnerDecisions.md`. The recommendations you answered
 
 The owner answered "aligned to recommendation" (`docs/OwnerDecisions.md` Part
 31). This closes the Open item "confirm the labeled lines in Parts 25-28".
+
+# 2026-09-25 — owner items from the fourth pass on ADR-017 (#36)
+
+## Done — 2026-09-25: keep Part 40, or go back to the stored fingerprint?
+
+**Answered. Owner said "aligned - keep part for"; asked which was meant, the owner
+chose "Keep Part 40".** Recorded in `docs/OwnerDecisions.md` Part 40. The
+recommendation below was not taken.
+
+### The question as it was put
+
+**Why this is back with you again.** Part 40 left the method to attempt four. You
+answered on a comparison that was wrong in three places, found by a second
+independent pass after you answered:
+
+- **Re-reading the raw data does not work as it is stored today.** The DoltHub
+  source saves a multi-month fetch as several documents joined together, and the
+  code that turns them into prices reads only one. It needs new code.
+- **I had the weakness backwards.** If the price-reading code changes, a *stored
+  fingerprint* stops matching, so the data drops out of Level C: a loud failure,
+  which is the cautious direction. *Re-reading* would compare the new code's answer
+  with itself, so it always matches, and a change that alters prices passes
+  **silently**: the flattering direction.
+- **The migration was overstated.** Adding a fingerprint to future records does not
+  force a change to the one saved record, `RPT-0001`. It can stay as it is; it cannot
+  back Level C anyway, because its data is not in git.
+
+**The question:** keep Part 40 (attempt four picks, now with the facts corrected in
+Part 40), or go back to the stored fingerprint as you first ruled in Part 38?
+
+*Recommended: go back to the stored fingerprint.* With the facts right, the two are
+not close: the fingerprint fails in the cautious direction and exists as a plan;
+re-reading fails in the flattering direction and does not work on the stored data.
+**The cost, stated plainly:** fetch records gain a field, which changes ADR-014 for
+future records; and after a change to the price-reading code, data already fetched
+drops to Level D and cannot regain Level C until ADR-014's rule against re-recording
+identical bytes is revisited. Attempt four would have to handle that.
+
+I recommended delegating because I believed both methods had comparable weaknesses.
+They do not. That is the reason for bringing this back rather than leaving it.
+
+## Done — 2026-09-25: attempt four chooses how the prices are bound
+
+**Answered. Owner said "Let attempt four pick the method with the code in front of
+it, and let its independent pass check that choice"** — recorded as
+`docs/OwnerDecisions.md` **Part 40**. Part 38's rule stands; the stored fingerprint
+is one option, not a requirement.
+
+### The question as it was put: the fingerprint, or either method that binds the prices?
+
+**Why this is back with you.** When you ruled Part 38 ("yes to fingerprint") you
+had been told the fingerprint was *the only thing* that catches prices changed after
+the fetch. That was wrong, and the independent pass on these records found it.
+There is a second way: Belay already keeps the raw bytes the vendor sent and checks
+their hash, and every data source has code that turns those bytes into prices. So
+the next attempt could re-read the bytes, turn them into prices again, and compare
+— binding the prices without adding anything to the fetch record.
+
+**The difference that matters.**
+
+- *A stored fingerprint* changes what every fetch record carries. Under ADR-014 that
+  makes the one saved record, `RPT-0001`, a migration of a permanent record. It is
+  fixed at fetch time, so a later change to the parsing code cannot move it.
+- *Re-reading the bytes* changes no record and needs no migration. But it depends on
+  the parsing code at the time of the check: if that code changes, old data could
+  stop matching, or match differently.
+
+Either way the rule you ruled holds: Level C only when the prices used are the ones
+the vendor sent; adjusted prices are Level D until the adjustment is recorded.
+
+**The question:** keep the stored fingerprint as the method, or rule only the rule
+and let the next attempt choose the method, with its independent pass checking the
+choice?
+
+*Recommended: rule only the rule.* The method is repository mechanics, which you
+delegate, and both methods have a real weakness the next attempt should weigh with
+the code in front of it.
+
+**Corrected after the owner answered:** three statements above were wrong — "every
+data source has code that turns those bytes into prices", the claim that a stored
+fingerprint "makes" `RPT-0001` a migration, and which method a parser change hurts.
+They stand here as they were put; the corrections are in `docs/OwnerDecisions.md`
+Part 40 and the Done entry above (kept).
+
+## Done — 2026-09-25: what should ADR-017 promise? (option A)
+
+**Answered. Owner said "A - per your recommendations"** — recorded as
+`docs/OwnerDecisions.md` **Part 37**, which reads correctly once #36 (Parts 35
+and 36) has merged.
+
+The fourth independent pass broke attempt three of ADR-017 three ways, and showed
+that ADR-017's own reasoning rules out any check made inside the program against a
+caller determined to fake. The question as put:
+
+> Which should ADR-017 promise: stop honest mistakes and make faking visible in
+> review (A), or make faking impossible for code inside Belay (B)?
+
+Recommended A: B cannot be delivered by code, and review is the only defence that
+exists against deliberate faking. The owner also asked whether a blockchain would
+help; the answer given, no for this problem, is recorded in Part 37.
+
+## Done — 2026-09-25: a fingerprint of the prices (follow-up 1)
+
+**Answered. Owner said "yes to fingerprint"** — recorded as
+`docs/OwnerDecisions.md` **Part 38**, with two things the owner was told wrong and
+one cost not stated, all recorded there: the fingerprint is not the only method
+(the Done entries above), the ADR-014 cost to the saved record `RPT-0001` was not
+stated, and re-fetching would not give `RPT-0001` a fingerprint.
+
+## Done — 2026-09-25: each result names its fetch record (follow-up 2)
+
+**Answered. Owner said "yes"** — recorded as `docs/OwnerDecisions.md` **Part 39**.
+What a later re-check does when the record is missing or has changed was not
+asked, and is left open there.
+
+## Later — merge #36, after attempt four and its independent pass
+
+#36 holds attempt three, which the fourth pass broke. #37 (Parts 37-40) was merged
+first on the owner's word, "merge approved if needed". #36 merges only on the owner's
+word, once attempt four is built to Parts 37-40 and its own independent pass is
+answered. `docs/proposals/ADR-017-attempt-four-session-brief.md` has the plan.
+
+## Later — ratify or reject ADR-017
+
+After attempt four is built to Parts 37-40 and has had its own independent pass.
+Not on attempt three.

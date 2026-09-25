@@ -3471,3 +3471,365 @@ owner was asked to confirm or correct them.
 Items 2-7 of those notes are not rulings. They are gaps and readings for the
 final text round on ADR-015 and ADR-016 (Part 28e, step 1). The open ones are
 25g against 26e and 27f, 25h and 26b against 18e, and 28e against 18g.
+
+---
+
+# Part 37 — Ruled 2026-09-25: what ADR-017 promises (option A)
+
+**Numbered 37, not 32.** Parts 32-34 are on #33 and Parts 35-36 are on #36, both
+open. This Part refers to Parts 35 and 36 and reads correctly only once #36 has
+merged. Until this Part is on `main` it is a proposal, not a ruling.
+
+**Why the question arose.** The fourth independent pass on #36
+(<https://github.com/belay-systems/Belay/pull/36#issuecomment-5838006269>) broke
+attempt three of ADR-017 three ways. The record `disclosure_from` checks is read
+from a repository and a store the caller chooses. Record identifiers and store
+paths can walk out of those folders with `..`. And the prices in a series are not
+bound to the record, so a genuine fetch with invented prices on the same dates is
+still graded Level C. The pass also found that ADR-017's own argument against
+keyed signing — the adversary is "a caller in this process", who can reach
+anything the code can — rules out every check made inside the program, attempt
+three included. So the ADR had to say which risk it guards against.
+
+**Question put**, in the session, one question with a recommendation:
+
+> Which should ADR-017 promise: stop honest mistakes and make faking visible in
+> review (A), or make faking impossible for code inside Belay (B)?
+
+*Recommended: A.* Reasons given: B cannot be delivered, because whoever can change
+the code that produces a result can change the code that checks it, and the only
+defences against that sit outside the program — git history, pull request review,
+continuous integration. A covers the likeliest failure (Belay's own code
+mislabelling by accident) and routes deliberate faking to review, which is the only
+defence that exists against it.
+
+**Owner said: "A - per your recommendations."**
+
+### What it settles
+
+- **37a. ADR-017 is to promise option A.** Level C is to be guarded against honest
+  mistakes in Belay's code, and faking a Level C result is to be made visible in
+  review rather than impossible. Nothing here says the code delivers that yet.
+- **37b. Option B is not adopted.** ADR-017 does not promise that code running
+  inside Belay cannot fake a Level C result.
+
+### Session readings, not the owner's words
+
+- **"per your recommendations" was read as covering option A only.** It is plural,
+  and by then the owner had heard three recommendations: A, and yes to each of two
+  follow-ups, each given with its cost when A was first explained. But before the
+  owner answered, the session had said the follow-ups would be brought one at a
+  time afterwards, and had asked only "do you choose A?". So the plural may have
+  meant all three; the conservative reading was taken, and both follow-ups were
+  then put on their own (Parts 38 and 39). **Corrected before merge:** this note
+  first gave the reason as the follow-ups "not yet put with their costs", which was
+  false — the costs had been stated.
+- **A depends on the follow-ups; they are not add-ons.** "Stop honest mistakes"
+  needs the prices bound to the record (Part 38), which is what the pass's B3
+  breaks. "Visible in review" needs each metric artifact to name its record
+  (Part 39) *and* that record to be committed wherever the metric artifact is:
+  `artifacts/` being tracked does not put an uncommitted file into a pull request,
+  and a metric artifact that names no record never makes a forger commit one. Both
+  follow-ups were ruled yes, so A is deliverable as ruled; had either been refused,
+  it would not have been. **Corrected before merge:** this note first said a forged
+  record "has to be a new tracked file under `artifacts/`, which a pull request
+  shows", which holds only with Part 39 and a committed-record check.
+- **What else the code needs.** The pass sketched it: the record and stored bytes
+  read only from the repository's own `artifacts/` and `data/market/`, not folders
+  the caller passes in; joined paths kept inside those roots; the record loaded
+  must carry the identifier asked for. A design for the next attempt to confirm,
+  not a ruling.
+- **"Visible" covers the record, never the bytes.** `data/market/` is outside git
+  by ADR-013, so a reviewer can see a new record but not the data it names.
+- **A blockchain was considered and advised against.** Before answering, the owner
+  asked whether making Belay a blockchain or web3 project would help. The session's
+  answer: no, for this problem. A ledger proves when something was written and that
+  it has not changed since, never that it was true when written — the "oracle
+  problem". Of the pass's three breaks, as the owner was told: B1's invented record a
+  ledger would have stored permanently; B2 is a bug in Belay's own checking code,
+  which a ledger does not touch; B3's swapped prices "the lie happens before
+  anything gets written, so the chain would faithfully preserve the swapped prices".
+  That last holds for the metric artifact, which is written after the swap; the
+  fetch record in B3 is genuine and written before it, and what catches B3 is
+  comparing the prices against that record (Part 38). Git chains
+  every change to the one before it and GitHub keeps that public. A chain would also
+  cost fees, add a network dependency that `AGENTS.md`'s determinism rules forbid in
+  tests, and need an account and a dependency, both the owner's alone. The one later
+  use noted: proving a future paper-trading record was not backfilled, for which
+  timestamping a commit hash would do without a dapp. Not pursued. **Corrected
+  before merge, twice:** this note first said all three breaks put the false label
+  in at writing; a later draft said B1 and B2 both put a false record in at writing,
+  which misstated what the owner was told about B2, and called the B3 answer wrong
+  when it is right for the metric artifact. The conclusion does not change.
+
+### What it does not settle
+
+- **The two follow-ups.** Put separately and ruled as Parts 38 and 39.
+- **Ratification of ADR-017.** Still owed and still the owner's alone. Attempt three
+  should not be ratified: the fourth pass's blocking findings stand.
+- **The fixes themselves.** The pass's findings are #36's to fix, including the
+  "What it settles" wording in Part 36 that the pass says goes beyond the owner's
+  words. Nothing in Part 36 is changed by this Part.
+
+---
+
+# Part 38 — Ruled 2026-09-25: a fetch record carries a fingerprint of its prices
+
+**Follow-up 1 to Part 37**, put on its own after the owner chose option A. Like
+Part 37, it reads correctly once #36 has merged, and is a proposal until it is on
+`main`.
+
+**Why the question arose.** The fourth pass's B3: `disclosure_from` checks a
+series against its fetch record by bar count and first and last date only. A
+genuine fetch with its prices replaced on the same dates (closes of 1.00 and
+900.00, relabelled GME) was still graded Level C as DoltHub AAPL. No adversary is
+needed: a cleaning step, a split adjustment or a bug after the fetch does the same.
+
+**Question put**, in the session, with a recommendation:
+
+> Should a fetch record store a fingerprint of the prices? … When Belay fetches
+> data, it would also store a fingerprint of the exact prices it received. Before
+> granting Level C, it would check that the prices being used still match that
+> fingerprint. If a single price differs, the result is not Level C.
+
+The cost was stated with it: backtests usually adjust prices, for example so a
+2-for-1 split does not read as a 50% crash, and under this rule adjusted prices
+would be graded Level D until the adjustment step itself is recorded as evidence,
+so early Stage 3 backtests on adjusted prices would be "research only".
+*Recommended: yes* — a Level C label should mean "these are the prices the vendor
+sent"; recording adjustments properly can come later, as its own piece of work.
+
+**Owner said: "yes to fingerprint".**
+
+### What it settles
+
+- **38a. A fetch record stores a fingerprint of the prices it received.**
+- **38b. Level C requires the prices a result is computed over to match that
+  fingerprint.** If a single price differs, the result is not Level C.
+- **38c. The cost is accepted.** Prices adjusted after the fetch are not Level C
+  until the adjustment is itself recorded.
+
+### What the owner was told that was wrong
+
+- **"The only thing that catches" changed prices.** Said when option A was first
+  explained, and repeated in Part 37's first draft and in
+  `docs/OperatorChecklist.md`. It is false. `disclosure_from` already reads the
+  stored raw bytes and checks their hash, so re-parsing them and comparing the
+  result with the series in hand could bind the prices **without changing what a
+  fetch record carries**. Found by the
+  independent pass on this record, not by the session. The ruling stands as given;
+  whether to keep the fingerprint as the method or let the next attempt choose
+  between the two was put back to the owner, who left it to attempt four (Part 40).
+  **Corrected before merge:** this entry first said "every source has a parser for
+  those bytes". Not as stored: DoltHub stores a multi-month fetch as one JSON
+  document per month joined by newlines (`payload=b"\n".join(payloads)` in
+  `framework/data/dolthub.py`), and its `_parse` reads exactly one document. Re-parsing
+  needs code that does not exist yet. Found by the second independent pass.
+- **The cost to ADR-014 was not stated.** Adding a field to fetch records changes
+  what they are signed over, and ADR-014 records that once a record is saved,
+  "every later change to the signed content" is "a migration of permanent"
+  append-only records. `artifacts/RPT-0001/1.0.0.yaml` is saved. An earlier draft of
+  this Part said the Part 36 recommendation had already told the owner that; it had
+  not — that recommendation was about what a *metric artifact* carries.
+
+### Session readings, not the owner's words
+
+- **What the fingerprint covers.** "The prices" is read as every value in every bar
+  the source returned — open, high, low and close with the bar's date — in a fixed
+  canonical form, beside the existing `content_hash` of the raw bytes rather than
+  instead of it. Whether volume, which is not a price, is included is the next
+  attempt's to decide and state.
+- **A parser change moves a fingerprint of parsed prices.** `fetch_record`'s own
+  docstring hashes the raw bytes on purpose because a parser change alters the
+  parsed form. A fingerprint written at fetch time is fixed; a re-parse at check
+  time would be exposed to the current parser. The next attempt must say which
+  risk it accepts.
+
+### What it does not settle
+
+- **Existing records.** `RPT-0001` carries `content_hash` over its raw bytes and no
+  fingerprint of its parsed prices. **Re-fetching does not fix that**: a fetch whose
+  bytes are identical returns the existing record unchanged (ADR-014 rule 5), so
+  `RPT-0001` gains a fingerprint only through a new record version or a migration
+  under ADR-014. Its bytes are also outside git, so no fresh clone can back a Level
+  C result with it in any case. Nothing depends on it today: no metric artifact is
+  stored (`git ls-files artifacts` lists only `artifacts/RPT-0001/1.0.0.yaml`).
+  **Corrected before merge:** an earlier draft said it "could back a Level C
+  result only once re-fetched", which was wrong on both counts.
+- **How an adjustment is recorded** so that an adjusted series can earn Level C.
+  Later, as its own piece of work.
+- **Whether a mismatch is refused or graded Level D.** The cost the owner accepted
+  was described as Level D, which points to Level D; Part 36's reading chose
+  refusal. Settle it
+  in the next attempt and put it to the owner if the two disagree.
+- **Ratification of ADR-017.** Unchanged from Part 37.
+
+---
+
+# Part 39 — Ruled 2026-09-25: every metric artifact names the fetch record behind its grade
+
+**Follow-up 2 to Part 37**, put on its own after Part 38. Like Parts 37 and 38, it
+reads correctly once #36 has merged, and is a proposal until it is on `main`.
+
+**Why the question arose.** The fourth pass's D3: a genuine Level C metric
+artifact built through `disclosure_from` carries no record identifier, no version
+and no hash of its fetch record. Its grade is checked once, when it is built, and
+cannot be re-checked by anything that reads it later — including the promotion
+gate ADR-017 says the grade exists for.
+
+**Question put**, in the session, with a recommendation:
+
+> Should every result name the fetch record behind its grade, yes or no?
+
+Explained with it: each result would write down which fetch record it came from —
+the record's name, its version, and its fingerprint — so anyone, or any later
+check, could look the record up and confirm the Level C still stands. The cost was
+described as small: every result already has a free-text "provenance" line, which
+today says only how many days of data it used; the record's details would go on
+that line, and the four disclosure fields the constitution's backtesting rules
+require would stay as they are. *Recommended: yes* — without it, the fingerprint
+ruled in Part 38 is checked only once, by the same code that produces the result.
+
+**Owner said: "yes".**
+
+### What it settles
+
+- **39a. Every metric artifact names the fetch record behind its grade: the
+  record's identifier, its version, and its fingerprint**, so the grade can be
+  re-checked after the artifact is built. **Corrected before merge:** this first
+  read "every metric artifact graded Level C", which narrowed the owner's "every
+  result"; the narrowing is a reading and is below.
+
+### Session readings, not the owner's words
+
+- **Where it is written.** The evidence record's existing `provenance` line, as the
+  question described. The owner was shown that as the cost, not asked to rule on
+  it; the next attempt may place it elsewhere if the four `Disclosure` fields stay
+  unchanged (`tests/test_governance_conformance.py`, which asserts set equality
+  between those fields and the four `Validation/Backtesting.md` requires).
+- **"Its fingerprint"** is read as the price fingerprint of Part 38, or whatever
+  binds the prices if Part 38's method changes. The code already calls
+  `content_hash` "the fingerprint" (`framework/data/fetch_record.py`'s module
+  docstring and `fetch_record`), which supports that reading. Carrying it as well
+  is the next attempt's choice.
+- **A result with no fetch record names none.** A hand-built disclosure has no
+  record to name, so 39a applies to results computed over a fetch. That includes
+  results that are Level D despite having a record — prices adjusted after the fetch
+  (38c), or a mismatch if the next attempt downgrades rather than refuses — which
+  must still name it, so they can be traced and regraded once the adjustment is
+  recorded.
+- **Not stated when the question was put:** the `provenance` text is inside the
+  evidence record's hash (`EvidenceRecord.canonical_payload`), so this changes the
+  integrity hash of every metric artifact built after it. No metric artifact is
+  stored in the repository, so nothing existing is affected.
+
+### What it does not settle
+
+- **What a later re-check does** when the named record is missing or no longer
+  matches. Refuse, downgrade or report: not asked.
+- **Who runs the re-check, and when.** A promotion gate is the obvious reader; that
+  belongs with ADR-015 and ADR-016, not here.
+- **That the named record is committed.** Part 37's readings show "visible in
+  review" needs it; not asked separately.
+- **Ratification of ADR-017.** Unchanged from Part 37: owed after attempt four and
+  its own independent pass.
+
+---
+
+# Part 40 — Ruled 2026-09-25: attempt four chooses how the prices are bound
+
+**A correction to how Part 38 was reached, put back to the owner.** Like Parts
+37-39, it reads correctly once #36 has merged, and is a proposal until it is on
+`main`.
+
+**Why the question arose.** When the owner ruled Part 38 ("yes to fingerprint"),
+they had been told a stored fingerprint was "the only thing that catches" prices
+changed after the fetch. The independent pass on these records showed that was
+false: re-parsing the stored raw bytes is a second method. **As the session put it
+to the owner** (three parts of this were wrong; see below): every source has a
+parser for those bytes; a stored fingerprint changes what every fetch record carries
+— under ADR-014 a migration of the saved `RPT-0001` — but is fixed at fetch time, so
+a parser change cannot move it; re-parsing changes no record, but a parser change
+could make old data stop matching or match differently.
+
+**Question put**, in the session, with a recommendation:
+
+> Do you want to keep the fingerprint as the method, or rule only the rule?
+
+Explained with it: the rule is the same either way — Level C only when the prices
+used are exactly what the vendor sent, and adjusted prices are Level D until the
+adjustment is recorded. *Recommended: rule only the rule* — let attempt four pick
+the method with the code in front of it, and let its independent pass check that
+choice; the method is repository mechanics, which the owner delegates.
+
+**Owner said: "Let attempt four pick the method with the code in front of it, and
+let its independent pass check that choice".**
+
+### What the owner was told that was wrong
+
+Found by the second independent pass on these records, after the owner answered.
+
+- **Re-parsing is not available as the data is stored.** DoltHub joins one JSON
+  document per month with newlines, and its parser reads one document. It needs new
+  code, and splitting on newlines is unsafe if a document ever contains one.
+- **The parser-change weakness was given to the wrong method.** When identical bytes
+  are fetched again, `fetch_and_record` returns a series freshly parsed by the
+  current parser beside the old record. Under a *stored fingerprint*, a parser change
+  makes those prices stop matching, so the data loses Level C — a loud failure, in
+  the unflattering direction; and because ADR-014 rule 5 writes no new record for
+  identical bytes, the data cannot regain it without a change there. Under
+  *re-parsing*, both sides come from the current parser and always match, so a parser
+  change that alters prices passes **silently** — the flattering direction.
+- **The migration was overstated.** A fingerprint on future records does not force
+  a migration of `RPT-0001`. It can stay without one; it could not back Level C in
+  any case, since its bytes are outside git (Part 38).
+
+The ruling stands as given. Whether to keep it with the corrected facts, or return to
+the stored fingerprint, was put back to the owner.
+
+### Put back after the correction, and kept
+
+**Question put**, with the three corrections above explained:
+
+> Do you want to keep Part 40, or go back to the stored fingerprint?
+
+*Recommended: go back to the stored fingerprint*, with its cost stated: fetch
+records gain a field (an ADR-014 change for future records), and after a change to
+the price-reading code, data already fetched drops to Level D and cannot regain
+Level C until ADR-014's rule against re-recording identical bytes is revisited.
+
+**Owner said: "aligned - keep part for".** Read two ways — "aligned" to the
+recommendation, or "keep Part 40" — so the session asked which was meant, offering
+"Go back to fingerprint" and "Keep Part 40". **Owner chose: "Keep Part 40".**
+
+So Part 40 stands, decided this time on the corrected comparison. The owner did not
+take the recommendation, and that is recorded rather than smoothed over. Attempt four
+picks the method knowing that re-reading needs new code and passes a parser change
+silently, and that a stored fingerprint fails loudly and needs ADR-014 rule 5
+revisited to recover.
+
+### What it settles
+
+- **40a. Attempt four picks the method that binds the prices to the fetch record.**
+  Part 38a's stored fingerprint is one option, not a requirement.
+- **40b. Attempt four's independent pass checks that choice.**
+- **40c. Part 38b and 38c stand.** Level C requires the prices a result is computed
+  over to match what the fetch received; prices adjusted after the fetch are not
+  Level C until the adjustment is itself recorded.
+
+### Session readings, not the owner's words
+
+- **The choice is read as open to either method put to the owner**, or another that
+  binds the prices at least as tightly, provided attempt four states which it chose,
+  why, and which weakness it accepts — as corrected above: a stored fingerprint
+  fails loudly on a parser change and needs ADR-014 rule 5 revisited to recover;
+  re-parsing needs new code and passes a parser change silently.
+- **Part 39's "its fingerprint"** is read as whatever identifies the prices under the
+  method chosen — for a re-parse, the record's existing `content_hash` of the raw
+  bytes may be enough. Part 39's session readings already said so.
+
+### What it does not settle
+
+- **Which method.** Attempt four's, as ruled.
+- **Everything Parts 38 and 39 left open**, unchanged.
+- **Ratification of ADR-017.** Unchanged from Part 37.
