@@ -46,3 +46,23 @@ snapshot; the repository overrules it.
 
 Record project state, findings and owner rulings in the repository, never only
 in a provider's memory.
+
+## What this file is for, and the one thing it may hold alone
+
+This file may hold **how a rule maps onto this provider's tools** — never the rule
+itself. The rule lives in `AGENTS.md`; the mapping is a convenience and may be
+wrong or absent without any rule being lost.
+
+- `AGENTS.md`, "How work is claimed and landed", point 4: close a helper session
+  out the moment it reports. **In Claude Code that is `archive_session`**, and the
+  owner asked for it on 2026-09-25 so that a finished helper is distinguishable
+  from one still working. A helper's own summary is not the deliverable — one here
+  reported twelve findings and summarised itself as "no defects found".
+- `AGENTS.md`, "Determinism and Provider Independence": a scheduled check-in is an
+  ordinary script any operator can run. In Claude Code it is `send_later`. Nothing
+  in `framework/`, `scripts/` or `tests/` may depend on either.
+
+**Preferences that are not about Belay do not belong here.** "Always archive a
+finished session" is how the owner wants *every* project handled, not a Belay rule;
+this repository can only bind the agents working in it. The general form belongs in
+the owner's own Claude settings, which outlive any container.

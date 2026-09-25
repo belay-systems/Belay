@@ -90,6 +90,15 @@ by hand. They are plain instructions.
    has measured that an author's own pass finds almost nothing and a fresh one
    finds several defect-grade errors every time. Run it before the change lands,
    not after.
+   - **Its findings belong on the pull request, not in the helper's own record.**
+     Whatever tool you spawn it with, its private summary is not the deliverable
+     and has been wrong: one pass here summarised itself as "no defects found"
+     having reported twelve, two of them blocking.
+   - **Close a helper out the moment it reports, and say so.** The owner asked for
+     this on 2026-09-25: a finished helper that still shows as live is
+     indistinguishable from one still working. If one pass leads to another —
+     fixing findings creates code nothing has reviewed — say that before starting
+     it rather than after, and keep a visible list of what is running.
 5. Two agents agreeing is not validation. Cross-review catches mistakes. It
    replaces none of the evidence gates in `constitution/`.
 
