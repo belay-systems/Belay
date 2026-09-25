@@ -3620,14 +3620,14 @@ question of who calls `save()` and when, and nothing here answers it.
 ## ADR-015: A Strategy's Stage Is Carried, Not Asserted — And A Stage Move Without Evidence Is Not A Review
 
 Status:
-**PROPOSED — revised 2026-09-25 after a fourth falsification pass and the owner's Parts 25-28, and for Parts 32 and 33 (32a: rule 4, "Which ADR-016 version applies"; 32c and 33a: the Required Follow-Up; 33c: rules 3h and 5; 33d: rule 4(f)) and the fifth pass's wording findings F5-2, F5-9 and F5-10. Not ratified. Not implemented in any part.**
+**PROPOSED — revised 2026-09-25 after a fourth falsification pass and the owner's Parts 25-28, and for Parts 32 and 33 (32a: rule 4, "Which ADR-016 version applies"; 32c and 33a: the Required Follow-Up; 33c: rules 3h and 5; 33d: rules 4(f) and 5), the fifth pass's wording findings F5-2, F5-9 and F5-10, and the sixth pass's F6-2, F6-5, F6-6, F6-11 and F6-18 (Part 34). Not ratified. Not implemented in any part.**
 
 Date:
-2026-09-19 (revised 2026-09-24, 2026-09-25, and twice more on 2026-09-25)
+2026-09-19 (revised 2026-09-24, 2026-09-25, and four more times on 2026-09-25)
 
 ---
 
-> **Where the fifth revision stands (2026-09-25). Read this first; where the blocks
+> **Where the sixth revision stands (2026-09-25). Read this first; where the blocks
 > below differ from it, this one is current.**
 >
 > - **A fourth falsification pass found this ADR still not ready** (Issue #21, the
@@ -3645,7 +3645,7 @@ Date:
 >   this ADR is conformed to the code (Required Follow-Up).
 > - **The fifth revision** fixed F4-3 and F4-1 and applied 28a-28d ("Revision history"). A
 >   fifth pass (Issue #21) found F5-1 to F5-12. **The sixth revision** applies Parts 32 and 33
->   and the wording of F5-2, F5-9 and F5-10; every other F5 attack is a step-2 test (33a).
+>   and the wording of F5-2, F5-9 and F5-10; every other F5 attack is a step-2 test (33a). A sixth pass then found F6-1 to F6-20 in those edits; Part 34 fixes the author's errors and leaves the rest, with five owner questions, to step 2 (Required Follow-Up).
 > - **What blocks ratification now:** Parts 32 and 33 reaching `main`; the code of 28e;
 >   a fresh pass on the text as ratified (32c; a different AI is welcome, never waited
 >   for, 30b); and the owner's ratification of both ADRs.
@@ -3985,10 +3985,10 @@ Date:
 >   other, then a re-climb to `Production`, read `Production` with no flag. F4-7, F4-9
 >   and 28d are not in the model; tests 81-83 are argued from the text.
 >
-> **Six independent passes, thirteen blocking defects against this ADR, none found by
-> the author** (3, 2, 3, 2, 1 and 2, in the order above; B7, shared with ADR-016, is
+> **Eight independent passes, eighteen blocking defects against this ADR, none found by
+> the author** (3, 2, 3, 2, 1, 2, then 1 in the fifth Issue #21 pass and 4 in the sixth; B7, shared with ADR-016, is
 > not counted). *(Was "Four ... ten" until the fourth revision, and "Five ... eleven"
-> until the fifth.)* That is the pattern this repository has recorded for every session that
+> until the fifth, and "Six ... thirteen" until the sixth.)* That is the pattern this repository has recorded for every session that
 > has attacked this ADR, and it is why the Required Follow-Up asks for another pass
 > rather than treating this revision as settled.
 
@@ -4454,9 +4454,9 @@ named below, and no more**:
   checked as ADR-016 rule 3 checks 2-6 and rule 2 checks 5-6 define (resolution
   through a read that recomputes the hash, type, grade, subject, disclosures, the
   allowlist and the grade its producing module writes), and ADR-016 rule 8 is
-  applied to the bound significance report. Which checks: DRAFTER. One read per bound
+  applied to the backtest significance report bound beside the seven (ADR-016 rule 8, 33b; sixth-pass finding F6-11). Which checks: DRAFTER. One read per bound
   report: none for a rung below `Paper Trading`, at least one at `Paper Trading`, and
-  at least seven on a capital rung (ADR-016 rule 2). A downward rung binds no reports
+  at least eight on a capital rung (ADR-016 rules 2 and 8, 33b). A downward rung binds no reports
   (ADR-016 rule 3), so a demotion adds no read here.
 - **A confidence authorization, where rule 3g requires one (26c).** One more read:
   the review named by the Revision's `confidence_review`.
@@ -4484,7 +4484,7 @@ first"; a count fixed by the last rung is bounded, a traversal is not.
 
 **Cost, stated against 9e(iii)'s "Two extra reads, bounded".** The owner selected
 two. 26e is the later ruling and requires more: on a capital rung, the predecessor,
-the review, and at least seven reports; on a Revision, one more for the review's
+the review, and at least eight reports (33b); on a Revision, one more for the review's
 subject. The number is still fixed by the last rung and never grows with the length
 of the history.
 
@@ -4986,14 +4986,14 @@ every one of them names an `RPT` identifier.)* The read:
      version of the identifier, the one the strategy is to stand at. **That version
      need not be at the frontier** (rule 5; fourth-pass finding F4-1): the frontier
      may be what the repair corrects. It names in `supersedes` the stored versions or
-     stored downward reviews it sets aside. **It may set aside only a version that has no valid base, or whose own chain fails rule 3c** (RULED 33c, fifth-pass finding F5-1: a genuine demotion is lifted only by naming its review, as 28a says), and it carries ADR-016 rule 9's
+     stored downward reviews it sets aside. **It may set aside only a version that has no valid base, or whose own chain fails rule 3c** (RULED 33c, fifth-pass finding F5-1: "A genuine demotion is lifted only by a later review that names it with a human yes (28a)"). **A version whose last rung is downward and whose review resolves is never set aside** (DRAFTER; sixth-pass finding F6-5: after a bar raise under 32a its chain can fail rule 3c, and a genuine demotion would pass as a forgery). Whether 33c's "file" also covers a stored downward review is open (Part 34, question 1), and it carries ADR-016 rule 9's
      `human_authorization`, as every raise must. The read leaves out each named
      version (step 1) and each named review (step 5), and **rule 3e does not count a
      named version** (F4-1). It may also name the review of a resolving downward rung
      whose date is wrong, which re-anchors rule 4(f) and changes no stage (28c; rule
      4(f)). **All repairs and supersessions are judged together** (DRAFTER; fifth-pass
-     finding F5-2): the read with every one whose yes is declared is compared with the
-     read with only those whose yes passes 26f's verifier. If the first is a capital stage
+     finding F5-2): the read with every one that needs no yes and every one whose yes is declared is compared with the
+     read with every one that needs no yes and only those whose yes passes 26f's verifier (sixth-pass finding F6-2: a harsher `Demote` naming a milder one needs no yes, and was left out of both). If the first is a capital stage
      above the second, or a capital stage with a higher confidence, the read is the second
      (27g, the verifier DRAFTER as in step 5; RULED 28b: "A repair or supersession that raises a funded strategy's confidence needs the verified human yes of 26f, like any other confidence change on a capital stage (26c)";
      fourth-pass finding F4-4). Judged one at a time, two declared-yes repairs each raised
@@ -5355,11 +5355,11 @@ finding B7.)*
 | Production | ADR-016 rules 1-3, 5, 6, 8 and 9 |
 | Retired | no floor — clause 1 below; ADR-016 rule 1 |
 
-**Which ADR-016 version applies (RULED 32a, which overrules 25g's "It does not
+**Which ADR-016 version applies (RULED 32a, which overrules 25g's first two sentences, "A raised bar applies from each strategy's next step. It does not
 re-judge past steps"; findings N4 and S1).** A review records the `bar_version` it
 was saved under (ADR-016 rule 10), and `save()` accepts only the current version.
-**Every read and every sweep judges every stored review by the current version's
-constants** (32a). So a raised bar lowers a strategy's read at once (DRAFTER): a
+**Every review a read checks, and every stored review in a sweep, is judged by the current version's
+constants** (32a). A read below capital checks its base's last rung, a capital read the whole chain (27f); whether that satisfies 32a's "every past step" is open (Part 34, question 3; sixth-pass finding F6-6). So a raised bar lowers a strategy's read at once (DRAFTER): a
 review that no longer meets it fails rule 3c, and the read falls as for any review
 that fails (25d). **A ladder's reviews never go down in `bar_version`** (DRAFTER;
 2N7, ADR-016 rule 10), kept as a check on the record: only a file that bypassed
@@ -5518,7 +5518,7 @@ integrity_hash)`, empty when the review supersedes nothing, present on every out
   28a, 28b; the verifier on a stage raise is DRAFTER, F5-10). A
   `Remain Current Stage` review whose `supersedes` is not empty is a **repair review**
   (rule 3h step 6). It may also name stored STRATEGY versions of its subject's
-  identifier, which the read then leaves out: only a version with no valid base, or whose own chain fails rule 3c (RULED 33c).
+  identifier, which the read then leaves out: only a version with no valid base, or whose own chain fails rule 3c (RULED 33c), and never a version whose last rung is downward and whose review resolves (F6-5).
 - **What it cannot do.** It orders two reviews about one version. Between different
   positions the ladder gives the order: a review is saved only while its subject is
   at the frontier (rule 5's reconcile, with rule 3b condition 2), so a stored review
@@ -6412,7 +6412,7 @@ in favour of declare-and-reconcile — rule 5.
   fail, and the ADRs describe what the code does."** This revision is 28e's final
   text round. Next, rule 3h's current-stage read, with what it depends on, is built
   as code. Every attack from the Issue #21 passes (the first pass's B1-B3, the second's
-  models A to F, the third's X1-X6, ATK1 and ATK2, the fourth's F4-1 to F4-10, and the fifth's F5-1 to F5-12, RULED 33a) is
+  models A to F, the third's X1-X6, ATK1 and ATK2, the fourth's F4-1 to F4-10, the fifth's F5-1 to F5-12, RULED 33a, and the sixth's F6-1 to F6-20 with its five owner questions, Part 34) is
   written first as a test that fails by design against the unchanged code, beside
   tests 1-83. Where the code and this text then disagree, this ADR is conformed to
   the code in a later change, and the disagreement is recorded. The code is
@@ -6425,8 +6425,8 @@ in favour of declare-and-reconcile — rule 5.
   tried to break both
 - **a fresh independent pass, BEFORE implementation, on this ADR and ADR-016
   together.** A fresh session satisfies it; a different AI is welcome, never waited
-  for (30b). 32c adds one more, on the text as ratified. Six passes have
-  now found thirteen blocking defects in this ADR, in drafts whose citations and
+  for (30b). 32c adds one more, on the text as ratified. Eight passes have
+  now found eighteen blocking defects in this ADR, in drafts whose citations and
   measurements were each time correct —
   which is the standing lesson that verifying an ADR's *facts* is not attacking its
   *rules*. ADR-014's Status block records what happened when the ordering was reversed:
