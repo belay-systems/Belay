@@ -775,4 +775,5 @@ your code-owner review.
   scheduled review that runs that day.
 - Then #22, and its five steps in the section "no one merges alone" once that
   PR has merged.
-- #20 waits on his independent pass (Issue #21). #7 and #14 wait on his reply.
+- #20 (`docs/proposals/ADR-016-evidence-bar-DRAFT.md`) waits on his independent
+  pass (Issue #21). #7 and #14 wait on his reply.
