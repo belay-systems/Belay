@@ -2963,3 +2963,43 @@ recommendation.
 How a human authorization is verified. It also does not ratify either ADR;
 both stay PROPOSED until they are revised, a fresh independent pass has tried
 to break them, and the owner ratifies them.
+
+# Part 27 — Ruled 2026-09-25: seven more principles for the evidence bar
+
+**Question put.** A third falsification pass on ADR-015 (#7) and ADR-016
+(#20), posted on Issue #21, found nothing left that grants capital. It found
+one blocking way the lock jams shut on an honest strategy, and seven questions
+only the owner can answer. The session put each one with a recommendation.
+
+**Owner said: "aligned".**
+
+### What it settles
+
+- **27a. This replaces 26d.** After a demotion, a climb back requires new paper
+  or live trading evidence gathered after the demotion. A backtest may reuse
+  historical data. 26d's reading, "any data dated before the demotion", would
+  have barred about ten years of history and been a permanent ban in effect.
+  27a supersedes it.
+- **27b.** Keep the current-stage read (`current_stage`). It also reports the
+  confidence that was approved.
+- **27c. Unsaved trials are a stated gap in the evidence bar, not a 25j
+  matter.** A trial run but never stored is a stated residual of ADR-016.
+  Follow-up: Belay's own tools store every run automatically.
+- **27d. A later review names what it supersedes.** When two downward reviews,
+  or a downward and a Promote, exist about the same version, the later review
+  must name the one it supersedes. Once a position, or any later one, is backed
+  by a resolving review, an older stored downward review about it stops
+  applying.
+- **27e.** 25i's bar on reuse after a demotion follows a strategy across
+  identifiers, including a re-registered unchanged specification.
+- **27f.** Reading a capital stage verifies the whole chain, not only the
+  last step.
+- **27g. Raising a stage is a capital decision.** A repair that raises the
+  stage read needs a recorded human yes, as in 25f.
+
+### What it does not settle
+
+It does not ratify either ADR. Both stay PROPOSED until they are revised, a
+fresh independent pass has tried to break them, and the owner ratifies them.
+The owner is asking the second contributor for the different-AI pass on
+Issue #21.
