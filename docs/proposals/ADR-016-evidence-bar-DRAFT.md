@@ -20,9 +20,9 @@ Date:
 > `docs/proposals/ADR-014-rule-5-amendment-DRAFT.md`, until the owner rules where
 > both ADRs land.
 >
-> **ADR-015 is now cited by line** (finding N7): as "ADR-015 at `1c75876`, lines
+> **ADR-015 is now cited by line** (finding N7): as "ADR-015 at `c11bf59`, lines
 > n-m", meaning DECISIONS.md under docs/ on branch `adr/015-stage-is-carried` at
-> commit 1c75876. *(Repointed for Parts 32 and 33 from `ddda627`. ADR-015's edits for them
+> commit c11bf59. *(Repointed for Parts 32-34 from `ddda627`. ADR-015's edits for them
 > replaced lines one for one, so every line number is the same at both commits.
 > `ddda627` had replaced `61789bc`, `26f5d75` and `94815a2`.)* The file name and line numbers are written without backticks on
 > purpose: the file on this branch is `main`'s, where ADR-015 does not exist, and the
@@ -31,12 +31,12 @@ Date:
 
 > **What changed for Part 32 (2026-09-25).** The three readings Part 31 left open
 > were put to the owner, who ruled **Part 32** (on branch `claude/great-turing-v2d0x8`
-> until it merges). **32a, "Today's bar"**, overrules 25g's "It does not re-judge past
-> steps": rule 10 now judges every stored review by the current version's constants,
+> until it merges). **32a, "Today's bar"**, overrules 25g's first two sentences, "A raised bar applies from each strategy's next step. It does not re-judge past steps."
+> Rule 10 now judges every stored review by the current version's constants,
 > so a raised bar lowers a strategy's read at once, with its cost stated; test 24 is
 > rewritten to match, and ADR-015 rule 4's "Which ADR-016 version applies" is
 > rewritten line for line (Changes rows 36-38). **32b**: rule 6 says 25h and 26b amend
-> 18e. **32c**: item 12 of "Put to the owner at ratification" requires the fresh pass
+> 18e. **32c**: item 12 of "Required Follow-Up (ADR-016)" requires the fresh pass
 > on the text as ratified. Nothing else is redesigned (32, "Session readings").
 >
 > **Then a fifth pass, and Part 33 (2026-09-25).** A fresh-session pass on the fifth
@@ -134,7 +134,7 @@ Date:
 >   not yet on `main`; every rule below that cites 32x or 33x rests on that record,
 >   and reverts to DRAFTER if it does not reach `main` as written. **27a supersedes
 >   26d**; where 26d is mentioned below, it is marked superseded. **32a overrules
->   25g's "It does not re-judge past steps".**
+>   25g's first two sentences, "A raised bar applies from each strategy's next step. It does not re-judge past steps."**
 > - **Only Parts 18, 19, 22, 23, 25-28, 30, 32 and 33 are cited as RULED.** Anything else
 >   is DRAFTER, and every number no Part rules is `None`, which keeps its rung closed.
 
@@ -218,7 +218,7 @@ grade check and rule 2's distinctness check limit what that buys.
 
 ### Rule 1 — The grade floor per rung, upward moves only
 
-**RULED (18a, 18b).** This fills ADR-015 rule 4's table (ADR-015 at `1c75876`, lines
+**RULED (18a, 18b).** This fills ADR-015 rule 4's table (ADR-015 at `c11bf59`, lines
 5338-5356).
 
 | Rung reached (`to_stage`) | Minimum `EvidenceLevel` — upward moves only |
@@ -238,7 +238,7 @@ Trading` C, `Promotion Review` B, `Micro Capital` B, `Limited Capital` A,
 column, "Also required on this rung", under the same RULED mark. It is removed: which
 other rules bind which rung is set in each rule below, with its own mark.)*
 
-**Direction is computed exactly as ADR-015 rule 4 drafts it** (ADR-015 at `1c75876`,
+**Direction is computed exactly as ADR-015 rule 4 drafts it** (ADR-015 at `c11bf59`,
 lines 5382-5415): a move to `Retired` is classified first and is never upward;
 otherwise a move is upward when `STRATEGY_LADDER.index(to_stage) >
 STRATEGY_LADDER.index(from_stage)` (`framework/artifacts/enums.py:107-109`). Grades
@@ -438,7 +438,7 @@ capital, not a grant.
 **Cost, stated:** check 7 needs a listing of the store by subject, which the
 repository does not have (`framework/artifacts/repository.py:69-84` lists one
 identifier's versions). It is the subject index ADR-015 rule 3h also needs (ADR-015
-at `1c75876`, lines 5104-5111), derived from the store and never a separately
+at `c11bf59`, lines 5104-5111), derived from the store and never a separately
 maintained file. Required Follow-Up.
 
 **The "never stored" residual — named, and not closed (2N5). RULED (27c): "Unsaved
@@ -473,10 +473,10 @@ inputs.
 **RULED (18c).** All four outcomes — `Promote`, `Remain Current Stage`, `Demote`,
 `Retire` — carry at least one verifying evidence record, in both of `Remain`'s
 senses: a promotion rejected, and a strategy kept on the stage it holds. Applied in
-ADR-015 rule 4 (ADR-015 at `1c75876`, lines 5140-5149).
+ADR-015 rule 4 (ADR-015 at `c11bf59`, lines 5140-5149).
 
 **DRAFTER:** `review_artifact()`'s `evidence` parameter is required (ADR-015 at
-`1c75876`, lines 5166-5173).
+`c11bf59`, lines 5166-5173).
 
 **No grade floor on `Remain` — DRAFTER.** A `Remain` is not an upward move, so rule 1
 does not reach it. Whether keeping a strategy on capital must meet the floor of the
@@ -522,7 +522,7 @@ amendment is a lowered bar, and rule 10's conformance test turns red.
 While a constant is `None`, the validator refuses every upward move into the rung it
 closes, with a message naming this rule and the Part. **The check needs nothing but
 the review**, so ADR-015 rule 3c runs it on every read of a strategy (finding B3;
-ADR-015 at `1c75876`, lines 4464-4483). **`None` wins over any user setting** (rule
+ADR-015 at `c11bf59`, lines 4464-4483). **`None` wins over any user setting** (rule
 7). Filling a constant is an amendment to this ADR and a new `bar_version`, never a
 code change a session makes. Its unit, and what report proves a duration, are
 decided when it is filled. **No number is proposed here** (25, "What it does not
@@ -536,7 +536,7 @@ promotion that leaves it blank is refused." **Every `Promote` is RULED, not a dr
 choice** (finding N2: the previous revision marked it DRAFTER). The count corrects
 nothing; ADR-012 rule 10 (`docs/DECISIONS.md:2244-2250`) is unchanged.
 
-**RULED (32b): 25h and 26b amend 18e.** The owner chose "Yes, say it amends 18e",
+**RULED (32b): 25h and 26b amend 18e.** The owner chose "Yes, say it amends 18e (Recommended)",
 whose text was: "The count still corrects no result, but a count above the cap is
 refused." 18e's "The count corrects nothing and claims nothing" still holds of the
 result; it no longer holds of the promotion, which the count can now block.
@@ -571,7 +571,7 @@ A `Promote` review's `content` carries **`variants_tried`**. **DRAFTER — the c
    a `Derived From` edge to the strategy it came from. For each identifier in that
    ancestry, the counts considered are those on the `Promote` reviews named by the
    rungs of the ladder of the version **ADR-015's current-stage read returns** for
-   it (ADR-015 at `1c75876`, lines 4801-5131), and nothing else. **Each ancestor
+   it (ADR-015 at `c11bf59`, lines 4801-5131), and nothing else. **Each ancestor
    also contributes the number of distinct significance-report identifiers in its
    range** (rule 3 check 5's range, taken for the version its read returns; DRAFTER,
    third-pass finding 3N8). Without it, an ancestor's failed trials that were listed
@@ -733,7 +733,7 @@ report that passed at a critical value of at least 3.0. It must also have enough
 data, as amended ADR-012 defines."** Finding B5 (verdict).
 
 **RULED (33b): the report is a backtest report.** The owner chose "A backtest
-report": "The 3.0 significance-and-adequacy check always uses a backtest over 10+
+report (Recommended)": "The 3.0 significance-and-adequacy check always uses a backtest over 10+
 years of history, bound alongside the seven evidence records rather than as one of
 them. The capital rungs still need the B- or A-grade Statistical performance record
 from paper or live trading, and still wait for the paper and live lengths the
@@ -764,7 +764,7 @@ conformed to the code. The report's `content` records:
 
 **Where it runs.** On `save()` and `get()` of the review, in the sweep, and — RULED
 (26e) — in ADR-015 rule 3c whenever a strategy's stage is read (ADR-015 at
-`1c75876`, lines 4450-4460).
+`c11bf59`, lines 4450-4460).
 
 **Consequence, stated.** The ADR-012 amendment is itself PROPOSED and unimplemented,
 so no report today can carry item 3's record. **Until it is ratified and implemented,
@@ -800,7 +800,7 @@ on save and in the sweep.
 
 **The same `human_authorization` authorizes a confidence change on a capital stage
 — RULED (26c): "Changing a funded strategy's confidence needs a recorded human yes,
-as in 25f."** ADR-015 rule 3g (ADR-015 at `1c75876`, lines 4704-4744) requires it on
+as in 25f."** ADR-015 rule 3g (ADR-015 at `c11bf59`, lines 4704-4744) requires it on
 the `Remain Current Stage` review a capital-stage Revision names, and on the review
 of an Append that changes confidence.
 
@@ -836,12 +836,13 @@ Follow-Up item 1).
 
 ### Rule 10 — The bar has a version, and every read judges every step by today's bar
 
-**RULED (32a), overruling 25g's "It does not re-judge past steps".** Asked which
+**RULED (32a), overruling 25g's first two sentences, "A raised bar applies from each strategy's next step. It does not re-judge past steps."** Asked which
 bar a stage read judges each past step by, the owner chose **"Today's bar"**, whose
 text was: "Every read re-judges every past step against the current bar, so raising
 the bar immediately drops any strategy that no longer meets it." **RULED (25g), the
-words that stand:** "A raised bar applies from each strategy's next step. [...] No
-strategy holds capital today." Finding S1.
+words that stand:** "No strategy holds capital today." Finding S1. *(Corrected
+2026-09-25, sixth-pass finding F6-1: the previous text also quoted "A raised bar
+applies from each strategy's next step" as standing, which 32a overrules.)*
 
 **DRAFTER — the mechanism.**
 
@@ -850,11 +851,14 @@ strategy holds capital today." Finding S1.
   holds the current version's constants only; an earlier version's are in the text
   of the amendment that replaced them.
 - **Every review records `bar_version`**, on every outcome: the version it was saved
-  under, kept as a record. `save()` accepts only the current version. A version the
-  code does not know, or one above the current version, is refused.
-- **Every stored review is judged by the current version's constants**, on every
-  read (ADR-015 rule 3c) and in every sweep (ADR-015 rule 3f), never by the version
-  it records (32a). A raised floor therefore lowers a strategy's read at once: a
+  under, kept as a record. `save()` accepts only the current version. Every version
+  from 1 to `BAR_VERSION` is known; a version outside that range is refused
+  (sixth-pass finding F6-7).
+- **Every review a read checks, and every stored review in a sweep, is judged by the
+  current version's constants** (ADR-015 rules 3c and 3f), never by the version it
+  records (32a). A read below capital checks its base's last rung, and a capital read
+  the whole chain (27f); whether that meets 32a's "every past step" is open (Part 34,
+  question 3; sixth-pass finding F6-6). A raised floor therefore lowers a strategy's read at once: a
   review that no longer meets it fails 3c, and the read falls to the lowest stage it
   can establish, as for any review that fails (25d). The strategy climbs back only
   through new reviews that meet today's bar. A lowered bar also applies at once; the
@@ -895,7 +899,7 @@ an account or a tool Belay does not control, at any size, whatever stage Belay r
 A strategy closed at every capital rung by this ADR can still be traded outside it.
 Reports produced outside Belay and never stored are invisible to rule 3's check 7
 (and so are some produced inside it; rule 3, "The 'never stored' residual"). ADR-015
-rule 8 (ADR-015 at `1c75876`, lines 5631-5672) states the same limit for the capital
+rule 8 (ADR-015 at `c11bf59`, lines 5631-5672) states the same limit for the capital
 read. **`README.md` does not yet state this limit**, which 25j requires of "Belay's
 documents"; that is Required Follow-Up item 13, left to a change that edits the
 README.
@@ -906,12 +910,12 @@ README.
 
 ADR-015 rule 3c reads the last rung's review through the full validator, and — RULED
 (26e) — resolves that review's bound reports and applies rule 8 (ADR-015 at
-`1c75876`, lines 4450-4483). The validator does no I/O. The checks that read other
+`c11bf59`, lines 4450-4483). The validator does no I/O. The checks that read other
 reviews, the listing, or other identifiers run where the store is available.
 
 **On a capital stage the current-stage read runs the first two columns on every
 version back to `Idea`, not only the last — RULED (27f)**, in ADR-015 rule 3h step 3
-(ADR-015 at `1c75876`, lines 4801-5131). The store-wide column still runs only in
+(ADR-015 at `c11bf59`, lines 4801-5131). The store-wide column still runs only in
 `save()` and the sweep.
 
 | Check | Validator: on save, on `get()` of the review, and in ADR-015 rule 3c | Bound reports: on save, `get()` of the review, ADR-015 rule 3c (26e) and 3f | Store-wide: `save()` and ADR-015 rule 3f only |
@@ -947,11 +951,11 @@ column.
 
 ## Changes this makes to ADR-015 — every one, and where it was applied (findings B7 and 2N12)
 
-Every row is applied on pull request #7's branch. **"Now" is ADR-015 at `1c75876`**,
+Every row is applied on pull request #7's branch. **"Now" is ADR-015 at `c11bf59`**,
 checked line by line against that commit for this revision (`git show
-1c75876:docs/DECISIONS.md`). Rows 1-17 are the 2026-09-24 revision's changes, rows
+c11bf59:docs/DECISIONS.md`). Rows 1-17 are the 2026-09-24 revision's changes, rows
 18-26 the first 2026-09-25 revision's, rows 27-31 the fourth revision's, rows
-32-35 the fifth revision's, rows 36-38 the Part 32 revision's, and rows 39-47 the Part 33 revision's; the lines of the earlier rows moved and are repointed. "Was" is where the first pass found the
+32-35 the fifth revision's, rows 36-38 the Part 32 revision's, rows 39-47 the Part 33 revision's, and row 48 Part 34's; the lines of the earlier rows moved and are repointed. "Was" is where the first pass found the
 text (its "PR7:" citations); "—" where the text is new.
 
 | # | Change | Was (PR7:) | Now (lines) |
@@ -1003,6 +1007,7 @@ text (its "PR7:" citations); "—" where the text is new.
 | 45 | Test 74: a naming-nothing review with an authorization is refused only below the capital stages (F5-9) | — | 6043 |
 | 46 | Required Follow-Up, "Implementation": the fifth pass's F5-1 to F5-12 become step-2 tests (33a) | — | 6415 |
 | 47 | Required Follow-Up: Parts 32 and 33 are the record not yet on `main` | — | 6421-6423 |
+| 48 | The author's errors the sixth pass found (Part 34): the joint read counts supersessions that need no yes (F6-2); a version whose last rung is downward and resolves is never set aside (F6-5); the 33c quotation (F6-4); what a read re-judges (F6-6); rule 3c's backtest report and eight reports (F6-11); 25g's first two sentences overruled (F6-14); the date, heading, status and pass counts (F6-18); the sixth pass's findings are step-2 tests | — | 3623, 3626, 3630, 3648, 3988-3991, 4457, 4459, 4487, 4989, 4995-4996, 5358, 5361-5362, 5521, 6415, 6428-6429 |
 
 ## Tests this implies
 
@@ -1153,8 +1158,8 @@ refusal, never a bare exception type.
     hypothetical version 2 that raises `Micro Capital`'s floor above that review's
     grade, the current-stage read falls to the lowest stage it can establish below
     `Micro Capital`, with no new file written. The same strategy under version 1
-    reads `Micro Capital` (the mutation: judging by the recorded version keeps it
-    there). A new review saved under version 1 is refused naming the current
+    reads `Micro Capital`. The test fails if the read judges a review by the
+    version it records, which would keep it at `Micro Capital` under version 2. A new review saved under version 1 is refused naming the current
     version; an unknown version is refused.
 24a. **2N7.** Under a hypothetical version 2, a review at the second rung that records
     version 1 while the first rung's review records version 2: refused naming both,
@@ -1186,7 +1191,7 @@ a hand-built report could grade itself B. Check 8 makes it true.)* **So does eve
 climb back above `Paper Trading` after a demotion** (ADR-015 rule 4(f), 27a), which
 needs a paper or live report written after it.
 
-**Promotion gets heavier:** seven distinct reports on a capital rung, every stored
+**Promotion gets heavier:** seven distinct reports on a capital rung, and rule 8's backtest report beside them (33b), every stored
 report about the strategy listed, a human authorization that must also be
 verifiable, a non-decreasing variant count, and on `Paper Trading` and the capital
 rungs a variant count no larger than the reports' degrees of freedom allow (26b).
@@ -1313,7 +1318,7 @@ every rule now, while nothing in production does.
 8. **What counts as one variant** (18e).
 9. **A store index by subject**, which rule 3's check 7 and ADR-015 rule 3h step 5
    need; derived from the store, never a separately maintained file. It is required
-   infrastructure for both ADRs (ADR-015 at `1c75876`, lines 6440-6444).
+   infrastructure for both ADRs (ADR-015 at `c11bf59`, lines 6440-6444).
 10. **`metric_artifact()` writes `subject_id` and `subject_integrity_hash`**, and the
     ADR-012 amendment's reported conditions (rule 8).
 11. **Parts 32 and 33 merged to `main`** (Parts 25-31 are), and this draft revised
@@ -1351,6 +1356,21 @@ every rule now, while nothing in production does.
     The code is capital-path code: it lands through review like any other and opens
     no capital rung, because every rung stays closed by rule 5's `None` constants
     (28, "What it does not settle").
+19. **Open after the sixth pass (Part 34).** A sixth pass (Issue #21, "Sixth
+    pass") attacked the Part 32 and Part 33 edits. Part 34 fixed the author's errors
+    (F6-1, F6-2, F6-5, F6-6's wording, F6-7, F6-11, F6-14, F6-15, F6-17, F6-18 and
+    F6-20's labels) and ended the text rounds. **Open, each a step-2 test:** F6-3 (a
+    sub-capital raise on a declared yes blocks every later capital read), F6-4,
+    F6-8 (recovery after a bar raise needs a repair review), F6-9 and F6-10 (33d's
+    floor), F6-12 and F6-13 (the paper or live Statistical performance report under
+    33b), F6-16 (rule 10's non-decreasing check can refuse a `Demote`), F6-19.
+    **Five owner questions, put when step 2 starts:** (1) does 33c's "file" include
+    a stored `Demote` or `Retire` review? (2) after a verified climb into capital, do
+    earlier sub-capital raises on a declared yes still count? (3) may a read below
+    capital re-judge only its last step under 32a, the sweep catching the rest? (4)
+    is the paper or live Statistical performance report a trial for rule 6, and must
+    it pass? (5) under 32a, a later amendment that lowers the bar restores a capital
+    read with no new yes: accepted as a cost?
 
 ---
 
@@ -1358,11 +1378,11 @@ every rule now, while nothing in production does.
 
 **The first falsification pass (Issue #21).** Findings against ADR-015 alone are
 resolved on pull request #7's branch and listed in ADR-015's revision history
-(ADR-015 at `1c75876`, lines 3841-3865 for this pass; lines 3867-3901 for the
+(ADR-015 at `c11bf59`, lines 3841-3865 for this pass; lines 3867-3901 for the
 second; lines 3903-3944 for the third). The second column below names where each
 finding sits in this revision.
 
-| Finding | Resolved here in | Also in ADR-015 at `1c75876` |
+| Finding | Resolved here in | Also in ADR-015 at `c11bf59` |
 |---|---|---|
 | B1 | — | rule 3g, tests 39-43 |
 | B2 | — | rules 3e, 3h, tests 44-47 |
@@ -1391,7 +1411,7 @@ finding sits in this revision.
 
 **The owner's Part 25.**
 
-| Ruling | Resolved here in | Also in ADR-015 at `1c75876` |
+| Ruling | Resolved here in | Also in ADR-015 at `c11bf59` |
 |---|---|---|
 | 25a Distinct evidence | rule 2 | — |
 | 25b Part 22 joined to the ladder | rule 8 | — |
@@ -1399,7 +1419,7 @@ finding sits in this revision.
 | 25d Fail toward less capital | rule 3 (no binding on downward moves); rule 9 (no authorization on downward moves) | rules 3b, 3e, 3h, 8 |
 | 25e Live rungs closed | rule 5 | rule 3c runs it (B3) |
 | 25f A human authorizes capital | rule 9 | residual risk note |
-| 25g Raised bar applies from next step; "does not re-judge past steps" overruled by 32a | rule 10 | rule 4, "Which ADR-016 version applies" |
+| 25g Raised bar applies from next step; overruled by 32a, except "No strategy holds capital today" | rule 10 | rule 4, "Which ADR-016 version applies" |
 | 25h Refuse trial counts beyond the hurdle | rule 6 | — |
 | 25i No reuse after a demotion | rule 3 check 5 (report subject position); rule 3 check 8 (the grade that makes a report paper or live, for 27a) | rule 4(f) |
 | 25j Trading outside Belay out of scope | "What these rules do not reach" | rule 8 |
@@ -1407,7 +1427,7 @@ finding sits in this revision.
 **The second pass (Issue #21, 2026-09-24).** Its labels N1-N13 are written 2N1-2N13
 here, because the first pass used N1-N7.
 
-| Finding | Resolved here in | Also in ADR-015 at `1c75876` |
+| Finding | Resolved here in | Also in ADR-015 at `c11bf59` |
 |---|---|---|
 | 2N1, 2N2, 2N3, 2N4 | — (ADR-015's) | rule 3h (lines 4801-5131); rule 3c (lines 4437-4449); rule 3e (lines 4585-4640); tests 53-58 |
 | 2N5 | rule 3: `reports_considered`, "The listing's range is exactly check 5's range", `variants_tried` at least the significance reports listed, "The 'never stored' residual"; test 13 | rule 5 (lines 5490-5551) |
@@ -1423,7 +1443,7 @@ here, because the first pass used N1-N7.
 
 **The owner's Part 26.**
 
-| Ruling | Resolved here in | Also in ADR-015 at `1c75876` |
+| Ruling | Resolved here in | Also in ADR-015 at `c11bf59` |
 |---|---|---|
 | 26a An unresolved downward step lowers the read only | — | rule 3h steps 4 and 6; rule 3e; rule 4(f) |
 | 26b The trial cap at 5%, from each report's degrees of freedom, only where 3.0 applies | rule 6 | rule 4's table |
@@ -1434,7 +1454,7 @@ here, because the first pass used N1-N7.
 
 **The third pass (Issue #21, 2026-09-25).** Its labels are written 3N1-3N17 here.
 
-| Finding | Resolved here in | Also in ADR-015 at `1c75876` |
+| Finding | Resolved here in | Also in ADR-015 at `c11bf59` |
 |---|---|---|
 | 3N1, 3N2, 3N3, 3N5, 3N6, 3N9, 3N10, 3N12, 3N15, 3N17 | — (ADR-015's), but rule 9 authorizes the supersessions and repairs (27d, 27g), and rule 3 check 6 refuses a window that ends after `created` (3N5) | rule 3h (lines 4801-5131); rule 3b (lines 4336-4416); rule 3g (lines 4704-4799); rule 4(f) (lines 5190-5312); rule 5 (lines 5499-5530); tests 61-73 |
 | 3N4 | rule 3 check 8; "Which checks run where"; Consequences; test 6b | residual risk (lines 6211-6249) |
@@ -1447,7 +1467,7 @@ here, because the first pass used N1-N7.
 
 **The owner's Part 27.**
 
-| Ruling | Resolved here in | Also in ADR-015 at `1c75876` |
+| Ruling | Resolved here in | Also in ADR-015 at `c11bf59` |
 |---|---|---|
 | 27a A climb back needs new paper or live evidence; backtests reuse history (supersedes 26d) | rule 3 checks 6 and 8 supply the window rule and the grade | rule 4(f) (lines 5190-5312) |
 | 27b Keep `current_stage`; it reports the approved confidence | — | rule 3h; rule 3g; rule 8 |
@@ -1459,7 +1479,7 @@ here, because the first pass used N1-N7.
 
 **The fourth pass (Issue #21, 2026-09-25).** Its labels are F4-1 to F4-10.
 
-| Finding | Resolved here in | Also in ADR-015 at `1c75876` |
+| Finding | Resolved here in | Also in ADR-015 at `c11bf59` |
 |---|---|---|
 | F4-3 | "Changes this makes to ADR-015", row 32; rule 9 ("The key is allowed on any review whose `supersedes` is not empty"); test 22a | rule 5 (lines 5537-5549); test 74 |
 | F4-1, F4-2, F4-5, F4-6, F4-7, F4-8, F4-10 | — (ADR-015's) | rules 3e, 3g, 3h, 4(f) and 5; tests 75-81; revision history (lines 3946-3986) |
@@ -1468,7 +1488,7 @@ here, because the first pass used N1-N7.
 
 **The owner's Part 28.**
 
-| Ruling | Resolved here in | Also in ADR-015 at `1c75876` |
+| Ruling | Resolved here in | Also in ADR-015 at `c11bf59` |
 |---|---|---|
 | 28a A hand-written upward step cannot cancel a pending demotion | rule 9 | rule 3h step 5 (lines 4894-4924); test 80 |
 | 28b A repair or supersession raising capital confidence needs 26f's verifier | rule 5; rule 9; test 22a | rule 3h steps 5 and 6; test 77 |
@@ -1477,7 +1497,7 @@ here, because the first pass used N1-N7.
 | 28e How it is finished | the Status block; Required Follow-Up item 18 | Status block; Required Follow-Up ("Implementation") |
 | 32a Today's bar: every read judges every step by the current constants | rule 10; test 24 | rule 4, "Which ADR-016 version applies" (lines 5358-5367) |
 | 32b 25h and 26b amend 18e | rule 6 | — |
-| 32c 18g's fresh pass stands, on the text as ratified | Put to the owner at ratification, item 12 | Required Follow-Up (lines 6427-6428) |
+| 32c 18g's fresh pass stands, on the text as ratified | Required Follow-Up (ADR-016), item 12 | Required Follow-Up (lines 6427-6428) |
 | 33a Step 1 ends with wording fixes; every other fifth-pass attack is a step-2 test | the Status block | Required Follow-Up, "Implementation" (line 6415) |
 | 33b Rule 8's report is a backtest report, beside the seven records | rule 8 | — |
 | 33c A repair sets aside forgeries only | — | rule 3h step 6 (lines 4988-4989); rule 5 (line 5521) |
