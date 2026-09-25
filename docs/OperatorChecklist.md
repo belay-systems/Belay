@@ -872,9 +872,17 @@ Recommended A: B cannot be delivered by code, and review is the only defence tha
 exists against deliberate faking. The owner also asked whether a blockchain would
 help; the answer given, no for this problem, is recorded in Part 37.
 
+## Done — 2026-09-25: a fingerprint of the prices (follow-up 1)
+
+**Answered. Owner said "yes to fingerprint"** — recorded as
+`docs/OwnerDecisions.md` **Part 38**. The existing record `RPT-0001` has no
+fingerprint, so it cannot back a Level C result until re-fetched; recorded there,
+since it was not said when the question was put.
+
 ## Open — 2026-09-25: two follow-ups to option A
 
-Named when option A was put, not yet asked on their own. One at a time.
+Named when option A was put, not yet asked on their own. One at a time. Item 1 is
+answered (above, Part 38) and kept here as it was put.
 
 1. **Should a fetch record store a fingerprint of the parsed prices?**
    *Recommended: yes.* Today a genuine fetch with its prices replaced on the same

@@ -3556,3 +3556,65 @@ defence that exists against it.
 - **The fixes themselves.** The pass's findings are #36's to fix, including the
   "What it settles" wording in Part 36 that the pass says goes beyond the owner's
   words. Nothing in Part 36 is changed by this Part.
+
+---
+
+# Part 38 — Ruled 2026-09-25: a fetch record carries a fingerprint of its prices
+
+**Follow-up 1 to Part 37**, put on its own after the owner chose option A. Like
+Part 37, it reads correctly once #36 has merged, and is a proposal until it is on
+`main`.
+
+**Why the question arose.** The fourth pass's B3: `disclosure_from` checks a
+series against its fetch record by bar count and first and last date only. A
+genuine fetch with its prices replaced on the same dates (closes of 1.00 and
+900.00, relabelled GME) was still graded Level C as DoltHub AAPL. No adversary is
+needed: a cleaning step, a split adjustment or a bug after the fetch does the same.
+
+**Question put**, in the session, with a recommendation:
+
+> Should a fetch record store a fingerprint of the prices? … When Belay fetches
+> data, it would also store a fingerprint of the exact prices it received. Before
+> granting Level C, it would check that the prices being used still match that
+> fingerprint. If a single price differs, the result is not Level C.
+
+The cost was stated with it: backtests usually adjust prices, for example so a
+2-for-1 split does not read as a 50% crash, and under this rule adjusted prices
+would be graded Level D until the adjustment step itself is recorded as evidence,
+so early Stage 3 backtests on adjusted prices would be "research only".
+*Recommended: yes* — a Level C label should mean "these are the prices the vendor
+sent"; recording adjustments properly can come later, as its own piece of work.
+
+**Owner said: "yes to fingerprint".**
+
+### What it settles
+
+- **38a. A fetch record stores a fingerprint of the prices it received.**
+- **38b. Level C requires the series a result is computed over to match that
+  fingerprint.** If a single price differs, the result is not Level C.
+- **38c. The cost is accepted.** A series adjusted after the fetch is not Level C
+  until the adjustment is itself recorded.
+
+### Session readings, not the owner's words
+
+- **What the fingerprint covers.** "The prices" is read as every value in every
+  bar the source returned — date, open, high, low, close and volume — hashed in a
+  fixed canonical form, beside the existing `content_hash` of the raw bytes rather
+  than instead of it. That is the next attempt's to confirm.
+- **It changes what a fetch record carries, which touches ADR-014.** The
+  recommendation had already said so for the Part 36 question; it was not repeated
+  here.
+- **Records written before the fingerprint cannot support Level C.** Not stated
+  when the question was put. The one fetch record in the repository,
+  `artifacts/RPT-0001/1.0.0.yaml`, carries `content_hash` over its raw bytes and no
+  fingerprint of the parsed prices. Under 38b it could back a Level C result only
+  once re-fetched. Nothing depends on it today: no metric artifact is stored.
+
+### What it does not settle
+
+- **How an adjustment is recorded** so that an adjusted series can earn Level C.
+  Later, as its own piece of work.
+- **Whether a mismatch is refused or graded Level D.** "Not Level C" allows both;
+  Part 36's reading chose refusal, and that reading is still the session's.
+- **Follow-up 2** (each metric artifact names its fetch record). Not yet put.
+- **Ratification of ADR-017.** Unchanged from Part 37.

@@ -56,9 +56,16 @@ for this problem, with the reasons recorded in Part 37. The owner then said "A -
 your recommendations". Recorded as Part 37, with "per your recommendations" read as
 covering A only, since the two follow-ups had not yet been put with their costs.
 
+**Follow-up 1, put on its own.** Should a fetch record store a fingerprint of the
+prices, with Level C requiring the series to match it? Recommended yes, with the
+cost stated: prices adjusted after the fetch are Level D until the adjustment is
+recorded. The owner said "yes to fingerprint". Recorded as Part 38, together with a
+consequence not stated when it was put: `RPT-0001` has no fingerprint and cannot
+back Level C until re-fetched.
+
 ## Files changed
 
-- `docs/OwnerDecisions.md` — Part 37.
+- `docs/OwnerDecisions.md` — Parts 37 and 38.
 - `docs/OperatorChecklist.md` — the question as put (Done), the two follow-ups
   (Open), and ratification (Later).
 - `docs/NOW.md` — "In flight" and the next-task list.
@@ -91,12 +98,11 @@ was checked for exactly that.
 
 ## What is open
 
-- **Follow-ups 1 and 2** to option A, in `docs/OperatorChecklist.md`: a price
-  fingerprint on the fetch record, and a link from each metric artifact to its
-  record. To be put to the owner one at a time.
-- **Attempt four of ADR-017**, on #36, built to Part 37 and to whatever the owner
-  rules on the follow-ups, then its own independent pass. Not before.
-- **Merge order.** Part 37 refers to Parts 35 and 36, so this branch should merge
+- **Follow-up 2** to option A, in `docs/OperatorChecklist.md`: a link from each
+  metric artifact to its fetch record. To be put to the owner.
+- **Attempt four of ADR-017**, on #36, built to Parts 37 and 38 and to whatever the
+  owner rules on follow-up 2, then its own independent pass. Not before.
+- **Merge order.** Parts 37 and 38 refer to Parts 35 and 36, so this branch should merge
   after #36. Both edit the end of `docs/OwnerDecisions.md` and
   `docs/OperatorChecklist.md`, and both edit `docs/NOW.md`: keep `main`'s text first
   and add this branch's after it.

@@ -56,10 +56,11 @@ There, keep `main`'s text first and add the branch's text after it.
      escape them with `..`, and prices are not bound to the record.
    - The owner chose option A (Part 37): guard against honest
      mistakes and make faking visible in review; not "impossible".
-   - **Next:** put the two follow-ups in `docs/OperatorChecklist.md` to the owner
-     one at a time (a price fingerprint on the record; a link from each metric
-     artifact to its record). Then attempt four on #36, then its own independent
-     pass, then ratification. Not before.
+   - The owner ruled the price fingerprint (Part 38): Level C needs the series to
+     match a fingerprint of the prices the fetch received.
+   - **Next:** put follow-up 2 in `docs/OperatorChecklist.md` to the owner (a link
+     from each metric artifact to its record). Then attempt four on #36, then its
+     own independent pass, then ratification. Not before.
 2. **Finish the evidence bar the way Part 28e rules.**
    - **Step 1, the final text round on #7 and #20, with no redesign:**
      - fix the fourth pass's two blocking findings (F4-3 and F4-1, Issue #21,
