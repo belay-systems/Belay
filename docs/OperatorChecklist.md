@@ -1054,3 +1054,46 @@ I recommend against that: it would move a ruling to fit an implementation.
 **Nothing has been implemented either way, and ADR-017 must not be ratified until this
 is answered** — as written it would certify the weaker behaviour as delivering your
 ruling.
+
+## Open — 2026-09-25: ratify or reject ADR-017 (grade from provenance)
+
+`docs/proposals/ADR-017-grade-from-provenance-DRAFT.md`. **PROPOSED. Only you
+ratify an ADR.** It writes down what you already ruled twice — Part 35a and
+Part 36 — so the substance is not in question; what is owed is your ratification
+of the document, and one thing before it.
+
+**What it now says, in plain terms.** A computed number is graded "Level C —
+historical simulation" only when the price series behind it came from a fetch whose
+record is on disk in the repository. Anything else is Level D, "research only".
+
+**What is owed first, and it is the reason to wait.** Three independent passes ran
+on this work and **each one broke the implementation it was given** — the second and
+third found that the code did not deliver your ruling, both times erring toward the
+flattering reading. The current version (attempt three) has had **no pass at all**.
+The absence of one is not evidence that it is sound. Ask for a fourth before
+ratifying; it costs a session and has paid for itself three times.
+
+**One thing to know before you ratify, because it bounds what the ADR can promise.**
+Belay's artifact signature is an unkeyed hash and the signing function is public, so
+nothing in the code can prove a record was written by the fetch machinery rather than
+by a caller. The guarantee is therefore *"this record is on disk in the repository
+where it says it is, these are its bytes, this is its series"* — **not** "these bytes
+came from the data vendor". That limit is written into the ADR rather than papered
+over. Closing it needs keyed signing, which was sized for you: it collides with
+Belay's determinism rule, needs an ADR-005 amendment, touches 26 test files, and
+would not stop the thing that actually went wrong here. Recommended against for this
+purpose, worth revisiting for a different one.
+
+## Open — 2026-09-25: F-032's priority, P2 or P1
+
+Registered at **P2** on precedent: F-019 was the same finding family, the same
+breach, also graded High, and was carried at P2.
+
+The counter-argument, put here because you should see both: `docs/HANDOFF.md:2755-2757`
+maps Critical→P1 and Medium→P3 and leaves High unmapped, and the one High example it
+names (F-002) is carried at **P1**. F-032 is the finding where removing one line lets
+a signed record read `Demote: Micro Capital → Limited Capital` — a demotion that
+doubles the capital stage.
+
+**No recommendation was made and none was asked for. P2 stands unless you rule.**
+Nothing is blocked either way; this is a queue-ordering question.
