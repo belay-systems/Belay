@@ -3471,3 +3471,73 @@ owner was asked to confirm or correct them.
 Items 2-7 of those notes are not rulings. They are gaps and readings for the
 final text round on ADR-015 and ADR-016 (Part 28e, step 1). The open ones are
 25g against 26e and 27f, 25h and 26b against 18e, and 28e against 18g.
+
+---
+
+# Part 35 — Ruled 2026-09-25: grade from provenance (F-033); drop three unused dependencies (F-036)
+
+**Numbered 35, not 32.** Parts 32, 33 and 34 are used by #33, which is open and
+unmerged. Taking 32 here would collide on merge. There is no gate for Part
+numbers as there is for finding numbers (`scripts/review_due.py`), which is the
+same shape F-035 describes.
+
+**Questions put.** Two, one at a time, in `docs/OperatorChecklist.md`, each with
+a recommendation and its cost. Both came from `reports/review/2026-09-25-review.md`
+and both survived an independent falsification pass.
+
+1. **F-033 — what should Level C mean?** Should a computed number be graded
+   Level C only when its input series came from a recorded fetch, and Level D
+   otherwise? *Recommended: yes.*
+2. **F-036 — three unused dependencies.** Should `pandas`, `jinja2` and
+   `python-dateutil` be removed from `pyproject.toml`? *Recommended: yes, remove
+   all three*, and do **not** declare `numpy` in their place.
+
+**Owner said: "Aligned to recommendations".**
+
+### What it settles
+
+- **35a. A computed number is Level C only when its series came from a recorded
+  fetch. Otherwise it is Level D.** The grade comes from the disclosure's
+  provenance, not from the emitting function. Drafted as ADR-017
+  (`docs/proposals/ADR-017-grade-from-provenance-DRAFT.md`), **which this ruling
+  does not ratify** — only the owner ratifies an ADR.
+- **35b. The cost is accepted, and it was stated in the question.** Every metric
+  artifact Belay emits becomes Level D until the fetch path is wired through,
+  because `disclosure_from` has no non-test caller (open finding F-003). Under
+  ADR-016's draft evidence floor that would block promotion above
+  `Paper Trading`.
+- **35c. `pandas`, `jinja2` and `python-dateutil` are removed from
+  `pyproject.toml`.** None was imported by any file under `framework/`,
+  `scripts/`, `tests/` or `departments/`.
+- **35d. `numpy` is not declared in their place.** The alternative was offered
+  and not taken: it is imported nowhere, and declaring a dependency Belay does
+  not use yet is the wrong direction. If numerical work later wants it, declare
+  it then.
+
+### Session readings, not the owner's words
+
+- The **mechanism** for 35a. The recommendation the owner answered described
+  "`Disclosure` gains a constructor split". Building it revealed that
+  `tests/test_governance_conformance.py` asserts set equality between
+  `dataclasses.fields(Disclosure)` and the four things `Validation/Backtesting.md`
+  requires — a document frozen by ADR-002 — so a fifth field on `Disclosure`
+  would turn the constitution's own validation conformance red. The provenance is
+  therefore carried by a subclass and read through a property, which changes no
+  signed content. **The substance ruled is unaffected; the mechanism was not
+  what the owner was shown**, and that is this session's reading rather than a
+  ruling. ADR-017 records it in full.
+
+### What it does not settle
+
+- **Ratification of ADR-017.** That is a separate act and is owed.
+- **Any change to `constitution/Evidence_Standards.md`.** The four classes are
+  untouched. Level D reads "Hypothesis. Research only.", and arithmetic over
+  unsourced numbers is not strictly a hypothesis either; the owner was shown
+  this. Amending the constitution here is the owner's and was not asked.
+- **Binding the grade to a stored fetch record's `content_hash`**, so Level C
+  cannot be claimed without the bytes. Named in ADR-017 as the stronger form and
+  the follow-up; not ruled.
+- **F-032's priority.** Registered at P2 on the F-019 precedent. The owner was
+  shown that `docs/HANDOFF.md:2755-2757` leaves High unmapped while its only
+  High example is carried at P1. No recommendation was made and none was given,
+  so P2 stands unchanged rather than by ruling.

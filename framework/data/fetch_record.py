@@ -42,7 +42,7 @@ from framework.artifacts.repository import ArtifactRepository
 from framework.data.contract import DailyBarSeries, MarketDataSource
 from framework.data.store import SeriesStore, StoredSeries
 from framework.data.survivorship import SurvivorshipDisclosure
-from framework.metrics.reporting import Disclosure, SamplePeriod
+from framework.metrics.reporting import Disclosure, FetchedDisclosure, SamplePeriod
 
 
 def fetch_record(
@@ -474,7 +474,11 @@ def disclosure_from(
     if additional_limitations.strip():
         limitations = f"{limitations} {additional_limitations.strip()}"
 
-    return Disclosure(
+    # `FetchedDisclosure`, not `Disclosure`: the return type is what grades the
+    # metric. F-033, owner ruling Part 35 — a computed number is Level C only when
+    # its series came from a recorded fetch, and this function is the only thing in
+    # Belay that can say so. A hand-built `Disclosure` answers Level D.
+    return FetchedDisclosure(
         assumptions=assumptions,
         data_source=source.name,
         sample_period=series.period(),

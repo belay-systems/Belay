@@ -164,6 +164,62 @@ class Disclosure:
                     "not evidence."
                 )
 
+    @property
+    def evidence_level(self) -> EvidenceLevel:
+        """The grade a metric computed over this disclosure's series may carry.
+
+        **RESEARCH — Level D — unless the disclosure came from a recorded fetch.**
+        Ruled by the owner 2026-09-25 (`docs/OwnerDecisions.md` Part 35, F-033).
+        ADR-017 draft: `docs/proposals/ADR-017-grade-from-provenance-DRAFT.md`.
+
+        Before that ruling `metric_artifact` stamped `HISTORICAL` — Level C,
+        "historical simulation" — on every artifact it emitted, whatever produced
+        the numbers. Eight figures typed at a keyboard with
+        `data_source="I made these up"` validated as Level C and signed.
+        `constitution/Evidence_Standards.md` defines Level C as historical
+        simulation and Level D as "Hypothesis. Research only.", and the
+        `references/red-team-checklist.md` B5 item names "C whose support is
+        really D" as the thing to look for. That was it, in committed code.
+
+        The grade now comes from provenance rather than from the emitter, and it
+        fails in the unflattering direction: the hand-built case — the default,
+        the easy path, the one every caller takes today — is Level D.
+        `FetchedDisclosure` below is the only thing in Belay that answers Level C,
+        and `disclosure_from` is the only thing that builds one.
+
+        **What this does not do.** Nothing stops a caller constructing a
+        `FetchedDisclosure` by hand. That is a deliberate limit, not an oversight:
+        this change makes the honest path the easy one and the dishonest path an
+        explicit, greppable claim, which is what one enum value can buy. Binding
+        the grade to a stored fetch record's `content_hash` — so the claim cannot
+        be made without the bytes — is the stronger form, and ADR-017's draft
+        records it as the follow-up rather than smuggling it in here.
+        """
+        return EvidenceLevel.RESEARCH
+
+
+@dataclass(frozen=True, slots=True)
+class FetchedDisclosure(Disclosure):
+    """A `Disclosure` whose series came from a recorded fetch. Level C.
+
+    **Adds no dataclass field, and that is forced rather than tidy.**
+    `tests/test_governance_conformance.py` asserts set *equality* between
+    `dataclasses.fields(Disclosure)` and the four things
+    `Validation/Backtesting.md` requires a backtest to document — a document
+    frozen by ADR-002. A fifth field here would turn the constitution's own
+    validation conformance red. So the provenance is carried by the type and read
+    through the property above, and the signed content of every artifact is
+    byte-identical to what it was before this change.
+
+    Built only by `framework.data.fetch_record.disclosure_from`, which takes the
+    source and the arrived series rather than strings, so neither the name nor the
+    window can be typed by the caller.
+    """
+
+    @property
+    def evidence_level(self) -> EvidenceLevel:
+        return EvidenceLevel.HISTORICAL
+
 
 def metric_artifact(
     identifier: str,
@@ -210,7 +266,10 @@ def metric_artifact(
     evidence = EvidenceRecord.create(
         source=disclosure.data_source,
         methodology=methodology,
-        level=EvidenceLevel.HISTORICAL,
+        # F-033, owner ruling Part 35: the grade comes from the disclosure's
+        # provenance, not from this function. Hardcoding it here graded every
+        # metric Level C whatever produced the numbers.
+        level=disclosure.evidence_level,
         confidence=1.0,
         provenance=f"{observations} observations",
         timestamp=timestamp,

@@ -37,7 +37,7 @@ from pathlib import Path
 
 import pytest
 
-from framework.artifacts.enums import ArtifactType, DeliverableType
+from framework.artifacts.enums import ArtifactType, DeliverableType, EvidenceLevel
 from framework.artifacts.integrity import ArtifactIntegrity
 from framework.artifacts.validator import ArtifactValidator
 from framework.data.contract import (
@@ -50,7 +50,7 @@ from framework.data.contract import (
 from framework.data.fetch_record import disclosure_from, fetch_record
 from framework.data.store import SeriesStore, StoredSeries
 from framework.data.survivorship import Retention, SurvivorshipDisclosure
-from framework.metrics.reporting import SamplePeriod
+from framework.metrics.reporting import Disclosure, SamplePeriod
 
 FIXED_TIME = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
@@ -361,6 +361,40 @@ def test_a_disclosure_can_be_built_from_the_fetch_without_hand_written_strings()
         start=date(2024, 1, 2), end=date(2024, 1, 3)
     )
     assert "inflates" in disclosure.known_limitations.lower()
+
+
+def test_a_derived_disclosure_grades_the_metric_historical_and_a_hand_built_one_does_not():
+    """F-033, owner ruling Part 35 (ADR-017 draft): the grade comes from provenance.
+
+    The pair is the point, and it is the whole of what makes the guard assertable.
+    Before this, `metric_artifact` hardcoded `HISTORICAL` on every artifact it
+    emitted, so eight numbers typed at a keyboard signed as historical simulation.
+
+    Built so that only the return type of `disclosure_from` can satisfy it: if that
+    function returns a plain `Disclosure`, the first assertion fails. That is the
+    mutation the ADR says must turn the suite red, since a guard nothing asserts is
+    F-019's and F-032's shape.
+    """
+    derived = disclosure_from(
+        source=SOURCE,
+        series=SERIES,
+        assumptions="Daily closes, unadjusted for dividends.",
+    )
+    hand_built = Disclosure(
+        assumptions="Daily closes, unadjusted for dividends.",
+        data_source=SOURCE.name,
+        sample_period=SamplePeriod(start=date(2024, 1, 2), end=date(2024, 1, 3)),
+        known_limitations="Typed at the call site.",
+    )
+
+    assert derived.evidence_level is EvidenceLevel.HISTORICAL
+    assert hand_built.evidence_level is EvidenceLevel.RESEARCH
+
+    # Identical in every documented field, and graded differently. The four things
+    # `Validation/Backtesting.md` requires cannot tell these apart, which is why
+    # the provenance is carried by the type rather than by a fifth field.
+    assert derived.data_source == hand_built.data_source
+    assert derived.sample_period == hand_built.sample_period
 
 
 def test_the_derived_disclosure_reports_the_covered_window_not_a_claimed_one():

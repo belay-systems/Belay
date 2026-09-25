@@ -32,8 +32,16 @@ Written 2026-09-25, for `main` at `95e5a4a`, plus this branch
 - **Review gate:** `python scripts/review_due.py` gives the next finding
   number. It is the only authority on that; this file does not restate its
   answer (F-035). It returns `SKIP` until 2026-10-07.
-- **Two owner rulings are owed** and block F-033 and F-036 —
-  `docs/OperatorChecklist.md`, the two 2026-09-25 items.
+- **Both owner rulings have landed.** "Aligned to recommendations",
+  `docs/OwnerDecisions.md` **Part 35**: a computed number is Level C only when its
+  series came from a recorded fetch (F-033, drafted as ADR-017, **not ratified**),
+  and `pandas`/`jinja2`/`python-dateutil` are removed with `numpy` not declared
+  (F-036). Both are implemented on this branch.
+- **F-033's suite run is incomplete.** The sandbox blocked `python -m pytest`
+  after the test edits, so **CI on #36 is the first full verification** of it.
+  F-036 was verified in a fresh virtual environment (709 passing with none of the
+  four packages installed). See
+  `docs/sessions/2026-09-25-owner-rulings-f033-f036.md`.
 - **Contributors help and never gate** (Part 30). Work lands on the owner's
   word, through the Owner bypass.
 
@@ -61,12 +69,21 @@ not edited from here: one Issue, one branch, one claimant.
 ## Highest Priority Next Task
 
 1. **An independent pass on Issue #35's branch, before it merges.** A fresh
-   session told to falsify it. It registers five findings and changes three
-   test files, `AGENTS.md`, `docs/ROADMAP.md` and `docs/FINDINGS.md`. Where to
-   aim: whether the three new F-032 tests really isolate their guards (re-apply
-   each mutation and confirm exactly one test fails); whether the two new
-   conformance tests can be satisfied without fixing the thing they check; and
-   whether the rewritten `docs/ROADMAP.md` Stage 2 prose is now true.
+   session told to falsify it. The pass already run covered `cbc4d20`; **the
+   Part 35 work is later and has had none**, and it is the first production code
+   in this workstream. Where to aim:
+   - `framework/metrics/reporting.py` and `framework/data/fetch_record.py`: does
+     the grade actually come from provenance, and can a caller still get Level C
+     without a fetch?
+   - **Run the mutation ADR-017 requires and has not had:** `disclosure_from`
+     returning a plain `Disclosure` must turn the suite red. If it does not, the
+     new guard is asserted by nothing — F-019's and F-032's shape.
+   - The full suite after the two test edits, which was never run locally.
+   - Whether ADR-017's draft claims anything it has not checked.
+   - The earlier work: whether the three F-032 tests isolate their guards
+     (re-apply each mutation, confirm exactly one test fails), whether the two new
+     conformance tests can be satisfied without fixing what they check, and
+     whether the rewritten `docs/ROADMAP.md` Stage 2 prose is true.
 2. **Finish the evidence bar the way Part 28e rules.**
    - **Step 1, the final text round on #7 and #20, with no redesign:** fix the
      fourth pass's two blocking findings (F4-3 and F4-1, Issue #21); apply

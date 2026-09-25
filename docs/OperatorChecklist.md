@@ -853,7 +853,21 @@ the end of `docs/OwnerDecisions.md`. The recommendations you answered
 The owner answered "aligned to recommendation" (`docs/OwnerDecisions.md` Part
 31). This closes the Open item "confirm the labeled lines in Parts 25-28".
 
-## Open — 2026-09-25: what should Level C mean? (F-033)
+## Done — 2026-09-25: what should Level C mean? (F-033)
+
+**Answered. Owner said "Aligned to recommendations"** — recorded as
+`docs/OwnerDecisions.md` Part 35a and 35b. A computed number is Level C only when
+its series came from a recorded fetch; Level D otherwise. Drafted as ADR-017
+(`docs/proposals/ADR-017-grade-from-provenance-DRAFT.md`), **which is PROPOSED and
+still owes the owner's ratification.** One thing the answer changed and the
+question had not anticipated: the mechanism could not be built as described,
+because a fifth field on `Disclosure` breaks the constitution's own validation
+conformance. Part 35's "Session readings" records that. The question as put is
+below, unchanged.
+
+---
+
+### The question as it was put
 
 **Appended at the end rather than at the top, so no line citation into this file
 moves.** Raised by `reports/review/2026-09-25-review.md` (F-033) and confirmed by
@@ -909,7 +923,18 @@ phrasing is a follow-up, not part of this answer.
 **This is a ruling and probably an ADR, not an edit. It has not been
 implemented, and this recommendation is not a decision.**
 
-## Open — 2026-09-25: drop three unused dependencies? (F-036)
+## Done — 2026-09-25: drop three unused dependencies? (F-036)
+
+**Answered. Owner said "Aligned to recommendations"** — recorded as
+`docs/OwnerDecisions.md` Part 35c and 35d. `pandas`, `jinja2` and
+`python-dateutil` are removed from `pyproject.toml`; `numpy` is **not** declared in
+their place, the alternative having been offered and not taken. Verified by a fresh
+virtual environment: the install pulls none of the four, the suite passes, and
+`python scripts/status.py` exits 0. The question as put is below, unchanged.
+
+---
+
+### The question as it was put
 
 Raised by `reports/review/2026-09-25-review.md` (F-036) and confirmed by the
 independent pass. `AGENTS.md`, "Decisions that are the owner's alone", makes any
