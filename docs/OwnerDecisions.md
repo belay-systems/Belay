@@ -2863,6 +2863,222 @@ both loud and both safe.
 Whether the gate should ever read four-digit numbers. At the ceiling it stops
 and names the file.
 
+---
+
+# Part 16 — Ruled 2026-09-22: the second contributor gets Admin, overruling 15b
+
+**Question put.** The owner reported the second contributor's organization
+invitation accepted and asked a session to grant Write access — the mechanical
+step 15b already authorized. Before the session could act, the owner said: "i
+manually gave [the second contributor] Admin perms." `gh`-equivalent lookup
+(`list_repository_collaborators`) confirmed: `eternalaether5`, `role_name:
+"admin"`, on the live repository. That is beyond 15b's ruling and reopens the
+tradeoff 15b named: with Admin, `eternalaether5` can bypass the `main: review`
+ruleset (its bypass condition is "any organization owner, through a pull
+request" — `docs/HANDOFF.md:5446-5453`), so the code-owner review requirement
+binds nobody but whoever the two owners choose to have it bind; and the
+owner's account is no longer the only one that can recover the organization.
+The session put three options: dial back to Write (matching 15b), keep Admin
+and update the ruling, or leave it unrecorded. The owner selected the second.
+
+**Owner said: "Keep Admin, update the ruling".**
+
+### What it settles
+
+`eternalaether5` holds Admin on `belay-systems/Belay`, not Write. 15b's role
+choice is overruled; 15b's reasoning is not wrong, it is a cost the owner has
+now chosen to accept knowingly rather than one the owner needs re-explained.
+`.github/CODEOWNERS:11`'s "Unknown owner" condition (`docs/OperatorChecklist.md`,
+"`.github/CODEOWNERS` is invalid while the invitation is pending") clears on
+this grant regardless of role — GitHub counts a code owner once the login has
+write access or above, and Admin includes write.
+
+### What it does not settle
+
+- **The `main: review` bypass is now live, not hypothetical.** Any merge
+  either owner's login pushes through as an organization owner skips the
+  code-owner check. Nothing in the repository enforces the second pair of eyes
+  Part 11a and `.github/CODEOWNERS`'s own comment describe once both
+  logins can bypass it. Whether that is acceptable day to day, or worth a
+  ruleset change, is the owner's — the session did not weaken it before
+  being asked to stand down.
+- **Organization recovery is no longer sole-owner.** Unchanged from what 15b
+  named as the cost of *not* doing this; now it applies.
+- How Belay is owned between the two, per 15b, is still unwritten.
+
+## 16a. Correction to Part 16 above, made within the same pull request before merge
+
+**Part 16 as first written conflated two different GitHub permissions.**
+`.github/rulesets/main-review.json`'s `bypass_actors` names
+`"actor_type": "OrganizationAdmin"` — GitHub's organization **Owner** role.
+`eternalaether5` was made an organization **Member** (Part 15b), and nothing
+in this session changed that. The grant this Part records is a *repository*
+collaborator permission (`list_repository_collaborators` returns it as
+`role_name`, a repository-scoped field), a separate axis from organization
+role entirely. **`eternalaether5` cannot bypass `main: review`'s PR-time
+review requirement.** That bypass is exercised only by an organization
+owner — at the time of writing, the account that created the organization
+(Part 14a).
+
+**What repository Admin grants instead, and why it still matters:**
+`scripts/public_settings.py:216` manages `main: review` and `main: checks`
+through `repos/{repo}/rulesets` — a repository-scoped endpoint. GitHub's
+documented permission model for it: anyone with **admin access to the
+repository** may create, edit or delete a repository-level ruleset, a
+separate check from that ruleset's own bypass list. So `eternalaether5`, with
+repository Admin, can edit or delete `main: review` or `main: checks`
+directly (Settings → Rules → Rulesets) — no pull request, no bypass
+mechanism invoked, nothing for `bypass_actors` to gate. That is a different
+and structurally larger exposure than "skips one review": it is "can turn
+the requirement off". Repository Admin also grants managing repository
+secrets and Actions settings, adding or removing other collaborators,
+changing visibility, and deleting or transferring the repository — none of
+it exclusive to organization Owners.
+
+**Not independently verified live against this repository** — that would
+need `eternalaether5`'s own credentials or an organization-owner API check
+this session does not have. Stated from GitHub's documented, stable
+ruleset-permission model, not from a reproduced call, and flagged as such
+rather than counted as evidence.
+
+### What this settles
+
+Part 16's heading and its "What it settles" section stand: the owner holds
+knowingly to Admin. Its "What it does not settle" bypass claim above is
+superseded by this section wherever the two disagree.
+
+### What it does not settle
+
+Whether the owner still wants Admin now that the actual exposure is named
+correctly — put to the owner in the same session as a direct question, not
+assumed either way here.
+
+## 16b. Resolved: `eternalaether5` is Write, not Admin — 15b restored
+
+**Question put.** Given 16a's corrected exposure, the session asked whether
+to keep Admin (and accept it), keep Admin and move the rulesets to
+organization level (closing the ruleset-edit/delete gap while keeping
+Admin's other grants), or dial back to Write. Before building anything for
+the organization-level option, the session checked whether it would even
+work: `https://github.com/organizations/belay-systems/settings/rules` →
+**New ruleset** shows the picker, but with a standing banner — **"Organization
+rulesets won't be enforced until you upgrade this organization account to
+GitHub Team."** Screenshotted by the owner. Free-organization rulesets can be
+created but do nothing; building them would have produced a false sense of
+protection, not a real one. That option was dropped without being built.
+
+**Owner said: "maybe i just give him write access"**, then, after the owner
+changed it on GitHub: **"done."** `list_repository_collaborators` confirms:
+`eternalaether5`, `role_name: "write"`.
+
+### What it settles
+
+`eternalaether5` holds Write on `belay-systems/Belay`. Part 15b's original
+role choice is restored — Part 16's Admin grant stood for under two hours,
+corrected once its actual cost was understood rather than the one first
+assumed. The `main: review` and `main: checks` rulesets, unmodified
+throughout, now bind `eternalaether5` exactly as they were designed to:
+no bypass, no ability to edit or delete either ruleset, no repository
+settings, secrets or Actions access, no ability to add or remove other
+collaborators.
+
+### What it does not settle
+
+**Upgrading `belay-systems` to GitHub Team, which is the only way an
+organization-level ruleset would actually enforce here**, was surfaced and
+not pursued — it costs money and creates a paid subscription, which is the
+owner's decision alone (`AGENTS.md`, "Decisions that are the owner's
+alone"). If the owner wants organization-level protection later, that
+upgrade is the prerequisite; nothing here rules it in or out.
+
+---
+
+**What Part 16 does not touch.** Parts 1 through 15 stand except where 16
+says otherwise. No finding is opened or closed and no ADR changes status.
+
+---
+
+# Part 17 — Ruled 2026-09-22 (same session, minutes later): `eternalaether5` becomes an organization Owner, overruling 15b and 16b
+
+**Owner said:** "git recommends atleast 2 owners... so im giving him owner
+status again. sorry. the fix can be a new issue. log it." Confirmed live:
+`list_repository_collaborators` now reports `eternalaether5`,
+`role_name: "admin"` — the repository-level effect of organization Owner,
+which grants implicit admin on every repository in the organization. This is
+not the same change as Part 16's repository-Admin grant, corrected back out
+in 16b; organization Owner is a different and larger thing, on a different
+axis than either Part 16 or 16b considered.
+
+**What this reopens, precisely, having learned from Part 16's first mistake
+not to guess:** organization Owner satisfies
+`bypass_actors: [{"actor_type": "OrganizationAdmin"}]` in both
+`.github/rulesets/main-review.json` and (empty list, so moot)
+`main-checks.json`. Unlike Part 16's repository Admin, this bypass is real:
+either owner's login can now skip `main: review`'s required approving
+review and code-owner check on any pull request. `.github/CODEOWNERS`'s own
+comment — "Nobody can approve their own pull request, so this still means a
+second pair of eyes on ordinary work" — no longer holds as a GitHub-enforced
+fact for either owner; it holds only as a convention both choose to follow.
+Organization Owner additionally grants: full organization administration
+(billing, removing or adding owners, deleting the organization), not merely
+repository administration.
+
+**Why the owner did it anyway:** GitHub itself recommends an organization
+carry more than one Owner, so that no single lost or locked account strands
+the organization permanently — the same risk Part 15b named as the cost of
+*not* doing this ("the owner's is then the only account that can recover
+the organization"), now resolved in the other direction. This is a real
+tradeoff between two risks, not a lapse: account-recovery risk against
+review-bypass risk. The owner chose to accept the second to remove the
+first, and asked for the remedy to be tracked as follow-up work rather than
+solved in this moment.
+
+### What it settles
+
+`eternalaether5` is an organization Owner. Parts 15b and 16b's Member-only
+position is overruled a second time, this time deliberately and with the
+bypass consequence named up front rather than discovered after the fact.
+
+### What it does not settle
+
+**How the review-bypass gap gets closed, if it does.** The owner asked for
+an Issue rather than a fix in this session. Filed as Issue (linked from
+`docs/OperatorChecklist.md`) rather than solved here, because the honest
+options need more than one message's thought: e.g. swapping
+`bypass_actors` from `OrganizationAdmin` to a specific team whose membership
+the owners control more granularly, accepting the bypass as a documented
+convention-only gate, or something not yet considered. Nothing here decides
+between them.
+
+---
+
+**What Part 17 does not touch.** Parts 1 through 16 stand except where 17
+says otherwise. No finding is opened or closed and no ADR changes status.
+
+## 17a. Notes from the independent pass, 2026-09-25, made before merge
+
+A fresh-context falsification pass on this pull request found four places
+where the record says more than its evidence. None changes a ruling. Family
+wording in Part 16's quotation is redacted, as in Part 11a.
+
+- **"Confirmed live" above is an inference.** `role_name: "admin"` is also
+  what Part 16's repository-Admin grant returned. On 2026-09-25,
+  `list_repository_collaborators` with `affiliation=direct` returned no one,
+  so the Admin does not come from a direct repository grant. That fits
+  organization Owner, but an organization base permission or a team would
+  look the same. No organization-membership call is on record.
+- **"This bypass is real" is also inferred.** It rests on the ruleset naming
+  `OrganizationAdmin`, and on the check of `current_user_can_bypass` recorded
+  in `docs/OperatorChecklist.md`. That check was run for the original owner's
+  login, never for `eternalaether5`.
+- **Part 11a said governance records are "enforced by `.github/CODEOWNERS`
+  once a ruleset on `main` exists".** Under this Part that holds only as a
+  convention, for either owner. Part 30 (on #32) rules that no contributor's
+  review is required at all.
+- **Part 16's sentence** that the owner's account "is no longer the only one
+  that can recover the organization" was untrue for repository Admin, and
+  16a did not correct it. It became true only under Part 17.
+
 # Part 21 — Ruled 2026-09-22/23: step 2 of the Stage 3 order starts now, and how F-019 is fixed
 
 Part 20 is on pull request #22 and not yet on `main`; this Part is numbered
