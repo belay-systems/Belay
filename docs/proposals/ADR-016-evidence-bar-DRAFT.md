@@ -2,11 +2,12 @@
 
 Status:
 **PROPOSED — drafted from owner rulings, revised 2026-09-24 after a falsification
-pass and the owner's Part 25, and 2026-09-25 after a second pass and the owner's
-Part 26. Not ratified. Not implemented in any part.**
+pass and the owner's Part 25, 2026-09-25 after a second pass and the owner's Part 26,
+and again 2026-09-25 after a third pass and the owner's Part 27. Not ratified. Not
+implemented in any part.**
 
 Date:
-2026-09-22 (revised 2026-09-24, 2026-09-25)
+2026-09-22 (revised 2026-09-24, 2026-09-25, and again 2026-09-25)
 
 ---
 
@@ -17,14 +18,39 @@ Date:
 > `docs/proposals/ADR-014-rule-5-amendment-DRAFT.md`, until the owner rules where
 > both ADRs land.
 >
-> **ADR-015 is now cited by line** (finding N7): as "ADR-015 at `26f5d75`, lines
+> **ADR-015 is now cited by line** (finding N7): as "ADR-015 at `61789bc`, lines
 > n-m", meaning DECISIONS.md under docs/ on branch `adr/015-stage-is-carried` at
-> commit 26f5d75. *(Repointed 2026-09-25 from `94815a2`, the previous revision.)* The file name and line numbers are written without backticks on
+> commit 61789bc. *(Repointed in the fourth revision from `26f5d75`, which had
+> replaced `94815a2`.)* The file name and line numbers are written without backticks on
 > purpose: the file on this branch is `main`'s, where ADR-015 does not exist, and the
 > repository's citation test would read them against the wrong file. They go stale when that
 > branch changes; repoint them when it does.
 
-> **What changed in this revision (2026-09-25).** A second pass on the redrafts
+> **What changed in the fourth revision (2026-09-25).** A third pass (Issue #21, the
+> comment "Third supplementary pass: ADR-015 at `26f5d75` (#7), ADR-016 at `34844d6`
+> (#20)") again found nothing blocking of its own in this draft, calling it "ready
+> after fixes". It cannot be ratified before ADR-015. Against this draft it found
+> should-fix 3N4, 3N7 and 3N8, and nits 3N11, 3N13, 3N14 and 3N16. The owner then
+> ruled **Part 27 (27a-27g), 2026-09-25: "aligned"**. This revision:
+> - applies the allowlist, and the check of the grade the producing module writes,
+>   to every bound report on every rung that binds reports (3N4, rule 3 check 8);
+> - refuses a report whose data window ends after the report was made (3N5, rule 3
+>   check 6);
+> - states the cost of short significance reports, refuses a report of fewer than
+>   two observations as a significance report, and counts distinct report
+>   identifiers (3N7, rule 6);
+> - counts each ancestor's listed significance reports in the lineage floor (3N8), and
+>   refuses a promotion when an ancestor's read raises (3N16);
+> - records trials run and never stored as a stated residual of this ADR (RULED 27c);
+> - uses rule 9's authorization for the supersessions and repairs ADR-015 now allows
+>   (27d, 27g);
+> - repoints every ADR-015 citation to `61789bc` and adds this revision's rows to
+>   "Changes this makes to ADR-015".
+>
+> 27a (which supersedes 26d), 27b, 27e and 27f are applied in ADR-015. The scratch
+> models that checked these rules are described under "Findings and rulings".
+>
+> **What changed in the first 2026-09-25 revision (kept as history).** A second pass on the redrafts
 > (Issue #21, the comment "Second supplementary pass: the redrafts, ADR-015 at
 > `94815a2` (#7) and ADR-016 at `bad17de` (#20), read against Part 25") found
 > nothing blocking of its own in this draft and called it "ready after fixes", but
@@ -57,12 +83,13 @@ Date:
 >
 > - Parts 18, 19 and 23 are on `main` (`docs/OwnerDecisions.md`).
 > - **Part 22 (sample adequacy) is on this branch and not yet on `main`.**
-> - **Parts 25 and 26 are recorded on branch `claude/kind-knuth-9g7xlr` and are not
->   yet on `main` or on this branch.** Every rule below that cites 25x or 26x rests
->   on that record. If it does not reach `main` as written, those rules revert to
->   DRAFTER.
-> - **Only Parts 18, 19, 22, 23, 25 and 26 are cited as RULED.** Anything else is
->   DRAFTER, and every number no Part rules is `None`, which keeps its rung closed.
+> - **Parts 25, 26 and 27 are recorded on branch `claude/kind-knuth-9g7xlr` and are
+>   not yet on `main` or on this branch.** Every rule below that cites 25x, 26x or
+>   27x rests on that record. If it does not reach `main` as written, those rules
+>   revert to DRAFTER. **27a supersedes 26d**; where 26d is mentioned below, it is
+>   marked superseded.
+> - **Only Parts 18, 19, 22, 23, 25, 26 and 27 are cited as RULED.** Anything else
+>   is DRAFTER, and every number no Part rules is `None`, which keeps its rung closed.
 
 > **What the owner ruled, and what the drafter chose.** Every rule below carries
 > one of two marks, and a rule with parts of each marks each part:
@@ -102,7 +129,7 @@ user can lower. **18g ruled that the bar is its own decision record**, so that i
 change without reopening how the ladder works. This is that record.
 
 **On 2026-09-24 the owner ruled Part 25** after the falsification pass above, and
-then **Part 26** after the second pass.
+then **Part 26** after the second pass; **on 2026-09-25, Part 27** after the third.
 
 **What the rulings demand that nothing in Belay can check today:**
 
@@ -145,8 +172,8 @@ grade check and rule 2's distinctness check limit what that buys.
 
 ### Rule 1 — The grade floor per rung, upward moves only
 
-**RULED (18a, 18b).** This fills ADR-015 rule 4's table (ADR-015 at `26f5d75`, lines
-4827-4845).
+**RULED (18a, 18b).** This fills ADR-015 rule 4's table (ADR-015 at `61789bc`, lines
+5166-5184).
 
 | Rung reached (`to_stage`) | Minimum `EvidenceLevel` — upward moves only |
 |---|---|
@@ -165,8 +192,8 @@ Trading` C, `Promotion Review` B, `Micro Capital` B, `Limited Capital` A,
 column, "Also required on this rung", under the same RULED mark. It is removed: which
 other rules bind which rung is set in each rule below, with its own mark.)*
 
-**Direction is computed exactly as ADR-015 rule 4 drafts it** (ADR-015 at `26f5d75`,
-lines 4871-4904): a move to `Retired` is classified first and is never upward;
+**Direction is computed exactly as ADR-015 rule 4 drafts it** (ADR-015 at `61789bc`,
+lines 5210-5243): a move to `Retired` is classified first and is never upward;
 otherwise a move is upward when `STRATEGY_LADDER.index(to_stage) >
 STRATEGY_LADDER.index(from_stage)` (`framework/artifacts/enums.py:107-109`). Grades
 compare through `EVIDENCE_STRENGTH` (`framework/artifacts/enums.py:21-26`), never
@@ -205,7 +232,9 @@ as above, to exactly one evidence-record hash. The check refuses the review unle
    are distinct**, compared by `(report_id, report_version)`;
 6. **each bound report's `metric` is in its criterion's allowlist, and the report's
    grade is exactly the grade that entry says its producing module writes** (below;
-   second-pass finding 2N6).
+   second-pass finding 2N6). Rule 3 check 8 applies the second half to every bound
+   report on every rung that binds reports. Check 6 adds that the metric must be in
+   *this criterion's* list.
 
 **The per-criterion allowlist — DRAFTER, tied to the modules that exist.** `metric`
 is the `content` key `metric_artifact()` writes
@@ -313,10 +342,30 @@ review when:
 6. **a bound report omits a disclosure** (finding S15): any of `assumptions`,
    `data_source`, `sample_period_start`, `sample_period_end` or `known_limitations`
    is missing or blank in its `content` (`framework/metrics/reporting.py:124-133`,
-   `:227-231`);
+   `:227-231`); **or its window ends after the report's own `created`**, or starts
+   after it ends (DRAFTER; third-pass finding 3N5). The window is declared, because
+   `significance_artifact()` takes `sample_period` separately from `returns`
+   (`framework/metrics/statistics.py:307-316`). A window that ends after the report
+   was made states data the report cannot have had. After 27a the window gates one
+   thing, ADR-015 rule 4(f)'s paper-or-live check, and that rule states the
+   residual;
 7. **a stored report in the subject's range is not listed** (finding S14, below).
+   `save()` applies this to the store as it is at the save. **The sweep applies it as
+   of each review** (DRAFTER; third-pass nit 3N11): a report counts only if its
+   `created` is at or before the review's. Without that, every report stored after a
+   review would make the old review fail the sweep;
+8. **a bound report's grade is not the grade its producing module writes** (DRAFTER;
+   third-pass finding 3N4). Its `metric` must name an entry of rule 2's allowlist, in
+   any criterion, and its `evidence_level`, as the validator re-derives it, must equal
+   that entry's grade. This applies on **every rung that binds reports**, `Paper
+   Trading`, `Promotion Review` and the capital rungs, not only the capital ones.
+   Under the previous revision it ran only inside rule 2, so three files and
+   hand-built reports that graded themselves `B` bought `Promotion Review`, whose
+   floor is `B`. Now a record bound to a report is no stronger than the report (check
+   4), the report is no stronger than its module writes (this check), and no
+   allowlisted module writes `B`. So `Promotion Review` stays closed until one does.
 
-**Checks 4 and 6, and rule 2's checks 5 and 6, apply only to bound reports.** A
+**Checks 4, 6 and 8, and rule 2's checks 5 and 6, apply only to bound reports.** A
 listed report need only resolve, be a REPORT and be in range. *(Second-pass finding
 2N5: under the previous revision every stored report since the last step had to be
 bound, and binding applied the grade and disclosure checks, so one stored junk
@@ -331,8 +380,10 @@ both, from `Idea` onwards.
 
 **`variants_tried` is at least the number of significance reports listed — 2N5.**
 Every listed report whose `metric` is `statistical_significance` is one variant that
-was tested. A `Promote` whose `variants_tried` is smaller is refused, naming both
-numbers. This is what makes the listing bite: a failed trial that is stored is
+was tested, **counted once per `report_id`**: the versions of one report are one trial
+(DRAFTER; third-pass finding 3N7). A report of fewer than two observations is **not a
+significance report** for this count or for rule 6's cap (rule 6). A `Promote` whose
+`variants_tried` is smaller is refused, naming both numbers. This is what makes the listing bite: a failed trial that is stored is
 counted, whether or not the review binds it. **The cost, stated:** anyone who can
 write the store can store significance reports about a strategy and so push its
 lower bound above rule 6's cap, which refuses the promotion. That is a denial of
@@ -341,20 +392,22 @@ capital, not a grant.
 **Cost, stated:** check 7 needs a listing of the store by subject, which the
 repository does not have (`framework/artifacts/repository.py:69-84` lists one
 identifier's versions). It is the subject index ADR-015 rule 3h also needs (ADR-015
-at `26f5d75`, lines 4672-4679), derived from the store and never a separately
+at `61789bc`, lines 4965-4972), derived from the store and never a separately
 maintained file. Required Follow-Up.
 
-**The "never stored" residual — named, and not closed (2N5).** Check 7 sees only
-what is stored with a subject in range. Three kinds of trial escape it: a report
-computed and never saved; a report saved with no `subject_id`, or with one that
-names no version in range; and a computation run with other software. Nothing in
-Belay can see any of them. Only `variants_tried` records them, and it is
-self-declared (rule 6). **Whether this falls under 25j: DRAFTER, no, in part.** 25j
-rules out of scope "trading done outside Belay". A backtest run with Belay's own
-code and then discarded is neither trading nor outside Belay, so this draft does not
-treat it as covered by 25j; it is a residual of this ADR, stated here and put to the
-owner (item 12). A computation run entirely outside Belay is closer to 25j's reason,
-but 25j names trading, not research, so that reading is the owner's to make.
+**The "never stored" residual — named, and not closed (2N5). RULED (27c): "Unsaved
+trials are a stated gap in the evidence bar, not a 25j matter. A trial run but never
+stored is a stated residual of ADR-016. Follow-up: Belay's own tools store every run
+automatically."** Check 7 sees only what is stored with a subject in range. Three
+kinds of trial escape it: a report computed and never saved; a report saved with no
+`subject_id`, or with one that names no version in range; and a computation run with
+other software. Nothing in Belay can see any of them. Only `variants_tried` records
+them, and it is self-declared (rule 6). **This is a residual of this ADR, not a 25j
+matter** (27c), and it is listed under "Residual risk". The follow-up 27c names,
+Belay's own tools storing every run automatically, is Required Follow-Up item 16. It
+closes the first kind for runs made with Belay's own code. It does not close the other
+two. *(Replaced in the fourth revision: this paragraph read 25j as not covering the
+residual "in part" and put the question to the owner as item 12. 27c answered it.)*
 
 **What binding does not prove — survivorship and lookahead (finding S15).** Check 6
 proves the report *discloses*; it does not check what the disclosure says. The
@@ -374,10 +427,10 @@ inputs.
 **RULED (18c).** All four outcomes — `Promote`, `Remain Current Stage`, `Demote`,
 `Retire` — carry at least one verifying evidence record, in both of `Remain`'s
 senses: a promotion rejected, and a strategy kept on the stage it holds. Applied in
-ADR-015 rule 4 (ADR-015 at `26f5d75`, lines 4700-4709).
+ADR-015 rule 4 (ADR-015 at `61789bc`, lines 4999-5008).
 
 **DRAFTER:** `review_artifact()`'s `evidence` parameter is required (ADR-015 at
-`26f5d75`, lines 4726-4733).
+`61789bc`, lines 5025-5032).
 
 **No grade floor on `Remain` — DRAFTER.** A `Remain` is not an upward move, so rule 1
 does not reach it. Whether keeping a strategy on capital must meet the floor of the
@@ -401,11 +454,14 @@ verified, not only declared."**
 | `MINIMUM_PAPER_TRADING = None` | every upward move into `Micro Capital` | 18d, 19c |
 | `MINIMUM_MICRO_CAPITAL_DURATION = None` | every upward move into `Limited Capital` | 25e |
 | `MINIMUM_LIMITED_CAPITAL_DURATION = None` | every upward move into `Production` | 25e |
-| `HUMAN_AUTHORIZATION_VERIFIER = None` | every upward move into `Micro Capital`, `Limited Capital` and `Production`, and every confidence change on a capital stage (ADR-015 rule 3g, 26c) | 26f, 25f |
+| `HUMAN_AUTHORIZATION_VERIFIER = None` | every upward move into `Micro Capital`, `Limited Capital` and `Production` (26f, 25f); and, DRAFTER, every confidence change on a capital stage (ADR-015 rule 3g, 26c) and every supersession or repair that raises the read into a capital stage (ADR-015 rule 3h, 27d, 27g) | 26f, 25f; the extensions DRAFTER |
 
 **The fourth constant is 26f's closure.** Rule 9's `human_authorization` is a
 declaration: nothing in `framework/` authenticates who wrote it. 26f keeps the
-capital rungs closed until it can be verified. `HUMAN_AUTHORIZATION_VERIFIER` is
+capital rungs closed until it can be verified. **26f names the capital rungs.
+Extending the closure to capital-stage confidence changes, and to raises into a
+capital stage by supersession or repair, is the drafter's reading** (third-pass nit
+3N13). The reading is that each one moves capital as a promotion does (26c, 27g). `HUMAN_AUTHORIZATION_VERIFIER` is
 filled only by an amendment of this ADR that names a verification mechanism — how an
 authorization is checked against something the author of the review cannot produce
 alone. **26f leaves the mechanism open ("How a human authorization is verified"), so
@@ -415,7 +471,7 @@ amendment is a lowered bar, and rule 10's conformance test turns red.
 While a constant is `None`, the validator refuses every upward move into the rung it
 closes, with a message naming this rule and the Part. **The check needs nothing but
 the review**, so ADR-015 rule 3c runs it on every read of a strategy (finding B3;
-ADR-015 at `26f5d75`, lines 4274-4293). **`None` wins over any user setting** (rule
+ADR-015 at `61789bc`, lines 4385-4404). **`None` wins over any user setting** (rule
 7). Filling a constant is an amendment to this ADR and a new `bar_version`, never a
 code change a session makes. Its unit, and what report proves a duration, are
 decided when it is filled. **No number is proposed here** (25, "What it does not
@@ -449,8 +505,8 @@ A `Promote` review's `content` carries **`variants_tried`**. **DRAFTER — the c
    2N8: this was a fixed `MAXIMUM_VARIANTS_TRIED = 18`, a number no Part ruled, derived
    from the normal tail although the test is Student's t, and applied to `Idea →
    Research` as well.)*
-3. **At least the number of significance reports listed** in `reports_considered`
-   (rule 3, 2N5).
+3. **At least the number of significance reports listed** in `reports_considered`,
+   counted once per `report_id` (rule 3, 2N5, 3N7).
 4. **Never decreasing along the ladder.** `save()` refuses a `Promote` whose count is
    below the count on any earlier `Promote` review **named by a rung of the subject's
    ladder**.
@@ -459,14 +515,21 @@ A `Promote` review's `content` carries **`variants_tried`**. **DRAFTER — the c
    a `Derived From` edge to the strategy it came from. For each identifier in that
    ancestry, the counts considered are those on the `Promote` reviews named by the
    rungs of the ladder of the version **ADR-015's current-stage read returns** for
-   it (ADR-015 at `26f5d75`, lines 4545-4691), and nothing else. `save()` refuses a
-   `Promote` whose count is below the largest such count, plus one for each
-   identifier between. A new identifier does not reset the count. This overcounts
+   it (ADR-015 at `61789bc`, lines 4694-4990), and nothing else. **Each ancestor
+   also contributes the number of distinct significance-report identifiers in its
+   range** (rule 3 check 5's range, taken for the version its read returns; DRAFTER,
+   third-pass finding 3N8). Without it, an ancestor's failed trials that were listed
+   and never bound were dropped at the new identifier. An ancestor's value is the
+   larger of its largest named count and its distinct significance reports. `save()`
+   refuses a `Promote` whose count is below the largest ancestor's value, plus one for
+   each identifier between. A new identifier does not reset the count. This overcounts
    when several identifiers came from one batch of trials, which errs toward less
-   capital. *(Changed 2026-09-25: this counted "any `Promote` review of any
-   identifier in its `Derived From` ancestry", so one stored review about an
-   ancestor, named by no ladder, with a count above the cap, froze every
-   descendant.)*
+   capital. **If an ancestor's current-stage read raises, the `Promote` is refused**
+   (DRAFTER; third-pass nit 3N16): its count cannot be established, and reading it as
+   zero would be the reset this check exists to stop. *(Changed 2026-09-25: this
+   counted "any `Promote` review of any identifier in its `Derived From` ancestry", so
+   one stored review about an ancestor, named by no ladder, with a count above the
+   cap, froze every descendant.)*
 
 **The cap (26b; the formula is DRAFTER).** For a significance report `r` with `n_r`
 observations, `metric_artifact()` records `observations`
@@ -496,6 +559,38 @@ lists** in `reports_considered`. ADR-015 rule 3c, which reads only the bound rep
   so it errs toward refusal.
 - **The smallest over every listed report**, because a family of trials that
   includes a short one is more likely to have produced a lucky pass.
+
+**Short reports, and fewer than two observations — third-pass finding 3N7. DRAFTER.**
+- **Fewer than two observations is not a significance report.** At one observation
+  the test has zero degrees of freedom, and `student_t_two_sided_p` refuses it
+  ("a single observation supports no test",
+  `framework/metrics/distributions.py:120-140`). `significance()` cannot produce such
+  a report, so only a hand-built one exists. It is refused as a significance
+  report: it cannot be bound under rule 8, and it counts toward neither the cap nor
+  check 3. It is still listed, because every report in range is listed (rule 3 check
+  7).
+- **The cost of a short report, stated.** The cap is the smallest over every listed
+  report, so one short report sets it. Executed with the same function:
+
+      observations    2 (df    1): cap 0
+      observations    4 (df    3): cap 0
+      observations   10 (df    9): cap 3
+      observations   30 (df   29): cap 9
+
+  At four observations or fewer the cap is 0, and every upward move into `Paper
+  Trading` or a capital rung is refused **for that identifier, for good**, because
+  the report stays listed. That follows from 26b's "computed from each significance
+  report's own degrees of freedom": a trial at 3 degrees of freedom has a two-sided
+  tail above 5% at 3.0 on its own, so no family containing it meets 5%. **The way
+  out is a new identifier** with a `Derived From` edge, and with the same
+  specification digest it must name the original anyway (ADR-015 rule 3g, 27e). Its
+  count starts at the ancestor's value (check 5), which includes the short report as
+  one trial. Its cap is set by its own reports only. **So the short report's large
+  tail stops counting at the new identifier, which errs toward more capital, and is
+  stated.** The alternative is to carry ancestors' listed reports into the cap too.
+  Then one short report locks every descendant for good, and no honest strategy that
+  once ran a four-day test could ever reach `Paper Trading`. Put to the owner (item
+  15).
 
 **Worked example, executed.** Command, run from the repository root on this branch:
 
@@ -589,7 +684,7 @@ data, as amended ADR-012 defines."** Finding B5 (verdict).
 
 **Where it runs.** On `save()` and `get()` of the review, in the sweep, and — RULED
 (26e) — in ADR-015 rule 3c whenever a strategy's stage is read (ADR-015 at
-`26f5d75`, lines 4260-4270).
+`61789bc`, lines 4371-4381).
 
 **Consequence, stated.** The ADR-012 amendment is itself PROPOSED and unimplemented,
 so no report today can carry item 3's record. **Until it is ratified and implemented,
@@ -625,7 +720,7 @@ on save and in the sweep.
 
 **The same `human_authorization` authorizes a confidence change on a capital stage
 — RULED (26c): "Changing a funded strategy's confidence needs a recorded human yes,
-as in 25f."** ADR-015 rule 3g (ADR-015 at `26f5d75`, lines 4496-4521) requires it on
+as in 25f."** ADR-015 rule 3g (ADR-015 at `61789bc`, lines 4620-4655) requires it on
 the `Remain Current Stage` review a capital-stage Revision names, and on the review
 of an Append that changes confidence.
 
@@ -633,6 +728,12 @@ of an Append that changes confidence.
 `HUMAN_AUTHORIZATION_VERIFIER` is `None`, so every upward move into a capital rung
 is refused whatever `human_authorization` says, until an amendment names how an
 authorization is verified.
+
+**The same `human_authorization` authorizes a supersession or a repair that raises
+the read — RULED (27d, 27g).** ADR-015 rule 3h steps 5 and 6 require it on a review
+that names a stored downward review in `supersedes` and would raise the read by doing
+so, and on every repair review. On a raise into a capital stage, rule 5's verifier
+must also pass it (DRAFTER; 3N13).
 
 **Downward moves need no authorization** (DRAFTER): 25d, "It never refuses in a way
 that would block a demotion", and 18b. A `Remain` that keeps capital deployed does
@@ -688,7 +789,7 @@ an account or a tool Belay does not control, at any size, whatever stage Belay r
 A strategy closed at every capital rung by this ADR can still be traded outside it.
 Reports produced outside Belay and never stored are invisible to rule 3's check 7
 (and so are some produced inside it; rule 3, "The 'never stored' residual"). ADR-015
-rule 8 (ADR-015 at `26f5d75`, lines 5068-5105) states the same limit for the capital
+rule 8 (ADR-015 at `61789bc`, lines 5440-5481) states the same limit for the capital
 read. **`README.md` does not yet state this limit**, which 25j requires of "Belay's
 documents"; that is Required Follow-Up item 13, left to a change that edits the
 README.
@@ -699,8 +800,13 @@ README.
 
 ADR-015 rule 3c reads the last rung's review through the full validator, and — RULED
 (26e) — resolves that review's bound reports and applies rule 8 (ADR-015 at
-`26f5d75`, lines 4260-4293). The validator does no I/O. The checks that read other
+`61789bc`, lines 4371-4404). The validator does no I/O. The checks that read other
 reviews, the listing, or other identifiers run where the store is available.
+
+**On a capital stage the current-stage read runs the first two columns on every
+version back to `Idea`, not only the last — RULED (27f)**, in ADR-015 rule 3h step 3
+(ADR-015 at `61789bc`, lines 4694-4990). The store-wide column still runs only in
+`save()` and the sweep.
 
 | Check | Validator: on save, on `get()` of the review, and in ADR-015 rule 3c | Bound reports: on save, `get()` of the review, ADR-015 rule 3c (26e) and 3f | Store-wide: `save()` and ADR-015 rule 3f only |
 |---|---|---|---|
@@ -708,16 +814,17 @@ reviews, the listing, or other identifiers run where the store is available.
 | Rule 2 checks 1-4 | yes | — | — |
 | Rule 2 checks 5-6 (distinct reports; allowlist and grade, 2N6) | — | yes | — |
 | Rule 3 check 1 | yes | — | — |
-| Rule 3 checks 2-6 on bound reports | — | yes | — |
-| Rule 3 checks 2, 3, 5 on listed reports, and check 7 | — | — | yes |
+| Rule 3 checks 2-6 and 8 on bound reports (check 8: 3N4) | — | yes | — |
+| Rule 3 checks 2, 3, 5 on listed reports, and check 7 (in the sweep, as of each review: 3N11) | — | — | yes |
 | Rule 4 | yes | — | — |
 | Rule 5 closures, including 26f's | yes | — | — |
 | Rule 6 check 1 | yes | — | — |
 | Rule 6 check 2 (the cap) | — | over bound significance reports | over every listed one |
-| Rule 6 checks 3-5 | — | — | yes |
+| Rule 6 checks 3-5 (check 5 with each ancestor's significance reports, 3N8, and refused when an ancestor's read raises, 3N16) | — | — | yes |
 | Rule 8 | — | yes | — |
 | Rule 9, all but `shown` | yes | — | — |
 | Rule 9, `shown` | — | — | yes |
+| Rule 9 on a supersession or repair review (27d, 27g) | yes | — | — |
 | Rule 10, the version is known | yes | — | — |
 | Rule 10, never decreasing (2N7) | — | — | yes |
 
@@ -734,40 +841,46 @@ column.
 
 ## Changes this makes to ADR-015 — every one, and where it was applied (findings B7 and 2N12)
 
-Every row is applied on pull request #7's branch. **"Now" is ADR-015 at `26f5d75`**,
+Every row is applied on pull request #7's branch. **"Now" is ADR-015 at `61789bc`**,
 checked line by line against that commit for this revision (`git show
-26f5d75:docs/DECISIONS.md`). Rows 1-17 are the 2026-09-24 revision's changes, whose
-lines moved; rows 18-26 are this revision's. "Was" is where the first pass found the
+61789bc:docs/DECISIONS.md`). Rows 1-17 are the 2026-09-24 revision's changes, rows
+18-26 the first 2026-09-25 revision's, and rows 27-31 this revision's; the lines of
+the earlier rows moved and are repointed. "Was" is where the first pass found the
 text (its "PR7:" citations); "—" where the text is new.
 
 | # | Change | Was (PR7:) | Now (lines) |
 |---|---|---|---|
-| 1 | Rule 4's table points at this ADR in every cell, now naming rule 6 on every row (26b) | 4248-4258 | 4827-4845 |
-| 2 | Rule 4's paragraph making `Remain` optional replaced by 18c | 4185-4193 | 4700-4709 |
-| 3 | Rule 4(a): `evidence` required, not defaulted | 4197-4200 | 4726-4733 |
-| 4 | Rule 4(b): the construction refusal covers all four outcomes | 4201-4203 | 4734-4738 |
-| 5 | Rule 5: `FIELDS` grows by this ADR's six keys, to nineteen (2N5 added `reports_considered`) | 4381-4382 | 4979-4985 |
-| 6 | Rule 5: outcome-specific keys hold `None` where they do not apply, now including `reports_considered` and `human_authorization` on a confidence review | — | 4987-4997 |
-| 7 | The three places to reconcile at ruling time, now each ruled | 4312-4333 | 4915-4924 |
-| 8 | "Until it is filled… a single Level D record… satisfies it" | 4335-4339 | 4926-4929 |
-| 9 | Test 21: four outcomes, twelve tests | 4518-4520 | 5176-5179 |
-| 10 | Test 22: `Remain` with empty evidence refused, not saved | 4521-4522 | 5180-5184 |
-| 11 | Tests 23a and 23b: run, not `xfail`; example moved to `Paper Trading` | 4526-4529 | 5188-5209 |
-| 12 | Consequences: the signature grows by four, plus this ADR's six keys | 4622-4623 | 5430-5435 |
-| 13 | Rejected Alternatives: "mandatory `evidence`" no longer rejected | 4729-4731 | 5578-5582 |
-| 14 | Required Follow-Up: the bar is ruled; S12's claim corrected | 4755-4761 | 5638-5646 |
-| 15 | Still Open: the bar and `Remain` items settled | 4786-4804 | 5688-5694 |
-| 16 | Rule 3c reads the last review through the full validator (B3) | 4050-4051 | 4274-4293 |
-| 17 | The Status block: what blocks ratification | 3622-3623 | 3622-3696 |
-| 18 | Rule 3c resolves the last review's bound reports and applies rule 8 (26e, 2N12) | — | 4260-4270 |
-| 19 | Rule 3c's cost against 9e(iii)'s "two extra reads", restated for the bound reports | — | 4295-4299 |
-| 20 | Rule 3f: the "bound reports that do not exist" residual removed (26e) | — | 4461-4468 |
-| 21 | Rule 3g: a confidence change on a capital stage needs rule 9's `human_authorization` (26c) and is closed by rule 5's verifier (26f) | — | 4496-4521 |
-| 22 | Rule 3h: the subject index, shared with rule 3 check 7 | — | 4672-4679 |
-| 23 | Rule 4: `bar_version` never decreases along a ladder (2N7, rule 10) | — | 4847-4856 |
-| 24 | Rule 4(f): compares each bound report's data window (rule 3 check 6's `sample_period_start`) with the demotion's anchor (26d) | — | 4750-4801 |
-| 25 | Residual risk: three files buy at most `Validation`, and a declared authorization does not open capital (26e, 26f) | — | 5490-5514 |
-| 26 | Required Follow-Up: the subject index as required infrastructure | — | 5665-5669 |
+| 1 | Rule 4's table points at this ADR in every cell, now naming rule 6 on every upward row (26b; the `Retired` row names rule 1 only, third-pass nit 3N14) | 4248-4258 | 5166-5184 |
+| 2 | Rule 4's paragraph making `Remain` optional replaced by 18c | 4185-4193 | 4999-5008 |
+| 3 | Rule 4(a): `evidence` required, not defaulted | 4197-4200 | 5025-5032 |
+| 4 | Rule 4(b): the construction refusal covers all four outcomes | 4201-4203 | 5033-5037 |
+| 5 | Rule 5: `FIELDS` grows by this ADR's six keys, to nineteen (2N5 added `reports_considered`), and to twenty with ADR-015's `supersedes` (27d) | 4381-4382 | 5318-5325 |
+| 6 | Rule 5: outcome-specific keys hold `None` where they do not apply, now including `reports_considered` and `human_authorization` on a confidence review | — | 5352-5363 |
+| 7 | The three places to reconcile at ruling time, now each ruled | 4312-4333 | 5254-5263 |
+| 8 | "Until it is filled… a single Level D record… satisfies it" | 4335-4339 | 5265-5268 |
+| 9 | Test 21: four outcomes, twelve tests | 4518-4520 | 5552-5555 |
+| 10 | Test 22: `Remain` with empty evidence refused, not saved | 4521-4522 | 5556-5560 |
+| 11 | Tests 23a and 23b: run, not `xfail`; example moved to `Paper Trading` | 4526-4529 | 5564-5585 |
+| 12 | Consequences: the signature grows by four, plus this ADR's six keys | 4622-4623 | 5890-5895 |
+| 13 | Rejected Alternatives: "mandatory `evidence`" no longer rejected | 4729-4731 | 6069-6073 |
+| 14 | Required Follow-Up: the bar is ruled; S12's claim corrected | 4755-4761 | 6150-6158 |
+| 15 | Still Open: the bar and `Remain` items settled | 4786-4804 | 6209-6215 |
+| 16 | Rule 3c reads the last review through the full validator (B3) | 4050-4051 | 4385-4404 |
+| 17 | The Status block: what blocks ratification | 3622-3623 | 3622-3736 |
+| 18 | Rule 3c resolves the last review's bound reports and applies rule 8 (26e, 2N12) | — | 4371-4381 |
+| 19 | Rule 3c's cost against 9e(iii)'s "two extra reads", restated for the bound reports | — | 4406-4410 |
+| 20 | Rule 3f: the "bound reports that do not exist" residual removed (26e) | — | 4585-4592 |
+| 21 | Rule 3g: a confidence change on a capital stage needs rule 9's `human_authorization` (26c) and is closed by rule 5's verifier (26f); compared with the read's confidence (27b, 3N3) | — | 4620-4655 |
+| 22 | Rule 3h: the subject index, shared with rule 3 check 7 | — | 4965-4972 |
+| 23 | Rule 4: `bar_version` never decreases along a ladder (2N7, rule 10) | — | 5186-5195 |
+| 24 | Rule 4(f): rebuilt on 27a (26d superseded). A climb back binds a paper or live report whose grade rule 3 check 8 fixes, with a window rule 3 check 6 allows; each ancestor is read as rule 6 check 5 reads it (27e) | — | 5049-5140 |
+| 25 | Residual risk: three files buy at most `Validation`, now true of `Promotion Review` too because of rule 3 check 8 (3N4), and a declared authorization does not open capital (26e, 26f) | — | 5960-5998 |
+| 26 | Required Follow-Up: the subject index as required infrastructure | — | 6177-6181 |
+| 27 | Rule 3b: an upward Append sets aside a stored downward review only when rule 9 allows its review to supersede it (3N2, 27d, 27g) | — | 4326-4337 |
+| 28 | Rule 3h step 5: a supersession that raises the read carries rule 9's `human_authorization`, and on a capital stage passes rule 5's verifier (27d, 27g) | — | 4763-4821 |
+| 29 | Rule 3h step 6: the repair review carries rule 9's `human_authorization`, with rule 5's verifier on a raise into a capital stage (27g, 3N10) | — | 4822-4882 |
+| 30 | Rule 5: `supersedes`, the key 27d's save rule reads | — | 5327-5350 |
+| 31 | Required Follow-Up: the repair review and `supersedes`, the paper-and-live module that derives its window, and the specification digest index | — | 6182-6190 |
 
 ## Tests this implies
 
@@ -794,6 +907,10 @@ refusal, never a bare exception type.
 6. A report whose `metric` is outside its criterion's allowlist (`cagr` under
    Risk-adjusted returns): refused naming both. Any report under Regime robustness:
    refused naming the empty allowlist.
+6b. **3N4.** Three files bringing a strategy to `Promotion Review`, the review binding
+   a hand-built `sharpe_ratio` report graded `B`: refused by rule 3 check 8, naming
+   `framework/metrics/risk_adjusted.py` and the grade it writes (C). The same at
+   `Paper Trading`. The test fails if check 8 is moved back inside rule 2.
 6a. **2N6, the scratch model's scenario B.** Seven distinct records self-graded A,
    bound to seven hand-built REPORTs self-graded A, with all seven allowlists filled
    for the test: each report is refused naming its producing module and the grade it
@@ -821,7 +938,13 @@ refusal, never a bare exception type.
     blank `known_limitations`, listed and not bound: accepted, because checks 4 and
     6 apply to bound reports only. A `Promote` listing three significance reports
     and stating `variants_tried: 2`: refused naming both numbers.
+13a. **3N11.** The sweep over a store in which a report was stored in the subject's
+    range after a review was saved, and is not in that review's listing: the sweep
+    does not flag the review. A report stored before the review and left out: it
+    does.
 14. **S15.** A report whose `known_limitations` is blank: refused naming it.
+14a. **3N5.** A bound report whose `sample_period_end` is after its own `created`:
+    refused naming both dates.
 
 **Rule 4**
 
@@ -848,6 +971,15 @@ refusal, never a bare exception type.
     `17` refused, `16` accepted. The expected caps are computed in the test from
     `student_t_two_sided_p`, not typed in, and the test also asserts them against the
     worked example's printed values, so a change to either side turns it red.
+17c. **3N7, fewer than two observations.** A hand-built significance report with
+    `observations: 1` listed beside a good one: the review is not refused for it,
+    the cap is the good report's, and it does not count toward check 3. Bound under
+    rule 8, it is refused, naming 3N7.
+17d. **3N7, distinct identifiers.** Two versions of one significance report listed:
+    check 3's lower bound counts one. A report of four observations listed: the cap
+    is 0 and an upward move into `Paper Trading` is refused naming it. The test's
+    docstring says this is the stated cost, and names the way out (a new identifier,
+    `Derived From`).
 17b. **26b, where it applies.** `Idea → Research` and `Paper Trading → Promotion
     Review` with `variants_tried: 500`: not refused by the cap (no significance
     report is required there).
@@ -855,6 +987,11 @@ refusal, never a bare exception type.
     refused, naming both counts.
 19. A new identifier with a `Derived From` edge whose first `Promote` states a count
     at or below its ancestor's largest: refused, naming the ancestor.
+19b. **3N8.** An ancestor with three significance reports listed in its range, none
+    bound, and a largest named count of 1: a descendant's first `Promote` stating 3
+    is refused (the floor is 3 + 1), and 4 is accepted.
+19c. **3N16.** A descendant whose ancestor's current-stage read raises: its
+    `Promote` is refused, naming the ancestor.
 19a. **2N9.** A stored `Promote` review about the ancestor, named by no rung of the
     ladder the ancestor's current-stage read returns, with `variants_tried: 10000`:
     it does not raise the descendant's lower bound.
@@ -905,9 +1042,14 @@ closes all three capital rungs independently of that. Rule 1 needs Level B, whic
 needs a paper-trading engine that does not exist (`docs/ROADMAP.md:247`).
 
 **`Paper Trading` is closed too, until the ADR-012 amendment is ratified and
-implemented** (rule 8). **`Promotion Review` is effectively closed** until a report
-graded B can be produced (rule 3 check 4), which also waits on a paper-trading
-engine.
+implemented** (rule 8). **`Promotion Review` is closed** until an allowlisted module
+writes a report graded B: a bound record is no stronger than its report (rule 3
+check 4), and the report no stronger than its module writes (rule 3 check 8). That
+also waits on a paper-trading engine. *(Corrected in the fourth revision, third-pass
+finding 3N4: this said "effectively closed … (rule 3 check 4)", which was false while
+a hand-built report could grade itself B. Check 8 makes it true.)* **So does every
+climb back above `Paper Trading` after a demotion** (ADR-015 rule 4(f), 27a), which
+needs a paper or live report written after it.
 
 **Promotion gets heavier:** seven distinct reports on a capital rung, every stored
 report about the strategy listed, a human authorization that must also be
@@ -931,8 +1073,14 @@ every rule now, while nothing in production does.
   does not remove it.
 - **Survivorship and lookahead are not checked** (rule 3, S15).
 - **Trading outside Belay is not reached** (25j, above).
-- **Trials that were never stored are invisible** (rule 3, "The 'never stored'
-  residual"); only `variants_tried`, self-declared, records them.
+- **Trials that were never stored are invisible** — RULED (27c) a stated residual of
+  this ADR (rule 3, "The 'never stored' residual"); only `variants_tried`,
+  self-declared, records them, until Belay's own tools store every run
+  automatically (Required Follow-Up item 16).
+- **A short significance report closes `Paper Trading` for its identifier** (rule
+  6, 3N7), and a new identifier escapes its tail while keeping its count.
+- **A paper or live report's dates are declared** until the module that writes it
+  derives them (ADR-015 rule 4(f), 27a; Required Follow-Up item 17).
 - **`Derived From` is self-declared** (rule 6). Leaving it out resets the lineage.
 - **Anyone who can write the store can deny capital**: stored significance reports
   raise `variants_tried`'s lower bound (rule 3), and ADR-015's forged downward rungs
@@ -988,12 +1136,25 @@ every rule now, while nothing in production does.
    F-016 (the survivorship surface) are closed** (rule 3, S15).
 10. **Where the binding lives:** on the REVIEW, not the record (Context, S9).
 11. **Where both ADRs land in `docs/DECISIONS.md`**, and in which order.
-12. **Whether 25j covers trials that were never stored**; this draft reads it as
-    not covering a backtest run with Belay's own code and discarded (rule 3).
+12. ~~**Whether 25j covers trials that were never stored**; this draft reads it as
+    not covering a backtest run with Belay's own code and discarded (rule 3).~~
+    **Settled by 27c**: a residual of this ADR, not a 25j matter.
 13. **`variants_tried` at least the number of significance reports listed**, with
     its cost: a writer of the store can push the lower bound over the cap (rule 3).
 14. **`Derived From` lineage counted through each ancestor's current-stage read**
-    (rule 6, 2N9).
+    (rule 6, 2N9), now including each ancestor's distinct significance reports (3N8),
+    and refused when an ancestor's read raises (3N16).
+15. **Short reports** (rule 6, 3N7). A report of fewer than two observations is
+    not a significance report. Distinct report identifiers are counted. The cap
+    stays the smallest over the reports listed on this identifier only, so a short
+    report closes `Paper Trading` for its identifier and a new identifier escapes its
+    tail. The alternative carries ancestors' reports into the cap, and then a short
+    report locks every descendant for good.
+16. **Rule 3 check 8 on every rung that binds reports** (3N4), and check 6's refusal
+    of a window that ends after `created` (3N5).
+17. **Check 7 in the sweep, as of each review** (3N11).
+18. **Rule 5's verifier also closing capital-stage confidence changes and raises
+    into a capital stage by supersession or repair** (3N13).
 
 ## Required Follow-Up (ADR-016)
 
@@ -1011,10 +1172,10 @@ every rule now, while nothing in production does.
 8. **What counts as one variant** (18e).
 9. **A store index by subject**, which rule 3's check 7 and ADR-015 rule 3h step 5
    need; derived from the store, never a separately maintained file. It is required
-   infrastructure for both ADRs (ADR-015 at `26f5d75`, lines 5665-5669).
+   infrastructure for both ADRs (ADR-015 at `61789bc`, lines 6177-6181).
 10. **`metric_artifact()` writes `subject_id` and `subject_integrity_hash`**, and the
     ADR-012 amendment's reported conditions (rule 8).
-11. **Parts 25 and 26 merged to `main`**, and this draft revised again if either
+11. **Parts 25, 26 and 27 merged to `main`**, and this draft revised again if any
     changes.
 12. **A fresh independent pass** on this ADR and ADR-015 together. The owner's chosen
     different-AI pass on Issue #21 is still owed.
@@ -1027,6 +1188,14 @@ every rule now, while nothing in production does.
     fills `HUMAN_AUTHORIZATION_VERIFIER` and is the fourth thing capital waits for.
 15. **`metric_artifact()` writes each module's grade as this ADR's allowlist states**,
     and the allowlist's conformance test reads both (rule 2, 2N6).
+16. **Belay's own tools store every run automatically** — RULED (27c) as the
+    follow-up to the "never stored" residual. Every significance computation made
+    with Belay's code is stored with its subject, so check 7 sees it and it counts
+    toward `variants_tried`'s lower bound.
+17. **A module that writes paper and live reports, deriving each report's window
+    from the timestamps of the observations it recorded** (ADR-015 rule 4(f), 27a;
+    3N5). It is what closes the declared-date residual, and until it exists no report
+    is graded B or A.
 
 ---
 
@@ -1034,10 +1203,11 @@ every rule now, while nothing in production does.
 
 **The first falsification pass (Issue #21).** Findings against ADR-015 alone are
 resolved on pull request #7's branch and listed in ADR-015's revision history
-(ADR-015 at `26f5d75`, lines 3771-3795 for this pass; lines 3797-3837 for the
-second). The second column below names where each finding sits in this revision.
+(ADR-015 at `61789bc`, lines 3811-3835 for this pass; lines 3837-3871 for the
+second; lines 3873-3920 for the third). The second column below names where each
+finding sits in this revision.
 
-| Finding | Resolved here in | Also in ADR-015 at `26f5d75` |
+| Finding | Resolved here in | Also in ADR-015 at `61789bc` |
 |---|---|---|
 | B1 | — | rule 3g, tests 39-43 |
 | B2 | — | rules 3e, 3h, tests 44-47 |
@@ -1066,48 +1236,89 @@ second). The second column below names where each finding sits in this revision.
 
 **The owner's Part 25.**
 
-| Ruling | Resolved here in | Also in ADR-015 at `26f5d75` |
+| Ruling | Resolved here in | Also in ADR-015 at `61789bc` |
 |---|---|---|
 | 25a Distinct evidence | rule 2 | — |
 | 25b Part 22 joined to the ladder | rule 8 | — |
-| 25c Fixed specification | rule 6 check 4 (`Derived From` lineage) | rule 3g |
+| 25c Fixed specification | rule 6 check 5 (`Derived From` lineage) | rule 3g |
 | 25d Fail toward less capital | rule 3 (no binding on downward moves); rule 9 (no authorization on downward moves) | rules 3b, 3e, 3h, 8 |
 | 25e Live rungs closed | rule 5 | rule 3c runs it (B3) |
 | 25f A human authorizes capital | rule 9 | residual risk note |
 | 25g Raised bar applies from next step | rule 10 | rule 4, "Which ADR-016 version applies" |
 | 25h Refuse trial counts beyond the hurdle | rule 6 | — |
-| 25i No reuse after a demotion | rule 3 check 5 (report subject position) | rule 4(f) |
+| 25i No reuse after a demotion | rule 3 check 5 (report subject position); rule 3 check 8 (the grade that makes a report paper or live, for 27a) | rule 4(f) |
 | 25j Trading outside Belay out of scope | "What these rules do not reach" | rule 8 |
 
 **The second pass (Issue #21, 2026-09-24).** Its labels N1-N13 are written 2N1-2N13
 here, because the first pass used N1-N7.
 
-| Finding | Resolved here in | Also in ADR-015 at `26f5d75` |
+| Finding | Resolved here in | Also in ADR-015 at `61789bc` |
 |---|---|---|
-| 2N1, 2N2, 2N3, 2N4 | — (ADR-015's) | rule 3h (lines 4545-4691); rule 3c (lines 4247-4259); rule 3e (lines 4389-4432); tests 53-58 |
-| 2N5 | rule 3: `reports_considered`, "The listing's range is exactly check 5's range", `variants_tried` at least the significance reports listed, "The 'never stored' residual"; test 13 | rule 5 (lines 4979-4997) |
+| 2N1, 2N2, 2N3, 2N4 | — (ADR-015's) | rule 3h (lines 4694-4990); rule 3c (lines 4358-4370); rule 3e (lines 4506-4556); tests 53-58 |
+| 2N5 | rule 3: `reports_considered`, "The listing's range is exactly check 5's range", `variants_tried` at least the significance reports listed, "The 'never stored' residual"; test 13 | rule 5 (lines 5318-5363) |
 | 2N6 | rule 2: the allowlist names each module and its grade; test 6a | — |
-| 2N7 | rule 10, "never decreases"; test 24a | rule 4 (lines 4847-4856) |
-| 2N8 | rule 6 check 2 and "The cap"; tests 17-17b | rule 4's table (lines 4827-4845) |
+| 2N7 | rule 10, "never decreases"; test 24a | rule 4 (lines 5186-5195) |
+| 2N8 | rule 6 check 2 and "The cap"; tests 17-17b | rule 4's table (lines 5166-5184) |
 | 2N9 | rule 6 check 5 and "`Derived From` is self-declared"; test 19a | — |
-| 2N10, 2N11 | — (ADR-015's) | rule 3g (lines 4496-4521); rule 4(f) (lines 4750-4801); tests 59-60 |
-| 2N12 | "Which checks run where"; rule 8, "Where it runs" | rule 3c (lines 4260-4299); rule 3f (lines 4461-4468) |
+| 2N10, 2N11 | — (ADR-015's) | rule 3g (lines 4620-4655); rule 4(f) (lines 5049-5140); tests 59-60 |
+| 2N12 | "Which checks run where"; rule 8, "Where it runs" | rule 3c (lines 4371-4410); rule 3f (lines 4585-4592) |
 | 2N13 | Required Follow-Up item 13 | — |
 | nit: HANDOFF edited in place at 5683-5684 (`d592e7f`) | restored to `main`'s text on this branch, 2026-09-25 | — |
-| nit: ADR-015 D15:4290, :3766, :3784 | — | revision history (lines 3797-3837) |
+| nit: ADR-015 D15:4290, :3766, :3784 | — | revision history (lines 3837-3871) |
 
 **The owner's Part 26.**
 
-| Ruling | Resolved here in | Also in ADR-015 at `26f5d75` |
+| Ruling | Resolved here in | Also in ADR-015 at `61789bc` |
 |---|---|---|
 | 26a An unresolved downward step lowers the read only | — | rule 3h steps 4 and 6; rule 3e; rule 4(f) |
 | 26b The trial cap at 5%, from each report's degrees of freedom, only where 3.0 applies | rule 6 | rule 4's table |
 | 26c Confidence on a capital stage needs a human yes | rule 9, and rule 5's verifier closes it | rule 3g |
-| 26d 25i's evidence means the data | rule 3 check 6 supplies the window | rule 4(f) |
+| 26d 25i's evidence means the data — **superseded by 27a** | rule 3 check 6 supplies the window; since 27a it gates only the paper-or-live check | rule 4(f), rebuilt on 27a |
 | 26e Reading a stage re-checks its evidence | "Which checks run where"; rule 8 | rule 3c |
-| 26f Capital waits for verification | rule 5 (`HUMAN_AUTHORIZATION_VERIFIER`); rule 9 | residual risk (lines 5490-5514) |
+| 26f Capital waits for verification | rule 5 (`HUMAN_AUTHORIZATION_VERIFIER`); rule 9 | residual risk (lines 5960-5998) |
 
-**How this revision was checked.** The second pass's executable model was extended
+**The third pass (Issue #21, 2026-09-25).** Its labels are written 3N1-3N17 here.
+
+| Finding | Resolved here in | Also in ADR-015 at `61789bc` |
+|---|---|---|
+| 3N1, 3N2, 3N3, 3N5, 3N6, 3N9, 3N10, 3N12, 3N15, 3N17 | — (ADR-015's), but rule 9 authorizes the supersessions and repairs (27d, 27g), and rule 3 check 6 refuses a window that ends after `created` (3N5) | rule 3h (lines 4694-4990); rule 3b (lines 4257-4337); rule 3g (lines 4620-4692); rule 4(f) (lines 5049-5140); rule 5 (lines 5327-5350); tests 61-73 |
+| 3N4 | rule 3 check 8; "Which checks run where"; Consequences; test 6b | residual risk (lines 5960-5998) |
+| 3N7 | rule 3 (counted once per `report_id`); rule 6 check 3 and "Short reports, and fewer than two observations"; tests 17c-17d; owner item 15 | — |
+| 3N8 | rule 6 check 5 (each ancestor's significance reports); test 19b | — |
+| 3N11 | rule 3 check 7 (the sweep, as of each review); test 13a | — |
+| 3N13 | rule 5 (the fourth constant's extensions marked DRAFTER) | — |
+| 3N14 | this table (25c's row names check 5); "Changes this makes to ADR-015", row 1 | — |
+| 3N16 | rule 6 check 5 (refused when an ancestor's read raises); test 19c | rule 4(f) (lines 5049-5140) |
+
+**The owner's Part 27.**
+
+| Ruling | Resolved here in | Also in ADR-015 at `61789bc` |
+|---|---|---|
+| 27a A climb back needs new paper or live evidence; backtests reuse history (supersedes 26d) | rule 3 checks 6 and 8 supply the window rule and the grade | rule 4(f) (lines 5049-5140) |
+| 27b Keep `current_stage`; it reports the approved confidence | — | rule 3h; rule 3g; rule 8 |
+| 27c Unsaved trials are a residual of this ADR | rule 3, "The 'never stored' residual"; Residual risk; Required Follow-Up item 16 | — |
+| 27d A later review names what it supersedes | rule 9 (a supersession that raises) | rule 3h step 5; rule 5 (`supersedes`) |
+| 27e The bar follows a strategy across identifiers | rule 6 check 5 (its ancestors) | rule 4(f); rule 3g (the specification digest) |
+| 27f Reading a capital stage verifies the whole chain | "Which checks run where" (rule 3c's checks on every version of a capital read) | rule 3h step 3 |
+| 27g Raising a stage is a capital decision | rule 9 (a repair review); rule 5 (a raise into a capital stage) | rule 3h step 6 |
+
+**How the fourth revision was checked.** Two scratch models, neither in the
+repository and both written by the author, so neither is an independent pass. One is
+the third pass's own abstract model (X1-X6); the other is the previous revision's
+model, which uses the real framework classes. Both were extended with this
+revision's rules as worded, and each was run under today's bar and under a
+**hypothetical** bar with rule 5's constants filled and a verifier for 26f. Against
+them: A is refused on nine grounds; a `Promotion Review` bought with a hand-built
+report graded `B` is refused by rule 3 check 8, naming `risk_adjusted.py` and C
+(3N4); the caps print as in rule 6, with 0 at four observations and a refusal at one;
+C raises; C2, C3 and D read `Paper Trading` or `Retired`, flagged; F reads `Paper
+Trading` until both files are deleted. Under today's bar nothing reaches a capital
+stage. Under the hypothetical bar, X1 re-climbs to `Production` and X1b to `Micro
+Capital` once a person records a yes. An honest strategy climbs `Idea` to `Promotion
+Review`, is demoted, is refused a re-climb on paper evidence from before the
+demotion, and climbs back on paper evidence from after it.
+
+**How the first 2026-09-25 revision was checked (kept as history).** The second pass's executable model was extended
 to encode both ADRs' revised rules as worded, using the real `Artifact`,
 `EvidenceRecord`, `ArtifactIntegrity.sign`, `ArtifactValidator`,
 `ArtifactRepository` and `student_t_two_sided_p`. It is a scratch model written by
