@@ -99,6 +99,15 @@ was stopped, because Part 30 supersedes it.
 
 **Part 30** records the owner's rule that contributors help and never gate.
 
+## Merged, on the owner's word
+
+The owner said "Merge" to: merge #14, #24, #31 and #32 in that order, and close
+#22 and Issue #16. The branches were stacked, so that each one already
+contained the one before it and every merge went through without a conflict.
+The owner also said "aligned to recommendation" for the labeled lines in
+Parts 25-28 (Part 31). F-019 closed with #24's merge, after its independent
+pass.
+
 ## Corrections to the archive
 
 - `docs/HANDOFF.md:5768` and `:5842` list the `markdown-it-py` decision as

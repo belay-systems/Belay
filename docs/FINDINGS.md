@@ -58,7 +58,6 @@ one to trust.
 | `is_clean` Decides Whether The Survivorship Warning Prints, And Has No Test (F-016) | P2 | no | archive |
 | The Significance Test's Two-Sidedness Is Asserted By Nothing (F-017) | P3 | no | archive |
 | "Searched All 101 Documents" Has Rotted To 107 (F-018) | P3 | no | archive |
-| Eight Guards On The Capital And Provenance Path Are Asserted By Nothing (F-019) | P2 | no | archive |
 | The Citation For "Every Decision Requires Written Justification" Points At The Wrong Line In Nine Places (F-020) | P2 | no | archive |
 | The Dashboard's "Could Not Run" Branch Destroys The Page Instead Of Reporting (F-023) | P3 | no | archive |
 | Nothing Checks An Artifact's Identifier Prefix Against Its Type (F-024) | P3 | no | archive |
@@ -74,3 +73,4 @@ Findings closed from 2026-09-25 on. Earlier closures are recorded under
 
 | Finding | Closed | By |
 |---|---|---|
+| Eight Guards On The Capital And Provenance Path Are Asserted By Nothing (F-019) | 2026-09-25 | #24 |

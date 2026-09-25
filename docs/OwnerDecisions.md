@@ -2959,3 +2959,26 @@ help from others".** (Family wording is redacted as in Part 11a.)
 - Whether the rulesets should stop asking for a review at all, rather than
   having it bypassed each time. That is a repository setting, and only the
   owner changes those.
+
+---
+
+# Part 31 — Ruled 2026-09-25: the labeled lines in Parts 25-28 stand
+
+**Question put.** The independent pass on #31 found that the recommendations
+the owner answered "aligned" to in Parts 25-28 were put in chat, not on file.
+The notes after Part 28 list each line that goes beyond the questions recorded
+on Issue #21 as the session's wording until the owner confirms it. The
+owner was asked to confirm or correct them.
+
+**Owner said: "aligned to recommendation".**
+
+### What it settles
+
+- **31a.** Every line listed in item 1 of the notes after Part 28 stands as
+  recorded. They are the owner's rulings, not only the session's wording.
+
+### What it does not settle
+
+Items 2-7 of those notes are not rulings. They are gaps and readings for the
+final text round on ADR-015 and ADR-016 (Part 28e, step 1). The open ones are
+25g against 26e and 27f, 25h and 26b against 18e, and 28e against 18g.

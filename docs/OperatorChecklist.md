@@ -767,3 +767,8 @@ than repoint citations. In `.claude/skills/belay-review/SKILL.md` it rewrites
 the gate paragraph (`:287-295`) and one sentence of the outside-text rule
 (`:383`). It also appends Part 23 to `docs/OwnerDecisions.md`. Both files need
 your code-owner review.
+
+## Done — 2026-09-25: the labeled lines in Parts 25-28 confirmed
+
+The owner answered "aligned to recommendation" (`docs/OwnerDecisions.md` Part
+31). This closes the Open item "confirm the labeled lines in Parts 25-28".
