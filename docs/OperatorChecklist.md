@@ -796,7 +796,8 @@ the same file: repository Admin does not let `eternalaether5` bypass
 and 15b kept them a Member.** What repository Admin actually grants:
 `eternalaether5` can edit or delete the `main: review` / `main: checks`
 rulesets outright (repository-scoped rulesets are manageable by anyone with
-repository Admin, independent of the rulesets' own bypass lists), manage
+repository Admin, independent of the rulesets' own bypass lists; this is from
+GitHub's documented model and was not reproduced live, Part 16a), manage
 secrets and Actions settings, add or remove collaborators, and change
 visibility or delete the repository. See Part 16a for the full correction.
 

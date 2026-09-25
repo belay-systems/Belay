@@ -2870,7 +2870,7 @@ and names the file.
 **Question put.** The owner reported the second contributor's organization
 invitation accepted and asked a session to grant Write access — the mechanical
 step 15b already authorized. Before the session could act, the owner said: "i
-manually gave my brother Admin perms." `gh`-equivalent lookup
+manually gave [the second contributor] Admin perms." `gh`-equivalent lookup
 (`list_repository_collaborators`) confirmed: `eternalaether5`, `role_name:
 "admin"`, on the live repository. That is beyond 15b's ruling and reopens the
 tradeoff 15b named: with Admin, `eternalaether5` can bypass the `main: review`
@@ -3054,3 +3054,27 @@ between them.
 
 **What Part 17 does not touch.** Parts 1 through 16 stand except where 17
 says otherwise. No finding is opened or closed and no ADR changes status.
+
+## 17a. Notes from the independent pass, 2026-09-25, made before merge
+
+A fresh-context falsification pass on this pull request found four places
+where the record says more than its evidence. None changes a ruling. Family
+wording in Part 16's quotation is redacted, as in Part 11a.
+
+- **"Confirmed live" above is an inference.** `role_name: "admin"` is also
+  what Part 16's repository-Admin grant returned. On 2026-09-25,
+  `list_repository_collaborators` with `affiliation=direct` returned no one,
+  so the Admin does not come from a direct repository grant. That fits
+  organization Owner, but an organization base permission or a team would
+  look the same. No organization-membership call is on record.
+- **"This bypass is real" is also inferred.** It rests on the ruleset naming
+  `OrganizationAdmin`, and on the check of `current_user_can_bypass` recorded
+  in `docs/OperatorChecklist.md`. That check was run for the original owner's
+  login, never for `eternalaether5`.
+- **Part 11a said governance records are "enforced by `.github/CODEOWNERS`
+  once a ruleset on `main` exists".** Under this Part that holds only as a
+  convention, for either owner. Part 30 (on #32) rules that no contributor's
+  review is required at all.
+- **Part 16's sentence** that the owner's account "is no longer the only one
+  that can recover the organization" was untrue for repository Admin, and
+  16a did not correct it. It became true only under Part 17.
