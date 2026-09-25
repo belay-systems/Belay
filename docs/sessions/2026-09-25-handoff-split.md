@@ -54,7 +54,7 @@ its last message, the plan, into this session. The plan is carried into
   5 xfailed, and `python scripts/status.py` exited 0.
 - **On this branch:** 693 passed, 1 skipped, 5 xfailed. `status.py` exits 0
   and lists 41 findings, the same titles and priorities as before.
-  `python scripts/review_due.py` still gives F-031 as the next number.
+  `python scripts/review_due.py` still gives the number after F-030 as the next one.
 - **Line citations:** 241 citations point into the five large files
   (`git grep -h -o -E "<Name>\.md:[0-9]+" | wc -l`). Not one moved, because
   every edited line was replaced in place and every addition was appended.

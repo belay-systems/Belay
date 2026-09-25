@@ -4,7 +4,7 @@ The live list of open findings, and of findings closed from 2026-09-25 on.
 `python scripts/status.py` counts the rows under "Open" below. That count is the
 one to trust.
 
-**How this file is kept** (`docs/OwnerDecisions.md` Part 26):
+**How this file is kept** (`docs/OwnerDecisions.md` Part 29):
 
 - **One row per finding.** The row's title is the finding's name. Cite a finding
   by its title or its F-number, never by a line of this file. Rows move when
