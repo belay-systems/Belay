@@ -3620,7 +3620,7 @@ question of who calls `save()` and when, and nothing here answers it.
 ## ADR-015: A Strategy's Stage Is Carried, Not Asserted — And A Stage Move Without Evidence Is Not A Review
 
 Status:
-**PROPOSED — revised 2026-09-25 after a fourth falsification pass and the owner's Parts 25-28. Not ratified. Not implemented in any part.**
+**PROPOSED — revised 2026-09-25 after a fourth falsification pass and the owner's Parts 25-28, and once more for Part 32 (32a: rule 4, "Which ADR-016 version applies"; 32c: the Required Follow-Up). Not ratified. Not implemented in any part.**
 
 Date:
 2026-09-19 (revised 2026-09-24, 2026-09-25, and twice more on 2026-09-25)
@@ -4472,7 +4472,7 @@ performs no I/O**, so this adds no read: on the review it runs rule 4(c) and eve
 ADR-016 check that needs nothing but the review itself — the grade floor, the
 per-criterion shape, the rung closures (`MINIMUM_PAPER_TRADING` and the live-rung
 minimums, 18d and 25e), the recorded human authorization (25f), `variants_tried`
-and `bar_version` (25g, 25h). **Resolving the bound reports and rule 8 are now in
+and `bar_version` (32a, 25h). **Resolving the bound reports and rule 8 are now in
 this read too (26e, the fourth bullet above).** The ADR-016 checks that read *other*
 reviews or the whole store — rule 3 check 7 (every report considered is listed),
 rule 6 checks 3-5, rule 10's non-decreasing `bar_version`, and rule 4(f) — still run
@@ -5355,16 +5355,16 @@ finding B7.)*
 | Production | ADR-016 rules 1-3, 5, 6, 8 and 9 |
 | Retired | no floor — clause 1 below; ADR-016 rule 1 |
 
-**Which ADR-016 version applies (25g; finding N4 and S1).** A review records the
-`bar_version` it was judged under (ADR-016 rule 10). A stored review is validated
-against the bar version it records, never re-judged against a later one, and
-`save()` accepts only the current version — so a raised bar applies from each
-strategy's next step (RULED 25g). **A ladder's reviews never go down in
-`bar_version`** (DRAFTER; second-pass finding 2N7, applied in ADR-016 rule 10), so a
-hand-written review cannot claim an older, laxer bar. ADR-016 pins each version's constants to its
-ratified text with a conformance test; that test, not a grade test, is what catches
-a floor that is lowered, including a `D` floor removed outright, which no
-promotion test can detect because nothing is below `D`.
+**Which ADR-016 version applies (RULED 32a, which overrules 25g's "It does not
+re-judge past steps"; findings N4 and S1).** A review records the `bar_version` it
+was saved under (ADR-016 rule 10), and `save()` accepts only the current version.
+**Every read and every sweep judges every stored review by the current version's
+constants** (32a). So a raised bar lowers a strategy's read at once (DRAFTER): a
+review that no longer meets it fails rule 3c, and the read falls as for any review
+that fails (25d). **A ladder's reviews never go down in `bar_version`** (DRAFTER;
+2N7, ADR-016 rule 10), kept as a check on the record: only a file that bypassed
+`save()` can break it. ADR-016's conformance test pins the constants to the ratified
+text; it, not a grade test, catches a lowered floor, even a `D` floor removed.
 
 **How rule 4 consumes it (DRAFTER).** A ninth step joins rule 4: for a review whose
 outcome moves a strategy **upward**, the artifact's `evidence_level` — which is
@@ -6418,14 +6418,14 @@ in favour of declare-and-reconcile — rule 5.
   the code in a later change, and the disagreement is recorded. The code is
   capital-path code: it lands through review like any other and opens no capital
   rung, which stay closed by their unruled constants (28, "What it does not settle")
-- **Parts 25-28 on `main`.** The owner's 25a-25j, 26a-26f, 27a-27g and 28a-28e are
-  recorded on branch `claude/kind-knuth-9g7xlr` and not yet merged. Rules here that
-  cite 25x, 26x, 27x or 28x rest on that record
+- **Part 32 on `main`.** Parts 25-28 merged with #31. The owner's 32a-32c are
+  recorded on branch `claude/great-turing-v2d0x8` and not yet merged. Rules here
+  that cite 32a, 32b or 32c rest on that record
 - **ratify or amend**, after ADR-016 is revised and a fresh independent pass has
   tried to break both
 - **a fresh independent pass, BEFORE implementation, on this ADR and ADR-016
-  together.** The owner's chosen different-AI pass on Issue #21 is still owed. *(28e
-  now has it run in parallel with the code, on the current text.)* Six passes have
+  together.** A fresh session satisfies it; a different AI is welcome, never waited
+  for (30b). 32c adds one more, on the text as ratified. Six passes have
   now found thirteen blocking defects in this ADR, in drafts whose citations and
   measurements were each time correct —
   which is the standing lesson that verifying an ADR's *facts* is not attacking its
