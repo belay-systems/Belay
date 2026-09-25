@@ -184,27 +184,27 @@ def roadmap_stages() -> list[tuple[str, str]]:
     return stages
 
 
-def open_findings() -> list[tuple[str, str]]:
-    """Pull the open findings and their priorities out of docs/HANDOFF.md.
+#: One row of docs/FINDINGS.md's "Open" table. A priority cell that is not
+#: P1-P3 parses as "?", so a malformed grade shows rather than vanishing.
+FINDING_ROW = re.compile(r"^\| (.+?) \| (\S*) \| (?:yes|no) \| .+? \|$", re.M)
 
-    The priority pattern used to require a blank line between "Priority:" and
-    the grade. No section in HANDOFF.md has ever been written that way — every
-    one of them puts it inline, as "Priority: P2. Watched by ..." — so the match
-    always failed and all fifteen findings rendered as "?". `\\s*` now spans
-    either layout, and two sections lead with prose on the same line
-    ("Governance question. Priority: P3."), which is why this searches rather
-    than matches from the start.
+
+def open_findings() -> list[tuple[str, str]]:
+    """Pull the open findings and their priorities out of docs/FINDINGS.md.
+
+    Until 2026-09-25 the register was prose sections in docs/HANDOFF.md, now a
+    frozen archive (docs/OwnerDecisions.md Part 29). It is one table row per
+    finding, so the priority is a cell rather than a phrase to hunt for, and a
+    title is the finding's name, word for word as the archive heads it.
     """
-    text = read(ROOT / "docs" / "HANDOFF.md")
-    section = re.search(r"\n# Open Findings\n(.*?)(?=\n# )", text, re.S)
+    text = read(ROOT / "docs" / "FINDINGS.md")
+    section = re.search(r"^## Open\n(.*?)(?=^## |\Z)", text, re.S | re.M)
     if not section:
         return []
 
     findings = []
-    for block in section.group(1).split("\n## ")[1:]:
-        title = block.splitlines()[0].strip()
-        priority = m.group(1) if (m := re.search(r"Priority:\s*(P\d)\b", block)) else "?"
-        findings.append((title, priority))
+    for title, cell in FINDING_ROW.findall(section.group(1)):
+        findings.append((title.strip(), cell if re.fullmatch(r"P[1-3]", cell) else "?"))
 
     # Unparsed findings sort last, not first. While every grade was "?" this
     # sort was inert and the table simply followed document order; now that it

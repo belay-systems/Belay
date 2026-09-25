@@ -1,4 +1,4 @@
-# Belay Session Handoff
+# Belay Session Handoff — ARCHIVE, frozen 2026-09-25. Start from `docs/NOW.md`; findings are in `docs/FINDINGS.md`
 
 ## Provenance — read this first
 

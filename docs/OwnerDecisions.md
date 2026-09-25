@@ -2862,3 +2862,60 @@ both loud and both safe.
 
 Whether the gate should ever read four-digit numbers. At the ceiling it stops
 and names the file.
+
+---
+
+# Part 29 — Ruled 2026-09-25: current state apart from history; the handoff is split
+
+**Question put.** The owner asked: "is there any precedent or known first
+principles about capped or other structure for our handoff and other growing
+files to be more better?" The session measured the problem:
+
+- `docs/HANDOFF.md` was 5,857 lines, more than any agent reads in one pass.
+- It held six next-task headings, and the current one was the last, while
+  `AGENTS.md` said the top-most block was current.
+- The test for that list checked the stale one.
+
+The session gave the precedents and first principles, now written up in
+`docs/proposals/growing-files.md`. It put one question: **does Immutable Law VII
+protect the knowledge, or the file layout?** It recommended "the knowledge",
+because text moved to a kept file, or rewritten while git keeps every earlier
+version, is not discarded.
+
+**Owner said: "well yeah i want you to write it all up, and implement it
+accordingly … surgical implementation".**
+
+This lifts the owner's parking of the same concern on 2026-09-23 ("Raise it
+with the owner when there is time to hash it out. Do not restructure these
+files before then"), which is recorded in `docs/HANDOFF.md` on #20's branch.
+
+### What it settles
+
+- **29a. Law VII protects knowledge, not a file's layout.** A file whose job is
+  current state may be rewritten. What the rewrite removes survives in git and
+  in the session record.
+- **29b. `docs/NOW.md` holds the current state.** It has the one
+  "Highest Priority Next Task" and the "Working Agreement". It is rewritten at
+  every session close and capped at 200 lines.
+- **29c. `docs/sessions/` holds history**, one file per session. A record is
+  never edited after it merges.
+- **29d. `docs/FINDINGS.md` is the findings register**, one row per finding.
+- **29e. `docs/HANDOFF.md` is frozen as the archive**, in place, so none of its
+  line citations moves. Its title line was edited in place to say it is
+  frozen; nothing was removed.
+- **29f. A test holds each of these rules** (`tests/test_handoff_files.py`).
+
+### Session choices, not the owner's words
+
+- **Freezing the archive in place.** The session first described moving it to
+  a new path. Reading the code changed that: `scripts/status.py` parsed it,
+  code comments cite its sections, and frozen reports cite its lines.
+- **The caps:** 200 lines and 16,000 bytes for `docs/NOW.md`, and 300 lines for
+  a session record.
+- **Parts 26-28 were taken** on #31's branch, so this Part is 29.
+
+### What it does not settle
+
+**Phase 2 is not settled.** That is the same split for `docs/DECISIONS.md`,
+this file, `docs/OperatorChecklist.md` and `CHANGELOG.md`. It waits until #7,
+#20 and #31 have landed, and it comes back to the owner as its own questions.
