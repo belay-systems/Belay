@@ -77,7 +77,7 @@ not edited from here: one Issue, one branch, one claimant.
      without a fetch?
    - **Run the mutation ADR-017 requires and has not had:** `disclosure_from`
      returning a plain `Disclosure` must turn the suite red. If it does not, the
-     new guard is asserted by nothing — F-019's and F-032's shape.
+     new guard is asserted by nothing, which is F-032's shape.
    - The full suite after the two test edits, which was never run locally.
    - Whether ADR-017's draft claims anything it has not checked.
    - The earlier work: whether the three F-032 tests isolate their guards
