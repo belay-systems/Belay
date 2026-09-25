@@ -2874,7 +2874,7 @@ could see from `pyproject.toml`. The session recommended declaring it.
 
 ### What it settles
 
-- `pyproject.toml`'s `dev` extra lists `markdown-it-py>=3.0`. The tests that
+- `pyproject.toml`'s `dev` extra lists `markdown-it-py>=2.2.0`. The tests that
   import it were run against 3.0.0 and 2.2.0 (the floor `rich` requires), and
   both pass.
 
@@ -2977,8 +2977,8 @@ only the owner can answer. The session put each one with a recommendation.
 
 - **27a. This replaces 26d.** After a demotion, a climb back requires new paper
   or live trading evidence gathered after the demotion. A backtest may reuse
-  historical data. 26d's reading, "any data dated before the demotion", would
-  have barred about ten years of history and been a permanent ban in effect.
+  historical data. 26d, read as covering all data dated before the demotion,
+  would have barred about ten years of history: a permanent ban in effect.
   27a supersedes it.
 - **27b.** Keep the current-stage read (`current_stage`). It also reports the
   confidence that was approved.
@@ -3045,3 +3045,43 @@ them. It proposed a different way to finish.
 It does not ratify either ADR. The code in 28e is capital-path code: it lands
 through review like any other, and it opens no capital rung. Every rung stays
 closed by its unruled constants.
+
+## Notes on Parts 24-28 from the independent pass, 2026-09-25, made before merge
+
+A fresh-context falsification pass on this pull request found the following.
+None of it changes what the owner said. It marks where the record goes beyond
+what is on file, so the owner can confirm or correct it.
+
+1. **The recommendations the owner answered "aligned" to are not on file.**
+   Parts 25-28 say each question was put with a recommendation. The questions
+   are in the pass comments on Issue #21, but the recommendations were put in
+   the session's chat, and that chat is not part of this repository. These
+   lines go beyond the questions as recorded on Issue #21, so they are **the
+   session's wording until the owner confirms them**:
+   - 25b's "at least" 3.0;
+   - 25c's "starts at Idea";
+   - 26a's "flagged for a human to repair" and "never makes a Retire final";
+   - 27b's second sentence;
+   - 27c's follow-up that Belay's own tools store every run;
+   - 27d taking both of the pass's alternatives;
+   - 28a's "at any stage" and its recorded human yes;
+   - the plan in 28e.
+2. **Part 28's premise is overstated.** Not every important finding came from
+   running a model: pass 1's B1-B3 and pass 4's F4-3 were argued from the
+   text.
+3. **25g against 26e and 27f is not reconciled.** 25g says a raised bar does
+   not re-judge past steps. 26e and 27f re-check evidence when a stage is
+   read. Neither says whether that check uses the bar in force at each step or
+   today's bar. It is open.
+4. **25h and 26b change 18e's role**, from a count that "corrects nothing" to a
+   refusal gate, without saying they amend 18e.
+5. **28e and 18g.** Part 28 does not say whether a fresh pass on the final
+   text is still required before ratification. `AGENTS.md` point 4 requires
+   one. Under Part 30 (on #32), a fresh session satisfies it, and the
+   different-AI pass is welcome but not waited on.
+6. **"Every attack becomes a test that must fail"** in 28e means the attack
+   must fail: the test passes when the attack is refused.
+7. **Part 24's floor is the session's choice.** It is lowered here from 3.0
+   to 2.2.0, the floor `rich` requires; the tests pass at both. 27a no longer
+   puts quotation marks around words 26d did not use.
+

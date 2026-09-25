@@ -772,3 +772,11 @@ your code-owner review.
 
 Owner ruled "Declare it" (`docs/OwnerDecisions.md` Part 24). It is declared in
 `pyproject.toml`'s `dev` extra.
+
+## Open — 2026-09-25: confirm the labeled lines in Parts 25-28
+
+Before the final text round on ADR-015 and ADR-016 (Part 28e), confirm or
+correct each line listed in "Notes on Parts 24-28 from the independent pass" at
+the end of `docs/OwnerDecisions.md`. The recommendations you answered
+"aligned" to are in the archived session "Belay threads status".
+

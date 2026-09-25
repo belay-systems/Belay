@@ -23,7 +23,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "markdown-it-py>=3.0"]
+dev = ["pytest>=8.0", "markdown-it-py>=2.2.0"]
 
 # Packages are listed explicitly rather than auto-discovered. The repository root
 # also holds governance directories (constitution/, Knowledge/, strategies/, ...)
