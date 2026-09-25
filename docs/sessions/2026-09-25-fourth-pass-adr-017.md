@@ -74,8 +74,9 @@ every metric artifact built after it (none is stored).
 ## Files changed
 
 - `docs/OwnerDecisions.md` — Parts 37 to 40.
-- `docs/OperatorChecklist.md` — four Done entries (option A, the two follow-ups,
-  and the method), and ratification (Later).
+- `docs/OperatorChecklist.md` — one open question (keep Part 40 or return to the
+  fingerprint), four Done entries (option A, the two follow-ups, and the method),
+  and ratification (Later).
 - `docs/NOW.md` — "Where things stand" (the review-gate line), "In flight", and the
   next-task list.
 - This record.
@@ -141,8 +142,34 @@ finding-number sentence in `docs/NOW.md`; the owner's quote, which begins "lets"
 Every correction to a ruling's record says so in the Part itself ("Corrected before
 merge"), rather than being edited away.
 
+## The second independent pass, and what it changed
+
+A second fresh agent reviewed Part 39, the fixes above and Part 40 against the same
+transcript, and rehearsed the merge onto #36 (`720 passed`). It found no blocking
+item, 5 defects and 6 notes; each defect was checked here before acting. The ones
+that mattered reached the owner's decisions:
+
+- **Re-parsing is not available as DoltHub's data is stored** (one JSON document per
+  month joined by newlines; `_parse` reads one). Confirmed by reading
+  `framework/data/dolthub.py` on #36; its own comment says "re-parsing is not this
+  hash's job". The first pass's "verified: each source has a parser" had checked only
+  that `_parse` exists.
+- **The parser-change weakness was given to the wrong method**, and the owner was
+  shown it backwards when deciding Part 40. Confirmed from `fetch_and_record`'s
+  existing-record path, which returns a freshly parsed series beside the old record.
+- **The migration of `RPT-0001` was overstated.**
+
+Recorded in Parts 38 and 40 and put back to the owner as one question. Also fixed:
+Part 37's blockchain note misstated what the owner was told about B2; 39a narrowed
+"every result" to Level C inside "What it settles" (moved to a reading, which now
+keeps adjusted-price results naming their record); quote marks around words the
+owner did not say; a count without its command; and the merge rule below, which said
+"add" where it must say "replace".
+
 ## What is open
 
+- **One question with the owner:** keep Part 40, or return to the stored
+  fingerprint now that the comparison is corrected. In `docs/OperatorChecklist.md`.
 - **Attempt four of ADR-017**, on #36, built to Parts 37-40 and the fourth pass's
   findings. It picks the method that binds the prices and says which weakness it
   accepts; its own independent pass checks that choice. Ratification after, not
@@ -153,5 +180,7 @@ merge"), rather than being edited away.
 - **Merge order.** Parts 37-40 refer to Parts 35 and 36, so this branch merges
   after #36. For `docs/OwnerDecisions.md` and `docs/OperatorChecklist.md`, keep the
   text already on `main` first and add this branch's after it. **Not for
-  `docs/NOW.md`:** keeping both sides fails the build. Take #36's `docs/NOW.md` and
-  add this branch's ADR-017 item and the #37 row to its one next-task list.
+  `docs/NOW.md`:** keeping both sides fails the build. Take #36's `docs/NOW.md`,
+  **replace** its item 1 (the fourth pass, now done) with this branch's ADR-017 item,
+  and add the #37 row. Keeping #36's item 1 as well also passes the tests, so nothing
+  would catch the stale item.

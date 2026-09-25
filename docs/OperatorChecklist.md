@@ -855,6 +855,38 @@ The owner answered "aligned to recommendation" (`docs/OwnerDecisions.md` Part
 
 # 2026-09-25 — owner items from the fourth pass on ADR-017 (#36)
 
+## Open — 2026-09-25: keep Part 40, or go back to the stored fingerprint?
+
+**Why this is back with you again.** Part 40 left the method to attempt four. You
+answered on a comparison that was wrong in three places, found by a second
+independent pass after you answered:
+
+- **Re-reading the raw data does not work as it is stored today.** The DoltHub
+  source saves a multi-month fetch as several documents joined together, and the
+  code that turns them into prices reads only one. It needs new code.
+- **I had the weakness backwards.** If the price-reading code changes, a *stored
+  fingerprint* stops matching, so the data drops out of Level C: a loud failure,
+  which is the cautious direction. *Re-reading* would compare the new code's answer
+  with itself, so it always matches, and a change that alters prices passes
+  **silently**: the flattering direction.
+- **The migration was overstated.** Adding a fingerprint to future records does not
+  force a change to the one saved record, `RPT-0001`. It can stay as it is; it cannot
+  back Level C anyway, because its data is not in git.
+
+**The question:** keep Part 40 (attempt four picks, now with the facts corrected in
+Part 40), or go back to the stored fingerprint as you first ruled in Part 38?
+
+*Recommended: go back to the stored fingerprint.* With the facts right, the two are
+not close: the fingerprint fails in the cautious direction and exists as a plan;
+re-reading fails in the flattering direction and does not work on the stored data.
+**The cost, stated plainly:** fetch records gain a field, which changes ADR-014 for
+future records; and after a change to the price-reading code, data already fetched
+drops to Level D and cannot regain Level C until ADR-014's rule against re-recording
+identical bytes is revisited. Attempt four would have to handle that.
+
+I recommended delegating because I believed both methods had comparable weaknesses.
+They do not. That is the reason for bringing this back rather than leaving it.
+
 ## Done — 2026-09-25: attempt four chooses how the prices are bound
 
 **Answered. Owner said "Let attempt four pick the method with the code in front of
@@ -891,6 +923,12 @@ choice?
 *Recommended: rule only the rule.* The method is repository mechanics, which you
 delegate, and both methods have a real weakness the next attempt should weigh with
 the code in front of it.
+
+**Corrected after the owner answered:** three statements above were wrong — "every
+data source has code that turns those bytes into prices", the claim that a stored
+fingerprint "makes" `RPT-0001` a migration, and which method a parser change hurts.
+They stand here as they were put; the corrections are in `docs/OwnerDecisions.md`
+Part 40 and the open question above.
 
 ## Done — 2026-09-25: what should ADR-017 promise? (option A)
 

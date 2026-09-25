@@ -62,9 +62,11 @@ to the branch merging second's own intent, with one list.
    - The owner then ruled: Level C needs the prices used to match what the fetch
      received (Part 38), and every Level C metric artifact names the fetch record
      behind its grade (Part 39).
-   - **Attempt four picks the method** that binds the prices — a stored fingerprint
-     or re-parsing the stored bytes — states which weakness it accepts, and its
-     independent pass checks the choice (Part 40).
+   - **Attempt four picks the method** that binds the prices, and its independent
+     pass checks the choice (Part 40). The owner decided that on a comparison that
+     was wrong in three places (corrected in Part 40), so it is **back with the
+     owner** in `docs/OperatorChecklist.md`: keep Part 40, or return to the stored
+     fingerprint.
    - **Next:** attempt four on #36, built to Parts 37-40 and the fourth pass's
      findings; then its own independent pass; then ratification. Not before.
 2. **Finish the evidence bar the way Part 28e rules.**
