@@ -3003,3 +3003,45 @@ It does not ratify either ADR. Both stay PROPOSED until they are revised, a
 fresh independent pass has tried to break them, and the owner ratifies them.
 The owner is asking the second contributor for the different-AI pass on
 Issue #21.
+
+# Part 28 — Ruled 2026-09-25: four more principles, and how the evidence bar is finished
+
+**Question put.** A fourth falsification pass on ADR-015 (#7) and ADR-016
+(#20), posted on Issue #21, found nothing that reaches capital without a
+verified human yes. It did find ADR-015 contradicting itself: one rule
+requires a human authorization on repair reviews, and another forbids that
+field there. It also found a forged file that blocks promotion permanently,
+and four questions only the owner can answer. The session also said that four
+rounds of prose had each added rules with new edge cases, and that every
+important finding was caught by running a model of the rules, not by reading
+them. It proposed a different way to finish.
+
+**Owner said: "aligned, yes to the plan".**
+
+### What it settles
+
+- **28a.** A hand-written upward step cannot cancel a pending genuine demotion
+  or retirement, at any stage. The review at that position must name it in
+  `supersedes` and carry a recorded human yes (25f, 27g).
+- **28b.** A repair or supersession that raises a funded strategy's confidence
+  needs the verified human yes of 26f, like any other confidence change on a
+  capital stage (26c).
+- **28c. A wrong date is repairable.** A mistaken or future-dated demotion date
+  must not ban a strategy and its descendants permanently. A correction of the
+  date, approved by a human, is allowed.
+- **28d.** A Retired strategy may be re-registered and climb again, carrying
+  its lineage (27e) and every bar that follows it. The ADRs say so.
+- **28e. How it is finished.**
+  1. One final text round fixes the two blocking findings and applies 28a-28d,
+     with no redesign.
+  2. The current-stage read is then built as code. Every attack from the
+     falsification passes on Issue #21 becomes a test that must fail, and the
+     ADRs describe what the code does.
+  3. The second contributor's different-AI pass on Issue #21 runs in parallel,
+     on the current text.
+
+### What it does not settle
+
+It does not ratify either ADR. The code in 28e is capital-path code: it lands
+through review like any other, and it opens no capital rung. Every rung stays
+closed by its unruled constants.
