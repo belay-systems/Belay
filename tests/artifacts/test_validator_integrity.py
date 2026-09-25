@@ -106,3 +106,33 @@ def test_a_signed_report_claiming_a_capital_stage_fails_validation():
 
     with pytest.raises(ValueError, match="Only STRATEGY artifacts carry a strategy_stage"):
         ArtifactValidator().validate(artifact)
+
+
+# ------------------------------- F-032: ADR-010 rule 9's (type, deliverable) pair
+#
+# `reports/review/2026-09-25-review.md` (F-032). The third guard of the same
+# shape, in a different file: disabling `framework/artifacts/validator.py`'s pair
+# check left the suite green at 704 passing, and an artifact typed `Regime`
+# carrying a `Universe Report` deliverable validated `True`. The comment above
+# that guard states why it exists — `type` "is what a promotion gate reads
+# first". Owner ruling: `docs/OwnerDecisions.md` Part 21b.
+
+
+def test_a_deliverable_contradicting_its_artifact_type_fails_validation():
+    """A `Universe Report` is a `REPORT`. Declared as a `REGIME`, it must not stand.
+
+    Built through the factory, so the identifier, the signature and the evidence
+    grade are all valid and the pair check is the only thing left that can refuse
+    it.
+    """
+    from framework.artifacts.enums import DeliverableType
+
+    artifact = ArtifactFactory().create(
+        identifier="REGIME-0001",
+        title="A universe report declared as a regime",
+        artifact_type=ArtifactType.REGIME,
+        deliverable=DeliverableType.UNIVERSE_REPORT,
+    )
+
+    with pytest.raises(ValueError, match="ADR-010 rule 9"):
+        ArtifactValidator().validate(artifact)

@@ -17,7 +17,7 @@ from datetime import date, datetime, timezone
 
 import pytest
 
-from framework.artifacts.enums import ArtifactType, DeliverableType
+from framework.artifacts.enums import ArtifactType, DeliverableType, EvidenceLevel
 from framework.artifacts.integrity import ArtifactIntegrity
 from framework.artifacts.validator import ArtifactValidator
 from framework.metrics.distributions import t_critical_value
@@ -359,3 +359,27 @@ def test_two_reviews_at_different_thresholds_do_not_share_a_hash():
     strict = _artifact(alpha=0.01)
 
     assert loose.integrity_hash != strict.integrity_hash
+
+
+def test_the_significance_artifact_is_graded_research_not_historical():
+    """F-033 / Part 35a: Level C needs provenance, and this path cannot have it.
+
+    `significance_artifact` takes `data_source` as a bare string and builds its own
+    `Disclosure`, so nothing about it can come from a stored fetch. It therefore
+    answers Level D — which is correct, and is **F-003 made visible in the grade**
+    rather than a new defect.
+
+    **This test exists because nothing asserted it.** ADR-017's draft stated the
+    Level D consequence as fact while
+    `grep -n "EvidenceLevel\\|\\.level" tests/metrics/test_significance.py` returned
+    nothing — a claim in a governing document resting on no test, which is F-019's
+    and F-032's shape. Found by the third independent pass on that work.
+
+    It goes red the day this path learns real provenance, which is the right moment
+    to revisit both this test and ADR-017's consequence list.
+    """
+    artifact = _artifact()
+
+    assert artifact.evidence_level is EvidenceLevel.RESEARCH
+    assert [record.level for record in artifact.evidence] == [EvidenceLevel.RESEARCH]
+    assert ArtifactValidator().validate(artifact) is True

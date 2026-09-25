@@ -20,6 +20,13 @@ one to trust.
   written up there.
 - **Priority** is P1, P2 or P3. **Watched** says whether a strict `xfail` test
   will go red when the finding is fixed.
+- **A finding of the form "guards asserted by nothing" closes against a guard
+  list re-derived from the code, never against the list the report happened to
+  print.** F-019 was closed with one test per guard for the seven guards F-019
+  enumerated, and the enumeration was treated as the scope; three more guards of
+  the same shape on the same path were still asserted by nothing the next day
+  (F-032), one of them the mirror of a guard the same pull request fixed. Re-walk
+  the code and mutate each guard you find.
 
 ## Open
 
@@ -65,6 +72,11 @@ one to trust.
 | CI States The Dashboard Job Fails When The Regexes Stop Matching; It Does Not (F-028) | P3 | no | archive |
 | ADR-002 Places `departments/` In A Layer That Remains Prose; It Holds Python, And `pyproject.toml` Ships It (F-029) | P3 | no | archive |
 | `test_no_session_brief_is_orphaned` Counts `docs/proposals/` As Its Own Pointer Set (F-030) | P3 | no | archive |
+| Three More Guards On The Capital Path Are Asserted By Nothing, And One Signs A Demotion That Climbs (F-032) | P2 | no | `reports/review/2026-09-25-review.md` |
+| Every Metric Artifact Is Graded Level C Whatever Produced It (F-033) | P2 | no | `reports/review/2026-09-25-review.md` |
+| ROADMAP Stage 2 States Three Things The Repository Contradicts (F-034) | P3 | no | `reports/review/2026-09-25-review.md` |
+| The Review Gate's Next Finding Number Was Consumed By Prose (F-035) | P3 | no | `reports/review/2026-09-25-review.md` |
+| Three Declared Runtime Dependencies Are Imported Nowhere (F-036) | P3 | no | `reports/review/2026-09-25-review.md` |
 
 ## Closed
 

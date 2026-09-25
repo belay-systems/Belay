@@ -177,14 +177,19 @@ def test_the_identifier_prefix_is_one_that_exists():
         _artifact(identifier="PORTFOLIO-0001")
 
 
-def test_the_evidence_is_graded_historical():
-    """Level C, `constitution/Evidence_Standards.md`: historical simulation. The
-    number is computed from observed values, which is stronger than a hypothesis
-    and weaker than a paper or live result."""
+def test_a_hand_built_disclosure_is_graded_research():
+    """F-033, owner ruling Part 35. **This test asserted Level C until 2026-09-25.**
+
+    Its fixture's own `data_source` reads "unit test fixture, supplied by hand", so
+    the test encoded the defect: a number computed over a series nobody fetched was
+    graded "historical simulation". The grade now comes from the disclosure's
+    provenance, and a hand-built `Disclosure` answers Level D — hypothesis,
+    research only — which is what this fixture actually is.
+    """
     evidence = _artifact().evidence
 
     assert len(evidence) == 1
-    assert evidence[0].level is EvidenceLevel.HISTORICAL
+    assert evidence[0].level is EvidenceLevel.RESEARCH
     assert evidence[0].verify() is True
 
 

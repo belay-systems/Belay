@@ -3471,3 +3471,166 @@ owner was asked to confirm or correct them.
 Items 2-7 of those notes are not rulings. They are gaps and readings for the
 final text round on ADR-015 and ADR-016 (Part 28e, step 1). The open ones are
 25g against 26e and 27f, 25h and 26b against 18e, and 28e against 18g.
+
+---
+
+# Part 35 — Ruled 2026-09-25: grade from provenance (F-033); drop three unused dependencies (F-036)
+
+**Numbered 35, not 32.** Parts 32, 33 and 34 are used by #33, which is open and
+unmerged. Taking 32 here would collide on merge. There is no gate for Part
+numbers as there is for finding numbers (`scripts/review_due.py`), which is the
+same shape F-035 describes.
+
+**Questions put.** Two, one at a time, in `docs/OperatorChecklist.md`, each with
+a recommendation and its cost. Both came from `reports/review/2026-09-25-review.md`
+and both survived an independent falsification pass.
+
+1. **F-033 — what should Level C mean?** Should a computed number be graded
+   Level C only when its input series came from a recorded fetch, and Level D
+   otherwise? *Recommended: yes.*
+2. **F-036 — three unused dependencies.** Should `pandas`, `jinja2` and
+   `python-dateutil` be removed from `pyproject.toml`? *Recommended: yes, remove
+   all three*, and do **not** declare `numpy` in their place.
+
+**Owner said: "Aligned to recommendations".**
+
+### What it settles
+
+- **35a. A computed number is Level C only when its series came from a recorded
+  fetch. Otherwise it is Level D.** The grade comes from the disclosure's
+  provenance, not from the emitting function. Drafted as ADR-017
+  (`docs/proposals/ADR-017-grade-from-provenance-DRAFT.md`), **which this ruling
+  does not ratify** — only the owner ratifies an ADR.
+- **35b. The cost is accepted, and it was stated in the question.** Every metric
+  artifact Belay emits becomes Level D until the fetch path is wired through,
+  because `disclosure_from` has no non-test caller (open finding F-003). Under
+  ADR-016's draft evidence floor that would block promotion above
+  `Paper Trading`.
+- **35c. `pandas`, `jinja2` and `python-dateutil` are removed from
+  `pyproject.toml`.** None was imported by any file under `framework/`,
+  `scripts/`, `tests/` or `departments/`.
+- **35d. `numpy` is not declared in their place.** The alternative was offered
+  and not taken: it is imported nowhere, and declaring a dependency Belay does
+  not use yet is the wrong direction. If numerical work later wants it, declare
+  it then.
+
+### Session readings, not the owner's words
+
+- The **mechanism** for 35a. The recommendation the owner answered described
+  "`Disclosure` gains a constructor split". Building it revealed that
+  `tests/test_governance_conformance.py` asserts set equality between
+  `dataclasses.fields(Disclosure)` and the four things `Validation/Backtesting.md`
+  requires — a document frozen by ADR-002 — so a fifth field on `Disclosure`
+  would turn the constitution's own validation conformance red. The provenance is
+  therefore carried by a subclass and read through a property, which changes no
+  signed `content`. **The substance ruled is unaffected; the mechanism was not
+  what the owner was shown**, and that is this session's reading rather than a
+  ruling. ADR-017 records it in full.
+- **The implementation does not deliver 35a, and 35a is the ruling rather than
+  the error.** Added 2026-09-25 after the independent pass on the change. The code
+  enforces "the disclosure came through `disclosure_from`", not "the series came
+  from a recorded fetch": that function takes a `DailyBarSeries` any caller can
+  build by hand, so eight invented bars passed with a real `MarketDataSource`
+  yield a Level C artifact carrying that vendor's name. Nothing in 35a is
+  withdrawn or softened by this note — **the ruling stands and the code is short
+  of it.** Closing the gap decides what a metric artifact must carry and touches
+  ADR-014, so it is put to the owner rather than chosen here
+  (`docs/OperatorChecklist.md`, 2026-09-25, "Level C does not yet mean what
+  Part 35a rules"). ADR-017 must not be ratified until that is answered.
+
+### What it does not settle
+
+- **Ratification of ADR-017.** That is a separate act and is owed.
+- **Any change to `constitution/Evidence_Standards.md`.** The four classes are
+  untouched. Level D reads "Hypothesis. Research only.", and arithmetic over
+  unsourced numbers is not strictly a hypothesis either; the owner was shown
+  this. Amending the constitution here is the owner's and was not asked.
+- **Binding the grade to a stored fetch record's `content_hash`**, so Level C
+  cannot be claimed without the bytes. Named in ADR-017 as the stronger form and
+  the follow-up; not ruled.
+- **F-032's priority.** Registered at P2 on the F-019 precedent. The owner was
+  shown that `docs/HANDOFF.md:2755-2757` leaves High unmapped while its only
+  High example is carried at P1. No recommendation was made and none was given,
+  so P2 stands unchanged rather than by ruling.
+
+---
+
+# Part 36 — Ruled 2026-09-25: Level C requires the stored fetch record
+
+**Question put.** `docs/OperatorChecklist.md`, "Level C does not yet mean what
+Part 35a rules". Part 35a ruled that a computed number is Level C only when its
+series came from a recorded fetch. The implementation enforced something weaker —
+that the disclosure came through `disclosure_from` — and that function took a
+series of price bars any caller can type by hand, so eight invented bars passed
+in with a real data source produced a Level C artifact carrying that vendor's
+name and licence. Found by an independent pass, not by the session that wrote it.
+The owner was asked:
+
+> Should Level C require the stored fetch record — the bytes on disk — rather
+> than just having gone through the fetch-shaped function?
+
+Recommended yes, with the cost stated: a second ADR rather than an edit, because
+it decides what a metric artifact must carry and touches ADR-014.
+
+**Owner said: "yes require the stored fetch record".**
+
+### What it settles
+
+- **36a. Level C requires the stored fetch record.** `disclosure_from` trusts
+  nothing the caller hands in but the record's identifier: it re-reads the record
+  from the repository, resolves the bytes from the store root and the record's own
+  signed `store_path`, and checks the series against the record.
+- **36b. What that guarantees, stated exactly.** *This record is on disk in the
+  repository where it says it is, these are the bytes it names, and this is the
+  series it describes.* It is **not** "these bytes came from the vendor". Nothing
+  available can prove that — see the note on the signature below.
+- **36c. Part 35a is delivered by this, and was never wrong.** The gap was between
+  the ruling and the code. The ruling stands as recorded.
+
+**Corrected 2026-09-25, before this was acted on, and the correction matters.**
+36a first read: *"A `Fetch` cannot be had without `fetch_and_record` having run."*
+**That was false**, and it sat here in "What it settles" where it read as part of
+the ruling. `Fetch` and `StoredSeries` are plain dataclasses and
+`ArtifactIntegrity.sign` is a **public classmethod over an unkeyed hash**, so a
+caller built a `Fetch` around a record it signed itself and obtained a Level C
+disclosure claiming a licensed vendor, a 25-year window and no survivorship bias —
+without `MarketDataSource` ever being instantiated, so the survivorship guard never
+ran. Found by the third independent pass. The ruling was right both times; the
+implementation was wrong twice, in the same direction.
+
+### Session readings, not the owner's words
+
+- **Refusal rather than a quiet Level D.** The question asked what Level C
+  requires, not what happens when it is not met. "No stored record, therefore
+  Level D" is an equally faithful reading. Refusal is the stricter choice and this
+  session's, not the owner's. Listed under "What it settles" until the third pass
+  pointed out it did not belong there.
+- **Reading the record back from the repository** as the way to anchor trust. The
+  owner ruled that the stored record is required, not how to establish that one is
+  stored.
+- **How a fetch record is told apart from any other report.** By the presence of
+  the provenance keys. **The justification first given for this was also wrong:**
+  it claimed a marker field would invalidate `artifacts/RPT-0001/1.0.0.yaml`.
+  Tested — it would not. That artifact's hash is over its own stored content, and
+  changing the emitting code cannot alter a file on disk. The real reason a marker
+  is no better is that it is exactly as forgeable; what does the work is the record
+  having come out of the repository at all.
+- **That ADR-017 carries this rather than a new ADR-018.** It is unratified and is
+  about exactly this question.
+
+### What it does not settle
+
+- **ADR-017's ratification.** Still owed, and still the owner's alone.
+- **Any change to `constitution/Evidence_Standards.md`.** Untouched.
+- **Authenticity.** The integrity hash is unkeyed, so no check here can prove a
+  record came from `fetch_record` rather than from a caller. What this raises is
+  the *cost*: a caller faking provenance must now write a permanent, discoverable
+  record into the repository instead of constructing an object in memory. Keyed
+  signing would change that and was put to the owner as a sizing question: it
+  collides with the determinism rule, needs an ADR-005 amendment, and — decisively
+  — would not stop an in-process caller, which is the adversary here.
+- **Remaining narrower routes:** constructing a `FetchedDisclosure` directly, or
+  subclassing `Disclosure` to override `evidence_level`. Neither is greppable by
+  the class name the earlier draft relied on.
+- **F-003.** Nothing calls `disclosure_from` in production yet, so every metric
+  artifact is still Level D. Unchanged by this ruling.

@@ -1164,3 +1164,131 @@ def test_every_document_carries_the_metadata_block():
         + "; ".join(nonconformant[:3])
         + (" ..." if len(nonconformant) > 3 else "")
     )
+
+
+# --------------------------------------------------- F-034: a complete stage's ADR claims
+#
+# `reports/review/2026-09-25-review.md` (F-034), proposing the durable fix that
+# `reports/review/2026-08-21-review.md` had already proposed a month earlier and
+# that was never built: "a conformance test that fails when a `Stage N — …
+# (complete)` heading disagrees with the ADR status it cites".
+#
+# The defect it is written against: `docs/ROADMAP.md`'s Stage 2 section said
+# "**ADR-014 was accepted 2026-08-02 and is implemented in no part**" while
+# `docs/DECISIONS.md`'s ADR-014 Status block read "Accepted and implemented,
+# 2026-08-02, in all nine rules." The two sat 35 days apart in the repository,
+# and `AGENTS.md` sends every session to read the roadmap.
+
+#: Phrases by which the roadmap asserts that an ADR is NOT implemented. Matched
+#: within one sentence of the ADR reference, not document-wide, so a stage may
+#: still discuss unimplemented work generally.
+#:
+#: Widened after the independent pass on this test showed two ordinary rewordings
+#: slipping past the first version — "has not been implemented in any rule" and a
+#: claim split across a full stop. The verb forms are enumerated rather than
+#: matched loosely because "implemented" alone appears in every Status block.
+_NOT_IMPLEMENTED = re.compile(
+    r"implemented in no part|implemented in none|implemented nowhere"
+    r"|not implemented in any (?:part|rule)"
+    r"|(?:is|was|has been|had been|remains)\s+(?:not|never)\s+(?:yet\s+)?implemented"
+    r"|(?:is|was|has|had)\s+(?:not|never)\s+been\s+implemented"
+    r"|(?:has|have|had)\s+not\s+been\s+implemented"
+    # `\b` excludes a match inside an identifier: `_adr_unimplemented` is the name
+    # of this very test, and `docs/ROADMAP.md` names it in prose.
+    r"|\bunimplemented\b",
+)
+
+#: A Status block that says the ADR is NOT implemented. `"not implemented" not in
+#: status` alone was wrong: ADR-006 reads "Not yet implemented", which contains
+#: `implemented` and not the contiguous string `not implemented`, so the ADR was
+#: classified as implemented and a *truthful* sentence about it was reported as a
+#: contradiction. Found by the independent pass on this test.
+_STATUS_SAYS_UNIMPLEMENTED = re.compile(
+    r"(?:not|never)\s+(?:yet\s+)?(?:been\s+)?implemented"
+    r"|implemented in no part|unimplemented|unimplementable",
+)
+
+_STAGE_HEADING = re.compile(r"^## Stage \d+ .*$", re.MULTILINE)
+_ADR_REFERENCE = re.compile(r"ADR-(\d{3})")
+
+
+def _complete_stage_sections() -> list[tuple[str, str]]:
+    """Return (heading, body) for each `## Stage N — … (complete)` section."""
+    text = (REPO / "docs" / "ROADMAP.md").read_text(encoding="utf-8")
+    headings = list(_STAGE_HEADING.finditer(text))
+    sections = []
+    for index, match in enumerate(headings):
+        end = headings[index + 1].start() if index + 1 < len(headings) else len(text)
+        heading = match.group(0)
+        if "(complete)" in heading.lower():
+            sections.append((heading.strip(), text[match.end() : end]))
+    return sections
+
+
+def _adr_status_blocks() -> dict[str, str]:
+    """Return {ADR number: its Status block text} from `docs/DECISIONS.md`."""
+    text = (REPO / "docs" / "DECISIONS.md").read_text(encoding="utf-8")
+    headings = list(re.finditer(r"^## ADR-(\d{3}).*$", text, re.MULTILINE))
+    blocks = {}
+    for index, match in enumerate(headings):
+        end = headings[index + 1].start() if index + 1 < len(headings) else len(text)
+        body = text[match.end() : end]
+        if status := re.search(r"^Status:\s*\n(.*?)(?:\n\n|\Z)", body, re.DOTALL | re.MULTILINE):
+            blocks[match.group(1)] = status.group(1).lower()
+    return blocks
+
+
+def test_a_complete_stage_does_not_call_an_implemented_adr_unimplemented():
+    """A `(complete)` stage may not contradict the ADR status it cites.
+
+    Sentence-scoped, with a one-sentence look-back: a complete stage is entitled to
+    say that some *other* work is unimplemented. What it may not do is name an ADR
+    and deny an implementation `docs/DECISIONS.md` records — in that sentence, or in
+    the next one via a pronoun ("Stage 2 rests on ADR-014. It is implemented in no
+    part."), which the first version of this test let through.
+
+    Paragraph scope was considered and rejected: one paragraph may legitimately name
+    an implemented ADR and an unimplemented one, and scoping that wide would report
+    the true sentence as a contradiction.
+
+    **Two known limits, both found by the independent pass on this test, both left
+    standing deliberately.**
+
+    1. *It cannot tell a quotation from a claim.* A correction note that quotes the
+       wording it corrects will fail this test. The convention is to describe the
+       old wording instead — the same move `scripts/review_due.py` asks for with the
+       bracketed `F-[NNN]` form.
+    2. *It matches a phrasing family, not a meaning.* `_NOT_IMPLEMENTED` enumerates
+       verb forms; a sufficiently novel phrasing ("remains unbuilt", "ADR-014 waits
+       on nothing but hands") will not match. This is a conformance check against
+       the shapes the repository has actually written, not a semantic one. If a new
+       phrasing slips through, add it there rather than assuming the test covers it.
+    """
+    statuses = _adr_status_blocks()
+    assert statuses, "no ADR Status blocks parsed out of docs/DECISIONS.md"
+
+    contradictions = []
+    for heading, body in _complete_stage_sections():
+        previous: list[str] = []
+        for sentence in re.split(r"(?<=[.!?])\s+", body):
+            flat = " ".join(sentence.split())
+            named = _ADR_REFERENCE.findall(flat)
+            if _NOT_IMPLEMENTED.search(flat.lower()):
+                # A sentence with no ADR of its own is attributed to the IMMEDIATELY
+                # preceding sentence's ADRs, which is the pronoun case. One sentence
+                # only: carrying further reaches across unrelated prose.
+                for number in named or previous:
+                    status = statuses.get(number, "")
+                    if "implemented" in status and not _STATUS_SAYS_UNIMPLEMENTED.search(
+                        status
+                    ):
+                        contradictions.append(
+                            f"{heading}: says ADR-{number} is unimplemented "
+                            f"({flat[:110]!r}), but its Status block reads "
+                            f"{status.strip()[:110]!r}"
+                        )
+            previous = named
+
+    assert not contradictions, "docs/ROADMAP.md contradicts an ADR status:\n" + "\n".join(
+        contradictions
+    )

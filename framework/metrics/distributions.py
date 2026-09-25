@@ -8,11 +8,14 @@ prohibits black-box reasoning, and "the library said so" is the answer it
 forbids. Thirty-five lines a reviewer can check against a printed t-table are
 explainable in the sense Law II means.
 
-`numpy` is not used either. It is present today only as a transitive dependency
-of `pandas` and appears nowhere in `pyproject.toml`, and building on a package
-nobody declared is the 2026-07-26 defect from the other side — there `pyyaml`
-was declared but not installed, and `ArtifactRepository.save()` had never once
-executed while the suite reported 46 passing.
+`numpy` is not used either, and **since 2026-09-25 it is not installed at all.**
+It used to arrive as a transitive dependency of `pandas` while appearing nowhere
+in `pyproject.toml`; the owner ruled `pandas` removed and `numpy` not declared in
+its place (F-036, `docs/OwnerDecisions.md` Part 35c and 35d). Building on a
+package nobody declared is the 2026-07-26 defect from the other side — there
+`pyyaml` was declared but not installed, and `ArtifactRepository.save()` had
+never once executed while the suite reported 46 passing. Either direction is the
+same error, so if numerical work later wants `numpy`, declare it first.
 
 **This module is a leaf. It imports nothing from Belay**, the same shape as
 `framework/artifacts/primitives.py` and for the same reason: it is arithmetic

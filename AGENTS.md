@@ -90,6 +90,15 @@ by hand. They are plain instructions.
    has measured that an author's own pass finds almost nothing and a fresh one
    finds several defect-grade errors every time. Run it before the change lands,
    not after.
+   - **Its findings belong on the pull request, not in the helper's own record.**
+     Whatever tool you spawn it with, its private summary is not the deliverable
+     and has been wrong: one pass here summarised itself as "no defects found"
+     having reported twelve, two of them blocking.
+   - **Close a helper out the moment it reports, and say so.** The owner asked for
+     this on 2026-09-25: a finished helper that still shows as live is
+     indistinguishable from one still working. If one pass leads to another —
+     fixing findings creates code nothing has reviewed — say that before starting
+     it rather than after, and keep a visible list of what is running.
 5. Two agents agreeing is not validation. Cross-review catches mistakes. It
    replaces none of the evidence gates in `constitution/`.
 
@@ -447,6 +456,15 @@ current state and the history, and the history buried the state.
   F-number, or a Part or ADR number. Never cite `docs/NOW.md` or
   `docs/FINDINGS.md` by line number, because both are rewritten. The line
   citations into the frozen archive stay valid, because it never changes.
+- **Never write the review gate's *next* finding number in prose. Write "the
+  number after F-NNN".** `scripts/review_due.py` issues one more than the highest
+  `F-NNN` it finds in any `.md` under `reports/` or `docs/` on any `origin` ref,
+  so a document that names the next number consumes it — permanently, on the push,
+  and the number then names no finding. This has happened twice: `e788cac` fixed
+  it in two files and wrote no rule, and F-035 is the same mistake a fortnight
+  later. Quoting a number from outside text is the one exception, and it uses the
+  bracketed form `F-[NNN]`, which `scripts/review_due.py` does not count.
+  `tests/test_handoff_files.py` holds this.
 - **The archive is corrected by a later record, never edited.** A session that
   finds something wrong in `docs/HANDOFF.md` writes the correction in its own
   `docs/sessions/` record and names the lines it corrects.

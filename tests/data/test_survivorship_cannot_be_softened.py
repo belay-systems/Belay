@@ -36,7 +36,12 @@ from pathlib import Path
 import pytest
 
 from framework.data.contract import DailyBar, DailyBarSeries, FetchedSeries, InstrumentClass, MarketDataSource
-from framework.data.fetch_record import disclosure_from, fetch_record
+from framework.artifacts.repository import ArtifactRepository
+from framework.data.fetch_record import (
+    disclosure_from,
+    fetch_and_record,
+    fetch_record,
+)
 from framework.data.store import SeriesStore
 from framework.data.survivorship import Retention, SurvivorshipDisclosure
 from framework.metrics.reporting import SamplePeriod
@@ -159,24 +164,52 @@ def test_a_second_source_with_a_kinder_answer_does_not_change_the_first():
     assert "inflates" not in dict(clean_record.content)["known_limitations"].lower()
 
 
-def test_the_metric_disclosure_carries_the_sources_answer():
+def _stored_fetch(tmp_path, source=None):
+    """A genuine `Fetch` — bytes on disk under a signed record over them.
+
+    Owner ruling Part 36 made a stored fetch the only route to a Level C
+    disclosure, so these tests need a real store rather than a hand-built series.
+    """
+    store = SeriesStore(root=tmp_path / "market")
+    repository = ArtifactRepository(tmp_path / "artifacts")
+    fetch = fetch_and_record(
+        identifier="RPT-0600",
+        source=source or SOURCE,
+        symbol="AAPL",
+        requested=REQUESTED,
+        store=store,
+        repository=repository,
+    )
+    return fetch, store, repository
+
+
+def test_the_metric_disclosure_carries_the_sources_answer(tmp_path):
     """`disclosure_from` is what puts survivorship onto every *metric*, which is
-    what a promotion gate actually reads."""
+    what a promotion gate actually reads.
+
+    Read off the **signed record** since Part 36, not off the source handed in, so
+    a caller cannot pair a real vendor's name with a series it never returned.
+    """
+    fetch, store, repository = _stored_fetch(tmp_path)
+
     disclosure = disclosure_from(
-        source=SOURCE, series=SERIES, assumptions="Daily closes."
+        fetch=fetch, assumptions="Daily closes.", store=store, repository=repository
     )
 
     assert disclosure.data_source == SOURCE.name
     assert "inflates" in disclosure.known_limitations.lower()
 
 
-def test_additional_limitations_are_appended_never_substituted():
+def test_additional_limitations_are_appended_never_substituted(tmp_path):
     """A caller may add what they know without removing what rule 5 requires."""
+    fetch, store, repository = _stored_fetch(tmp_path)
+
     disclosure = disclosure_from(
-        source=SOURCE,
-        series=SERIES,
+        fetch=fetch,
         assumptions="Daily closes.",
         additional_limitations="Covers one regime only.",
+        store=store,
+        repository=repository,
     )
 
     assert "Covers one regime only." in disclosure.known_limitations

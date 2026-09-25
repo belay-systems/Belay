@@ -91,10 +91,14 @@ def test_tampering_with_the_value_breaks_verification():
     assert ArtifactIntegrity.verify_hash(forged) is False
 
 
-def test_artifact_carries_historical_evidence():
+def test_artifact_over_a_hand_built_disclosure_is_graded_research():
+    """F-033, owner ruling Part 35: Level D unless the series came from a fetch.
+
+    Asserted `HISTORICAL` until 2026-09-25, on a disclosure built in this file.
+    """
     evidence = _artifact().evidence
     assert len(evidence) == 1
-    assert evidence[0].level is EvidenceLevel.HISTORICAL
+    assert evidence[0].level is EvidenceLevel.RESEARCH
     assert evidence[0].hash
 
 

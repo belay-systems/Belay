@@ -852,3 +852,248 @@ the end of `docs/OwnerDecisions.md`. The recommendations you answered
 
 The owner answered "aligned to recommendation" (`docs/OwnerDecisions.md` Part
 31). This closes the Open item "confirm the labeled lines in Parts 25-28".
+
+## Done — 2026-09-25: what should Level C mean? (F-033)
+
+**Answered. Owner said "Aligned to recommendations"** — recorded as
+`docs/OwnerDecisions.md` Part 35a and 35b. A computed number is Level C only when
+its series came from a recorded fetch; Level D otherwise. Drafted as ADR-017
+(`docs/proposals/ADR-017-grade-from-provenance-DRAFT.md`), **which is PROPOSED and
+still owes the owner's ratification.** One thing the answer changed and the
+question had not anticipated: the mechanism could not be built as described,
+because a fifth field on `Disclosure` breaks the constitution's own validation
+conformance. Part 35's "Session readings" records that. The question as put is
+below, unchanged.
+
+---
+
+### The question as it was put
+
+**Appended at the end rather than at the top, so no line citation into this file
+moves.** Raised by `reports/review/2026-09-25-review.md` (F-033) and confirmed by
+the independent pass on it.
+
+**What is wrong.** When Belay computes a number like a Sharpe ratio, it stamps the
+result "Level C — historical simulation". It stamps that on *every* such number,
+and nothing checks where the numbers came from. A session can type eight figures
+by hand, label the source "I made these up", and get back a signed, valid record
+graded Level C. Constructed and run on `main`:
+
+```
+validates:         True
+evidence_level:    EvidenceLevel.HISTORICAL   <- Level C
+data_source:       I made these up
+known_limitations: none
+```
+
+The grade is the one field a promotion gate is meant to trust without reading the
+rest of the record. Right now it only says "arithmetic happened", not "this came
+from real data".
+
+**The question, and it is yours because it decides what Level C means in Belay,
+and `constitution/Evidence_Standards.md` is frozen by ADR-002:**
+
+> Should a computed number be graded Level C only when its input series came from
+> a recorded fetch, and Level D otherwise?
+
+**Recommendation: yes.** Reasons:
+
+- It is the smallest change that makes the grade mean something a gate can rely
+  on. One value, threaded through one function — no new machinery.
+- It fails in the unflattering direction. Today an unsourced number is graded one
+  rung too high, which is the direction that buys capital it has not earned.
+- Belay already has the honest path built: `disclosure_from` derives the source
+  and the date window from the fetch itself. Nothing currently requires it, which
+  is open finding F-003.
+
+**The cost, stated plainly, because it is not small.** Nothing in Belay uses
+`disclosure_from` today. So on the day this lands, **every** metric artifact
+becomes Level D until the fetch path is wired through — and under ADR-016's draft
+evidence floor, that would block promotion above `Paper Trading` until it is. That
+is arguably correct (evidence before capital) but it is a real gate, not a
+formality, and you should choose it knowingly.
+
+**One wrinkle worth your eye.** `constitution/Evidence_Standards.md` defines Level
+D as "Hypothesis. Research only." A calculation over invented numbers is not
+really a hypothesis either — neither class fits it exactly. If you say yes, the
+wording may need to be "Level D is the floor for a computation whose inputs have
+no recorded provenance" rather than calling such a number a hypothesis. That
+phrasing is a follow-up, not part of this answer.
+
+**This is a ruling and probably an ADR, not an edit. It has not been
+implemented, and this recommendation is not a decision.**
+
+## Done — 2026-09-25: drop three unused dependencies? (F-036)
+
+**Answered. Owner said "Aligned to recommendations"** — recorded as
+`docs/OwnerDecisions.md` Part 35c and 35d. `pandas`, `jinja2` and
+`python-dateutil` are removed from `pyproject.toml`; `numpy` is **not** declared in
+their place, the alternative having been offered and not taken. Verified by a fresh
+virtual environment: the install pulls none of the four, the suite passes, and
+`python scripts/status.py` exits 0. The question as put is below, unchanged.
+
+---
+
+### The question as it was put
+
+Raised by `reports/review/2026-09-25-review.md` (F-036) and confirmed by the
+independent pass. `AGENTS.md`, "Decisions that are the owner's alone", makes any
+change to `pyproject.toml`'s dependencies yours.
+
+**What is wrong.** Belay declares seven pieces of third-party software it needs.
+Three of them are used by no file in the repository:
+
+```
+$ grep -rn "import pandas\|from pandas"   --include='*.py' framework/ scripts/ tests/ departments/
+$ grep -rn "import jinja2\|from jinja2"   --include='*.py' framework/ scripts/ tests/ departments/
+$ grep -rn "import dateutil\|from dateutil" --include='*.py' framework/ scripts/ tests/ departments/
+(no output from any of the three)
+```
+
+The other four are all really used: `pyyaml`, `networkx`, `rich`, `typer`.
+
+**The question:**
+
+> Should `pandas`, `jinja2` and `python-dateutil` be removed from
+> `pyproject.toml`?
+
+**Recommendation: yes, remove all three.** Reasons:
+
+- Nothing imports them, so nothing breaks today. Verified: `numpy` — the package
+  that arrives *with* `pandas` — is imported nowhere either.
+- They are not free. Installing Belay currently downloads `pandas` and `numpy`,
+  which are large, for no benefit.
+- Leaving them invites a real bug. `pandas` quietly installs `numpy`, so a future
+  session sees `numpy` available and uses it — and Belay has already ruled against
+  exactly that, on the reasoning that a package nobody declared is not a
+  dependency (`docs/HANDOFF.md:1157-1159`; the same reasoning is in the code, at
+  `framework/metrics/distributions.py:11-15`). If `pandas` were later removed,
+  that code would break with no declared cause.
+
+**If you would rather keep the option open:** the alternative is to declare
+`numpy` explicitly and drop only `jinja2` and `python-dateutil`. That is worse in
+my view — it adds a dependency Belay does not use yet — but it is a coherent
+choice if you expect numerical work soon.
+
+**No code changes either way. Nothing has been implemented, and this
+recommendation is not a decision.**
+
+## Done — 2026-09-25: Level C does not yet mean what Part 35a rules (F-033 follow-up)
+
+**Answered. Owner said "yes require the stored fetch record"** — recorded as
+`docs/OwnerDecisions.md` **Part 36**. `disclosure_from` now takes a `Fetch` and
+refuses unless the record validates, carries every provenance key, and names bytes
+that are on disk and hash to what it is signed over. The old route — a real source
+plus hand-typed bars — no longer exists: the function takes neither argument.
+
+Each of the five guards was mutated one at a time and each turns the suite red on
+exactly its own test. One of those tests exists only because the mutation showed it
+was missing: the record-validation guard first survived its own removal, a guard
+asserted by nothing in the session whose subject was that.
+
+**Still owed and still yours: ADR-017's ratification.** Its Decision is now the
+ruled form, and it has had no independent pass. The question as put is below,
+unchanged.
+
+---
+
+### The question as it was put
+
+**This is the one thing from today's work that needs you, and it exists because the
+implementation of your ruling falls short of the ruling.** Found by the independent
+pass on the change, not by the session that wrote it.
+
+**What you ruled** (Part 35a): a computed number is Level C only when its series came
+from **a recorded fetch**.
+
+**What the code enforces:** Level C only when the disclosure came through the function
+`disclosure_from`. Those are not the same thing, because that function accepts a series
+of price bars that anyone can type by hand. Eight invented bars, passed in with the real
+data source, produce this:
+
+```
+evidence_level:   EvidenceLevel.HISTORICAL   <- Level C
+data_source:      DoltHub post-no-preference/stocks (CC BY-SA 4.0)
+validates:        True
+```
+
+**Why that is worse than the original problem, not merely equal to it.** The finding
+that started this (F-033) produced an artifact whose source field read "I made these
+up" — it disclosed its own worthlessness. This one carries a real vendor's name and
+licence. The grade and the source agree, and both are wrong, so nothing on the artifact
+looks odd.
+
+Nothing is decided on such an artifact today: no strategy and no capital exist, and no
+metric artifact is stored anywhere in the repository. The cost arrives at Stage 3.
+
+**The question:**
+
+> Should Level C require the stored fetch record — the bytes on disk — rather than
+> just having gone through the fetch-shaped function?
+
+**Recommendation: yes.** Reasons:
+
+- It is what you already ruled. Part 35a says "recorded fetch"; this would make the code
+  say it too, rather than the documents being softened to match weaker code.
+- The grade is the one field a promotion gate is meant to trust without reading the rest.
+  A grade that can be earned by typing numbers is the defect we just spent a day on,
+  reappearing one door along.
+- It is checkable. A fetch record already carries a hash of the bytes it fetched, so
+  "prove the bytes exist" is a comparison, not a new mechanism.
+
+**The cost, stated plainly.** This is larger than the change you already approved. It
+decides what a metric artifact must carry, and it touches ADR-014, which rules how
+records are stored — so it is a second ADR rather than an edit. Until it is done, Level C
+means "fetch-shaped", and that is now written into the code comment, ADR-017's draft and
+the session record so no one reads it as more.
+
+**If you would rather not:** the alternative is to accept the weaker guarantee and say
+so — which means amending Part 35a's wording, since the code cannot be made to match it.
+I recommend against that: it would move a ruling to fit an implementation.
+
+**Nothing has been implemented either way, and ADR-017 must not be ratified until this
+is answered** — as written it would certify the weaker behaviour as delivering your
+ruling.
+
+## Open — 2026-09-25: ratify or reject ADR-017 (grade from provenance)
+
+`docs/proposals/ADR-017-grade-from-provenance-DRAFT.md`. **PROPOSED. Only you
+ratify an ADR.** It writes down what you already ruled twice — Part 35a and
+Part 36 — so the substance is not in question; what is owed is your ratification
+of the document, and one thing before it.
+
+**What it now says, in plain terms.** A computed number is graded "Level C —
+historical simulation" only when the price series behind it came from a fetch whose
+record is on disk in the repository. Anything else is Level D, "research only".
+
+**What is owed first, and it is the reason to wait.** Three independent passes ran
+on this work and **each one broke the implementation it was given** — the second and
+third found that the code did not deliver your ruling, both times erring toward the
+flattering reading. The current version (attempt three) has had **no pass at all**.
+The absence of one is not evidence that it is sound. Ask for a fourth before
+ratifying; it costs a session and has paid for itself three times.
+
+**One thing to know before you ratify, because it bounds what the ADR can promise.**
+Belay's artifact signature is an unkeyed hash and the signing function is public, so
+nothing in the code can prove a record was written by the fetch machinery rather than
+by a caller. The guarantee is therefore *"this record is on disk in the repository
+where it says it is, these are its bytes, this is its series"* — **not** "these bytes
+came from the data vendor". That limit is written into the ADR rather than papered
+over. Closing it needs keyed signing, which was sized for you: it collides with
+Belay's determinism rule, needs an ADR-005 amendment, touches 26 test files, and
+would not stop the thing that actually went wrong here. Recommended against for this
+purpose, worth revisiting for a different one.
+
+## Open — 2026-09-25: F-032's priority, P2 or P1
+
+Registered at **P2** on precedent: F-019 was the same finding family, the same
+breach, also graded High, and was carried at P2.
+
+The counter-argument, put here because you should see both: `docs/HANDOFF.md:2755-2757`
+maps Critical→P1 and Medium→P3 and leaves High unmapped, and the one High example it
+names (F-002) is carried at **P1**. F-032 is the finding where removing one line lets
+a signed record read `Demote: Micro Capital → Limited Capital` — a demotion that
+doubles the capital stage.
+
+**No recommendation was made and none was asked for. P2 stands unless you rule.**
+Nothing is blocked either way; this is a queue-ordering question.

@@ -7,75 +7,96 @@ said before lives in `docs/sessions/` and in git history
 (`docs/OwnerDecisions.md` Part 29).
 
 - **History** is in `docs/sessions/`, one file per session, and in
-  `docs/HANDOFF.md`, the archive, which is frozen as of 2026-09-25.
+  `docs/HANDOFF.md`, the archive, frozen as of 2026-09-25.
 - **Open findings** are in `docs/FINDINGS.md`.
-- **Trust commands over prose**, including this file. Re-derive the state
-  below before acting on it.
+- **Trust commands over prose**, including this file. Re-derive the state below
+  before acting on it.
 
 ## Where things stand
 
-Written 2026-09-25, for `main` as it stands once #14, #24, #31 and #32 have
-merged, in that order. #32 is the last of them.
+Written at the close of 2026-09-25. `main` is `95e5a4a`. Everything below is on
+**PR #36** (`claude/brave-pascal-e7401x`, Issue #35), which is green and mergeable
+and **not merged**.
 
-- **Suite:** 704 passed, 1 skipped, 5 xfailed (`python -m pytest -q`). That was
-  the result of the merge rehearsal on a scratch copy of `main`.
-- **`python scripts/status.py`:** exits 0, 40 open findings. F-019 closed with
-  #24.
-- **ADRs on `main`:** 14 (`grep -c "^## ADR-" docs/DECISIONS.md`).
-  ADR-015 (#7) and ADR-016 (#20) are drafts on branches, neither ratified.
-- **Owner rulings on `main`:** Parts 1-19, 21 and 23-31. Part 20 (#22) is not
-  adopted (Part 30), and #22 is closed. Part 22 is on #20.
-- **Review gate:** `python scripts/review_due.py` gives the next finding
-  number. The highest number in use anywhere is F-030.
-- **Contributors help and never gate** (Part 30). Work lands on the owner's
-  word, through the Owner bypass.
+- **Suite:** 720 passed, 1 skipped, 5 xfailed on #36. `main` is 704.
+- **`python scripts/status.py`:** exit 0, 45 open findings.
+- **The 2026-09-25 review merged** (#34), raising **F-032 to F-036**. All five were
+  independently attacked and all five survived; they are registered in
+  `docs/FINDINGS.md` under Open. **None is marked closed** — closure waits on a pass
+  and a merge, the precedent `bdeffe8` set for F-019.
+- **Owner rulings on `main`:** Parts 1-19, 21, 23-31. **Parts 35 and 36 are on #36**;
+  Parts 32-34 are on #33. Part 20 is not adopted.
+- **ADRs:** 14 on `main`. ADR-015 (#7), ADR-016 (#20) and **ADR-017 (#36)** are
+  drafts, none ratified.
+- **Review gate:** `python scripts/review_due.py` gives the next finding number and
+  is the only authority on it. `SKIP` until 2026-10-07.
+- **Contributors help and never gate** (Part 30).
 
-Re-derive with: `git fetch origin`, `git log --oneline -10 origin/main`, the
-open pull requests and Issues on GitHub, `python -m pytest -q`,
-`python scripts/status.py`, `python scripts/review_due.py`.
+Re-derive with: `git fetch origin`, `git log --oneline -10 origin/main`, the open
+pull requests and Issues, `python -m pytest -q`, `python scripts/status.py`,
+`python scripts/review_due.py`.
+
+## What #36 contains, and the one thing to understand about it
+
+Fixes for F-032, F-034 and F-035; the owner's Parts 35 and 36; and ADR-017's draft.
+F-033 and F-036 were owner rulings and are implemented. F-036 removed `pandas`,
+`jinja2` and `python-dateutil`.
+
+**The part worth reading before touching any of it.** F-033 — "every metric artifact
+is graded Level C whatever produced it" — took **three implementations**. The first
+two were each broken by an independent pass, and both times the code did not deliver
+the ruling while the documents claimed it did:
+
+| attempt | enforced | broken by |
+|---|---|---|
+| 1 | came through `disclosure_from` | `DailyBarSeries` is caller-buildable — typed bars + a real source gave Level C with that vendor's name |
+| 2 | the caller's record validates | `Fetch` is caller-buildable and `ArtifactIntegrity.sign` is **public over an unkeyed hash** — a caller signed its own record and got Level C claiming a licensed vendor and no survivorship bias |
+| 3 | the record is **in the repository** | standing, and **unreviewed** |
+
+**The ceiling, which is permanent without keyed signing:** nothing in the code can
+prove a record came from `fetch_record` rather than from a caller. The guarantee is
+"this record is on disk where it says it is, these are its bytes, this is its series"
+— not "it came from the vendor". Written into ADR-017 rather than papered over. Do
+not write "signed" as though it meant authenticity; that error ran through two
+implementations and four documents here.
 
 ## In flight
 
 | PR | What | State |
 |---|---|---|
-| #7 | ADR-015: a strategy's stage is carried, not asserted (F-007, F-014) | The final text round: item 1 below |
-| #20 | ADR-016 draft, Part 22, the ADR-012 amendment draft (`docs/proposals/ADR-016-evidence-bar-DRAFT.md`) | Moves with ADR-015 |
-
-Both merge cleanly onto this `main` and pass (704), except that each one
-appends to the end of `docs/OwnerDecisions.md` or `docs/OperatorChecklist.md`.
-There, keep `main`'s text first and add the branch's text after it.
+| #36 | This branch: F-032/F-034/F-035 fixed, Parts 35-36, ADR-017 draft | Green, mergeable. **Owner: ratify ADR-017; a fourth pass is owed first** |
+| #33 | Parts 32-34 and a session close | Open. **Will go red against #36's finding-number test** — it names the burned F-031 in four places under `docs/`; the fix is to write "the number after F-030", or the bracketed form when quoting |
+| #7 | ADR-015: a strategy's stage is carried, not asserted | The final text round |
+| #20 | ADR-016 draft, Part 22, the ADR-012 amendment draft | Moves with ADR-015 |
 
 ## Highest Priority Next Task
 
-1. **Finish the evidence bar the way Part 28e rules.**
-   - **Step 1, the final text round on #7 and #20, with no redesign:**
-     - fix the fourth pass's two blocking findings (F4-3 and F4-1, Issue #21,
-       2026-09-25 01:28 UTC);
-     - apply 28a-28d, which Part 31 confirms as recorded;
-     - settle the three open readings in the notes after Part 28: 25g against
-       26e and 27f, 25h and 26b against 18e, and 28e against 18g. Put each to
-       the owner as one question with a recommendation.
-   - **Step 2, build the current-stage read as code.** Every attack from the
-     passes on Issue #21 becomes a test that passes only when the attack is
-     refused. The plan is **waiting on the owner's "go"**:
-     - the tests are written by a separate model from the review findings,
-       not from the code;
-     - a fresh review then attacks the code;
-     - the ADR text is updated to match what the code does;
-     - it goes on its own branch, for example `claude/stage-read`, as a draft
-       pull request, and is not merged until the owner ratifies the ADRs;
-     - not in this first slice: the save-side checks, and ADR-016's evidence
-       checks (report binding, the trial cap).
-   - **The independent pass** on each step is a fresh session told to
-     falsify (Part 30). A different AI is welcome, never waited on.
-2. **Small, when convenient:**
-   - the gate items #29 left: `fullmatch` on report names, surviving an
-     invalid date, and ASCII digits in `REPORT` (`scripts/review_due.py`);
-   - a sentence in the review skill (owner-only) saying to write every finding
-     number in full ASCII (`F-NNN`), because the gate cannot read other shapes;
-   - phase 2 of the file split, for `docs/DECISIONS.md`,
-     `docs/OwnerDecisions.md`, `docs/OperatorChecklist.md` and `CHANGELOG.md`,
-     once #7 and #20 have landed (`docs/proposals/growing-files.md`).
+1. **A fourth independent pass on #36, then the owner ratifies or rejects ADR-017.**
+   Three passes ran and each broke the implementation it was given; attempt three has
+   had none, and its absence is not evidence. Where to aim: find a route to a Level C
+   disclosure that does not involve `fetch_and_record` running and its output staying
+   intact; mutate all eight guards in `disclosure_from` one at a time (**commit
+   first** — a harness here destroyed an uncommitted implementation with
+   `git checkout --`); check Part 36 and ADR-017 claim nothing more than the owner
+   ruled.
+2. **Close F-032 to F-036** once #36 merges — move their rows to Closed with the date
+   and the pull request. Not before: the register says closure follows a pass and a
+   merge.
+3. **Finish the evidence bar the way Part 28e rules** (#7 and #20). Step 1 is the
+   final text round; step 2 is the current-stage read as code and is **waiting on the
+   owner's "go"**. Whoever picks it up should read **Part 35b** first: every metric
+   artifact is Level D until the fetch path is wired, which under ADR-016's draft
+   floor would block promotion above `Paper Trading`.
+4. **Small, when convenient:**
+   - **F-003 is now load-bearing.** Nothing calls `disclosure_from` in production, so
+     no Level C artifact can exist at all. It blocks more than it did.
+   - A full tautological-test survey: 59 of 146 `pytest.raises` calls carry no
+     `match=`. Two of this session's own tests were vacuous and only mutation caught
+     them.
+   - `scripts/verify_clone.py` has not run for five consecutive reviews for want of
+     `dolt`, so the live data path is unverified.
+   - The gate items #29 left (`scripts/review_due.py`), and phase 2 of the file split
+     once #7 and #20 land.
 
 ## Working Agreement
 
