@@ -74,9 +74,8 @@ every metric artifact built after it (none is stored).
 ## Files changed
 
 - `docs/OwnerDecisions.md` — Parts 37 to 40.
-- `docs/OperatorChecklist.md` — one open question (keep Part 40 or return to the
-  fingerprint), four Done entries (option A, the two follow-ups, and the method),
-  and ratification (Later).
+- `docs/OperatorChecklist.md` — five Done entries (option A, the two follow-ups,
+  the method, and keeping Part 40), and ratification (Later).
 - `docs/NOW.md` — "Where things stand" (the review-gate line), "In flight", and the
   next-task list.
 - This record.
@@ -159,7 +158,11 @@ that mattered reached the owner's decisions:
   existing-record path, which returns a freshly parsed series beside the old record.
 - **The migration of `RPT-0001` was overstated.**
 
-Recorded in Parts 38 and 40 and put back to the owner as one question. Also fixed:
+Recorded in Parts 38 and 40 and put back to the owner as one question: keep Part 40,
+or go back to the stored fingerprint (recommended). The owner said "aligned - keep
+part for", which read both ways, so the session asked which was meant; the owner
+chose "Keep Part 40". Recorded in Part 40, with the recommendation noted as not
+taken. Also fixed:
 Part 37's blockchain note misstated what the owner was told about B2; 39a narrowed
 "every result" to Level C inside "What it settles" (moved to a reading, which now
 keeps adjusted-price results naming their record); quote marks around words the
@@ -168,8 +171,6 @@ owner did not say; a count without its command; and the merge rule below, which 
 
 ## What is open
 
-- **One question with the owner:** keep Part 40, or return to the stored
-  fingerprint now that the comparison is corrected. In `docs/OperatorChecklist.md`.
 - **Attempt four of ADR-017**, on #36, built to Parts 37-40 and the fourth pass's
   findings. It picks the method that binds the prices and says which weakness it
   accepts; its own independent pass checks that choice. Ratification after, not

@@ -855,7 +855,13 @@ The owner answered "aligned to recommendation" (`docs/OwnerDecisions.md` Part
 
 # 2026-09-25 — owner items from the fourth pass on ADR-017 (#36)
 
-## Open — 2026-09-25: keep Part 40, or go back to the stored fingerprint?
+## Done — 2026-09-25: keep Part 40, or go back to the stored fingerprint?
+
+**Answered. Owner said "aligned - keep part for"; asked which was meant, the owner
+chose "Keep Part 40".** Recorded in `docs/OwnerDecisions.md` Part 40. The
+recommendation below was not taken.
+
+### The question as it was put
 
 **Why this is back with you again.** Part 40 left the method to attempt four. You
 answered on a comparison that was wrong in three places, found by a second

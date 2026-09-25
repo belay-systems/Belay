@@ -3785,7 +3785,28 @@ Found by the second independent pass on these records, after the owner answered.
   any case, since its bytes are outside git (Part 38).
 
 The ruling stands as given. Whether to keep it with the corrected facts, or return to
-the stored fingerprint, was put back to the owner (`docs/OperatorChecklist.md`).
+the stored fingerprint, was put back to the owner.
+
+### Put back after the correction, and kept
+
+**Question put**, with the three corrections above explained:
+
+> Do you want to keep Part 40, or go back to the stored fingerprint?
+
+*Recommended: go back to the stored fingerprint*, with its cost stated: fetch
+records gain a field (an ADR-014 change for future records), and after a change to
+the price-reading code, data already fetched drops to Level D and cannot regain
+Level C until ADR-014's rule against re-recording identical bytes is revisited.
+
+**Owner said: "aligned - keep part for".** Read two ways — "aligned" to the
+recommendation, or "keep Part 40" — so the session asked which was meant, offering
+"Go back to fingerprint" and "Keep Part 40". **Owner chose: "Keep Part 40".**
+
+So Part 40 stands, decided this time on the corrected comparison. The owner did not
+take the recommendation, and that is recorded rather than smoothed over. Attempt four
+picks the method knowing that re-reading needs new code and passes a parser change
+silently, and that a stored fingerprint fails loudly and needs ADR-014 rule 5
+revisited to recover.
 
 ### What it settles
 
