@@ -3620,15 +3620,43 @@ question of who calls `save()` and when, and nothing here answers it.
 ## ADR-015: A Strategy's Stage Is Carried, Not Asserted — And A Stage Move Without Evidence Is Not A Review
 
 Status:
-**PROPOSED — revised 2026-09-24 after a falsification pass and the owner's Part 25. Not ratified. Not implemented in any part.**
+**PROPOSED — revised 2026-09-25 after a second falsification pass and the owner's Parts 25 and 26. Not ratified. Not implemented in any part.**
 
 Date:
-2026-09-19 (revised 2026-09-24)
+2026-09-19 (revised 2026-09-24, 2026-09-25)
 
 ---
 
-> **Where this revision stands (2026-09-24). Read this before the older blocks below;
+> **Where this revision stands (2026-09-25). Read this before the older blocks below;
 > where they differ, this one is current.**
+>
+> - **A second falsification pass found this ADR still not ready** (Issue #21, the
+>   comment "Second supplementary pass: the redrafts, ADR-015 at `94815a2` (#7) and
+>   ADR-016 at `bad17de` (#20), read against Part 25", 2026-09-24). It found two
+>   new blocking holes in how the current-stage read treats a downward step (N1, N2),
+>   should-fix findings N3, N4 and N10-N12 against this ADR, and three nits. It ran
+>   its attacks as an executable model.
+> - **The owner then ruled six more principles, Part 26 (26a-26f)**, 2026-09-24:
+>   "Aligned". **Parts 25 and 26 are recorded on branch `claude/kind-knuth-9g7xlr`
+>   and are not yet on `main`.** Every rule below that cites 25x or 26x rests on that
+>   record; if it does not reach `main` as written, those rules revert to DRAFTER.
+> - **This revision** rewrites the current-stage read (rule 3h) so that a downward
+>   rung can only lower a stage that is already established (N1), reads stored
+>   downward reviews through a subject index (N2), and flags a downward rung whose
+>   review does not resolve for a human to repair (26a, N4). It checks rule 3c's
+>   condition 5 against the version that appended the last rung (N3), has rule 3c
+>   resolve the last review's bound reports and apply ADR-016 rule 8 (26e, N12),
+>   requires a recorded human authorization for a confidence change on a capital
+>   stage (26c, N10), and compares data windows in rule 4(f) (26d, N11). Where each
+>   landed is in "Revision history" below. The scratch model that checked these rules
+>   is described there too.
+> - **What blocks ratification now:** Parts 25 and 26 reaching `main`; a fresh
+>   independent pass told to falsify both ADRs together (the owner's chosen
+>   different-AI pass on Issue #21 is still owed); and the owner's ratification of
+>   both.
+>
+> **The rest of this block is the 2026-09-24 revision's, kept as history, except the
+> marking legend at its end, which is current and was updated for this revision.**
 >
 > - **The bar is ruled, and lives in ADR-016.** The owner ruled the evidence bar on
 >   2026-09-22 (`docs/OwnerDecisions.md` Part 18, 18a-18g, on `main`) and put it in a
@@ -3655,7 +3683,10 @@ Date:
 > **How each rule is marked in this revision.**
 >
 > - **RULED (Part n)** — an owner ruling in `docs/OwnerDecisions.md`, whose words are
->   quoted there. Parts 18 and 9e are on `main`; Part 25 is not yet (above).
+>   quoted there. Only Parts 18, 19, 22, 23, 25 and 26 are cited as RULED. Parts 18,
+>   19 and 23 are on `main`; Part 22 is on pull request #20's branch; Parts 25 and 26
+>   are on `claude/kind-knuth-9g7xlr` (above). None of 22, 25 or 26 is on `main`
+>   yet. Part 9e, on `main`, is cited as SELECTED, never as RULED.
 > - **SELECTED (9e)** — one of the six shape selections of Part 9e. The owner chose
 >   the shape; 9e says in terms that it is "shape only" and ratifies no text. The
 >   wording that implements it is the drafter's.
@@ -3763,10 +3794,47 @@ Date:
 >   N5 (both branches conflicted with `main`) was resolved by merging `main` into this
 >   branch as a merge commit before this revision.
 >
-> **Two independent passes, five blocking defects, none found by the author.** That
-> is the pattern this repository has recorded for four consecutive sessions, and it
-> is the reason the Required Follow-Up asks for a third pass rather than treating
-> this one as settled.
+> - **This revision (2026-09-25).** A second pass on the redraft (Issue #21, named in
+>   the Status block) found two more blocking defects here, again none found by the
+>   author. A downward last rung counted without its review, so one hand-signed file
+>   with no reviews on disk read as `Limited Capital` (N1). Deleting the demoted
+>   *version* file, rather than its review, still undid a demotion (N2). **The second
+>   pass reused the labels N1-N7 for new findings, so in the table below its
+>   findings are written "2N1" to "2N13"**; plain N1-N7 above are the first pass's
+>   nits.
+>
+>   | Finding | Resolved in | Rests on |
+>   |---|---|---|
+>   | 2N1 | rule 3h steps 3-4 ("the base"); rule 3e ("Which stored versions count"); tests 53-55 | 25d |
+>   | 2N2 | rule 3h step 5 (stored downward reviews); Required Follow-Up (the subject index); test 56 | 25d |
+>   | 2N3 | rule 3c, the second read ("against the version that appended the last rung"); test 57 | — |
+>   | 2N4 | rule 3h step 6 (the repair flag); rule 3e; rule 4(f) ("the demotion index"); test 58 | 26a |
+>   | 2N10 | rule 3g ("Confidence on a capital stage"); rule 5; test 59 | 26c, 25f |
+>   | 2N11 | rule 4(f), second check (data windows); test 60 | 26d, 25i |
+>   | 2N12 | rule 3c (bound reports and ADR-016 rule 8); rule 3f; test 48; the residual removed from rule 3f and the residual-risk count | 26e |
+>   | nit, 3e's first clause labeled RULED | rule 3e ("Which stored versions count"), now marked | — |
+>   | nit, stale "Two independent passes" | the paragraph below | — |
+>   | nit, F-007 cited at `docs/HANDOFF.md:3365` | Context; repointed to `:3788`, the heading "A Strategy Can Still Be Signed Into Existence At Production (F-007)" | — |
+>
+>   2N5-2N9 and 2N13 are against ADR-016 and are resolved there. 26b and 26f are
+>   ADR-016's too; rule 4's table points at them.
+>
+>   **How this revision was checked.** The second pass's executable model (scenarios
+>   A, B, C, C2, D, E and F) was extended to encode this revision's rules as worded,
+>   using the real `Artifact`, `EvidenceRecord`, `ArtifactIntegrity.sign`,
+>   `ArtifactValidator`, `ArtifactRepository` and `student_t_two_sided_p`. It is a
+>   scratch model, not a test, and it is not in the repository. A model written by
+>   the author is not an independent pass. What it showed is written down as tests
+>   53-60, which the implementing change must run red first. **It found one
+>   defect in this revision's first wording**, recorded at rule 3h: "the nearest
+>   version that passes 3c" let a genuine Demote review stacked on a forged version
+>   supply `Limited Capital` (scenario C3), so the base must also end upward.
+>
+> **Four independent passes, ten blocking defects against this ADR, none found by
+> the author** (3, 2, 3 and 2, in the order above; B7, shared with ADR-016, is not
+> counted). That is the pattern this repository has recorded for every session that
+> has attacked this ADR, and it is why the Required Follow-Up asks for another pass
+> rather than treating this revision as settled.
 
 > **Nothing here is ratified.** No framework or other implementation code was
 > written for ADR-015. The public carrier PR #7 (`adr/015-stage-is-carried`) also
@@ -3781,7 +3849,7 @@ Date:
 re-executed for this draft rather than taken from their reports.
 
 **F-007 — a strategy can be signed into existence at Production.**
-`docs/HANDOFF.md:3365`, ruled for fix by the owner 2026-08-14
+`docs/HANDOFF.md:3788`, ruled for fix by the owner 2026-08-14
 (`docs/OwnerDecisions.md:935`, guarantee at `:952`). `ArtifactFactory.create()`
 refuses to mint a STRATEGY past `IDEA` (`framework/artifacts/factory.py:61-71`) and
 `ArtifactIntegrity.sign()` (`framework/artifacts/integrity.py:71-80`) is a public
@@ -3999,7 +4067,12 @@ consistency; none is an owner ruling.
 SELECTED (9e(iii)); "longest history wins" is SELECTED (9e(vi)). The fixed
 specification (3g) is RULED on capital stages (25c) and DRAFTER below them. Failing
 toward less capital (3b's downward append, 3e's counting rule, 3h) is RULED (25d);
-the mechanisms are DRAFTER. Everything else in rule 3 is DRAFTER.
+the mechanisms are DRAFTER. That an unresolved downward step lowers the read and
+does nothing more, and is flagged for a human, is RULED (26a); the flag's shape is
+DRAFTER. That reading a stage re-checks its evidence (3c) is RULED (26e); which
+checks, DRAFTER. That a confidence change on a capital stage needs a recorded human
+yes (3g) is RULED (26c); the mechanism, DRAFTER. Everything else in rule 3 is
+DRAFTER.
 
 **3.0 — the repository validates, and the scope is not the forger's to choose.**
 
@@ -4156,12 +4229,14 @@ cannot do is carry a strategy *up*: an upward append still fetches `P` through
 claim was false**
 
 Owner selection 3. For an in-scope artifact, `get()` performs the integrity check it
-already performs, runs rule 2, and then **two bounded extra reads and no more**:
+already performs, runs rule 2, and then **a bounded number of extra reads, each
+named below, and no more**:
 
 - **The predecessor exists and is a legal one.** For a STRATEGY with a non-empty
   ladder: the version named by `parent_hash` is stored under this identifier, is
   `ArtifactType.STRATEGY`, is integrity-verified, passes rule 2, and satisfies rule
-  3b condition 3 — Append or Revision — against this artifact.
+  3b condition 3 — Append or Revision — against this artifact, including rule 3g's
+  confidence condition (26c).
 - **The last rung's review exists and says what the rung claims.** `(review_id,
   review_version)` is stored, is integrity-verified, is typed `REVIEW`, carries
   `integrity_hash == review_integrity_hash`, **passes the full
@@ -4169,9 +4244,35 @@ already performs, runs rule 2, and then **two bounded extra reads and no more**:
   condition 5.** Re-running those sub-checks rather than only matching the hash
   is deliberate: matching the hash proves the file is the one named, and the
   sub-checks prove the named file is *about this rung*.
+- **Condition 5 is checked against the version that appended the last rung, not
+  against this artifact's predecessor (DRAFTER; second-pass finding 2N3).** The
+  review of rung `r = L[-1]` was written about the version that `r` was appended
+  to. For an Append that is this artifact's predecessor. For a Revision it is not:
+  the predecessor carries the same ladder `L`, and a review of it would need
+  `subject_ladder_length == len(L)`, which condition 5 refuses. Worded against the
+  predecessor, as the previous revision was, **every honest confidence Revision after
+  the first rung failed rule 3c**. So in both cases the review's subject is located
+  by rule 3a's scan: the stored version of this identifier whose stored
+  `integrity_hash` equals the review's `subject_integrity_hash`. It must be
+  integrity-verified, carry version `subject_version`, and carry ladder exactly
+  `L[:-1]`. For an Append this is the predecessor already read, so it costs nothing.
+  For a Revision it is one more read.
+- **The last review's bound reports resolve, and ADR-016 rule 8 holds — RULED (26e):
+  "The current-stage read resolves the last review's bound reports and applies
+  ADR-016 rule 8, not only the validator."** Second-pass finding 2N12. When the last
+  rung is upward, every report the review binds under ADR-016 rule 3 is resolved and
+  checked as ADR-016 rule 3 checks 2-6 and rule 2 checks 5-6 define (resolution
+  through a read that recomputes the hash, type, grade, subject, disclosures, the
+  allowlist and the grade its producing module writes), and ADR-016 rule 8 is
+  applied to the bound significance report. Which checks: DRAFTER. One read per bound
+  report: none for a rung below `Paper Trading`, at least one at `Paper Trading`, and
+  at least seven on a capital rung (ADR-016 rule 2). A downward rung binds no reports
+  (ADR-016 rule 3), so a demotion adds no read here.
+- **A confidence authorization, where rule 3g requires one (26c).** One more read:
+  the review named by the Revision's `confidence_review`.
 
-**Both reads use an internal one-level read — load, integrity-verify, and the full
-`ArtifactValidator().validate()` — and call `get()` on nothing.** *(Finding B3:
+**Every read above uses an internal one-level read — load, integrity-verify, and the
+full `ArtifactValidator().validate()` — and calls `get()` on nothing.** *(Finding B3:
 the previous draft read "load, integrity-verify, rule 2", so the review's own
 checks — rule 4(c)'s evidence requirement and every check ADR-016 adds — ran only
 when the review itself was saved or fetched. Three hand-written files, a
@@ -4181,14 +4282,21 @@ performs no I/O**, so this adds no read: on the review it runs rule 4(c) and eve
 ADR-016 check that needs nothing but the review itself — the grade floor, the
 per-criterion shape, the rung closures (`MINIMUM_PAPER_TRADING` and the live-rung
 minimums, 18d and 25e), the recorded human authorization (25f), `variants_tried`
-and `bar_version` (25g, 25h). The ADR-016 checks that need further reads — resolving
-each bound report — run when the review is saved or fetched, and in rule 3f's
-sweep; they are not in this read, and that is stated as a residual under rule 3f.
-If they called `get()`, reading a strategy at
-`PRODUCTION` would walk seven predecessors and seven reviews and each review would
-want its subject. `framework/artifacts/repository.py:129-166` argues for a bounded
-read path and says it is "not a second gate reimplementing the first"; two reads is
-bounded, a traversal is not.
+and `bar_version` (25g, 25h). **Resolving the bound reports and rule 8 are now in
+this read too (26e, the fourth bullet above).** The ADR-016 checks that read *other*
+reviews or the whole store — rule 3 check 7 (every report considered is listed),
+rule 6 checks 3-4, rule 10's non-decreasing `bar_version`, and rule 4(f) — still run
+only in `save()` and in rule 3f's sweep. If any read called `get()`, reading a
+strategy at `PRODUCTION` would walk seven predecessors and seven reviews and each
+review would want its subject. `framework/artifacts/repository.py:129-166` argues
+for a bounded read path and says it is "not a second gate reimplementing the
+first"; a count fixed by the last rung is bounded, a traversal is not.
+
+**Cost, stated against 9e(iii)'s "Two extra reads, bounded".** The owner selected
+two. 26e is the later ruling and requires more: on a capital rung, the predecessor,
+the review, and at least seven reports; on a Revision, one more for the review's
+subject. The number is still fixed by the last rung and never grows with the length
+of the history.
 
 **The second draft said `save()` having checked every link "guarantees that every
 rung in a stored ladder went through `save()`". That sentence was false and is
@@ -4202,7 +4310,7 @@ what this rule now does.
 
 **An `IDEA`-stage revision's parent link is checked by `save()` (rule 3a) and is not
 re-checked on read**, because no rung and therefore no capital claim depends on it.
-The two reads above are spent where a stage is being asserted.
+The reads above are spent where a stage is being asserted.
 
 **What `get()` still does not catch, stated exactly.** It checks one level: the
 immediate predecessor and the *last* rung's review. It does **not** check rungs `0`
@@ -4280,33 +4388,48 @@ the second of those outright.**
 
 **Which stored versions count.** A version counts toward `Lmax` only if it parses,
 its integrity hash verifies, it is `ArtifactType.STRATEGY`, it passes
-`ArtifactValidator` (which includes rule 2), **and either**:
+`ArtifactValidator` (which includes rule 2), **and it passes rule 3c** — a version
+with an empty ladder passes 3c trivially. A version that fails is **skipped and
+reported, never raised on**, as in rule 3a.
 
-- **its last rung is downward** (to `Retired`, or lower on `STRATEGY_LADDER`,
-  classified as rule 4's direction clause does) — **counted without rule 3c**; or
-- **it passes rule 3c's one-level check** — every other version, including one with
-  an empty ladder.
+**This replaces the previous revision's first clause, which counted a version whose
+last rung was downward without rule 3c.** That clause was the drafter's mechanism
+for 25d, and the previous revision labeled it RULED; only the principle was ruled
+(second-pass nit). It had two effects the rulings do not allow:
 
-**The first clause is new, RULED (25d), finding B2.** Under the previous draft a
-version that failed 3c was skipped whichever way its last step went. So: `v5` at
-`Production`, `v6` demoting it; delete `v6`'s demotion review, and `v6` fails 3c and
-stops counting; `Lmax` falls back to `v5`'s ladder; `v7` saved as a Revision of `v5`
-at `Production` is at the frontier and saves; and `latest()` reads `Production`. One
-deleted file undid a demotion. **A version that passes integrity and ends in a
-downward step now never leaves the frontier**, so `v6` stays `Lmax` and `v7` is
-refused for building on a non-frontier `P`.
+- **It let one forged file supply a stage** (second-pass finding 2N1). Rule 3h
+  treated such a version as established, so a single hand-signed file climbing to
+  `Production` and stepping down to `Limited Capital`, with no review on disk, read
+  as `Limited Capital`. Rule 3h's base (below) is the fix; this clause no longer
+  feeds it.
+- **It let one forged file retire a strategy permanently** (2N4). A counted
+  `Retired` version is the frontier, `Retired` has no legal successor
+  (`framework/artifacts/validator.py:57-102`), so no honest version could ever be
+  saved again. **RULED (26a): "A downward step whose review does not resolve lowers
+  the stage read now, and nothing more. It never makes a Retire final and never
+  bars earlier evidence under 25i. It is flagged for a human to repair."** So such a
+  version does not count toward the frontier, and honest saves continue from the
+  last counted version.
+
+**What still stops a deleted review from undoing a demotion (B2).** Not the frontier
+any more: the current-stage read. With the demotion review of `v6` deleted, `v6`
+fails 3c and stops counting, and `v7`, a Revision of `v5` at `Production`, now saves.
+But `v6` is still a readable tip, and rule 3h lowers every tip's stage by every
+downward rung after its base, whether that rung's review resolves or not, and flags
+it. The read returns `Paper Trading`. If `v6`'s *version* file is deleted instead,
+rule 3h step 5 reads the stored `Demote` review through the subject index and
+returns `Paper Trading` again (2N2). **Only deleting both files undoes the demotion,
+and then only git history shows it** (rule 3h, "The residual").
 
 **The cost, stated.** Anyone who can write one file that passes integrity and the
-validator can force a strategy down: a forged downward rung counts without its
-review. That is a denial of capital, not a grant of it, and 25d ("Fail toward less
-capital") chose it. Rule 3f's sweep reports the missing review.
+validator can lower the stage Belay reads: a forged downward rung lowers the read
+without its review. That is a denial of capital, not a grant of it, and 25d chose it.
+Since 26a it no longer blocks saves, never makes `Retired` final, and never bars
+evidence under rule 4(f); it is flagged on every read until a human repairs it.
 
-**The second clause is what stops a forged file dropped into the directory from
-owning the identifier for free:** a long ladder naming reviews that do not exist
-fails rule 3c and is not counted, so it neither becomes `Lmax` nor blocks honest
-saves — unless it ends downward, when it is counted by the first clause and the
-cost above applies. As in rule 3a, a version that fails these checks is **skipped
-and reported, never raised on**.
+**A forged file dropped into the directory does not own the identifier for free:**
+a long ladder naming reviews that do not exist fails rule 3c and is not counted, so
+it neither becomes `Lmax` nor blocks honest saves, whichever way its last rung goes.
 
 **The residual denial of service, admitted rather than argued away.** A forger who
 *also* writes the predecessor file and the review file that rule 3c checks can
@@ -4335,14 +4458,14 @@ It is the shape ADR-014 rule 7 already rules for orphaned store versions and
 Required Follow-Up, not a `get()` behaviour**, because its cost is proportional to
 the whole store.
 
-**What 3c does not check and only the sweep does, stated so no reader assumes
-otherwise (B3's residual).** A forger who writes a review whose bound reports do
-not exist passes rule 3c, because resolving reports needs reads 3c does not make.
-**Today that cannot reach capital:** every capital rung is closed by a check 3c
-*does* run, `MINIMUM_PAPER_TRADING` for `Micro Capital` (18d) and the live-rung
-minimums for `Limited Capital` and `Production` (25e), all `None`. Before any of
-those is filled, the owner should be asked whether rule 3c must also resolve bound
-reports on a capital rung, at the cost of more reads than 9e(iii)'s "two".
+**What the sweep adds to rule 3c.** Rule 3c checks the last rung, including its
+bound reports and ADR-016 rule 8 (26e). The sweep checks every rung, every
+predecessor back to `Idea`, the store-wide checks rule 3c does not make (ADR-016
+rule 3 check 7, rule 6 checks 3-4, rule 10's non-decreasing `bar_version`, rule
+4(f)), and lists every repair flag rule 3h raises. *(Replaced 2026-09-25, finding
+2N12: this paragraph was the residual "a forged review whose bound reports do not
+exist passes rule 3c". 26e ruled that 3c resolves them, so the residual is gone,
+not reworded.)*
 
 **3g — the specification is fixed once a strategy has climbed; a changed
 specification is a new identifier at `Idea`**
@@ -4356,8 +4479,10 @@ one field revisable: "A confidence revision produces a new version"
 (`docs/DECISIONS.md:660-665`). A new version must also change the fields that make
 it a new version. So, between a version with a non-empty ladder and its successor:
 
-- **May differ on a Revision:** `confidence` (ADR-005 rule 2), and the version's own
-  bookkeeping — `version`, `parent_hash`, `integrity_hash`, `created`, `updated`.
+- **May differ on a Revision:** `confidence` (ADR-005 rule 2), subject to the
+  condition below on a capital stage; the `confidence_review` entry of `content`,
+  which exists only for that condition; and the version's own bookkeeping —
+  `version`, `parent_hash`, `integrity_hash`, `created`, `updated`.
 - **May also differ on an Append:** `strategy_stage`, the `ladder` entry of
   `content`, and the `Validated By` entry of `relationships` — the three things
   rule 1 says a rung changes.
@@ -4367,6 +4492,33 @@ it a new version. So, between a version with a non-empty ladder and its successo
   `evidence`, `evidence_level`, `tags`, `summary`, `schema_version`, `author`,
   `metadata`, every other `content` entry, and every other `relationships` entry.
   A refusal names the first field that differs.
+
+**Confidence on a capital stage is a capital decision — RULED (26c): "Changing a
+funded strategy's confidence needs a recorded human yes, as in 25f."** Second-pass
+finding 2N10. Confidence sizes capital (`constitution/Capital_Authority.md:11-14`
+names it among the inputs that determine capital), so a Revision that changes
+`confidence` while the strategy holds a capital stage moves money without a review.
+**DRAFTER — the mechanism.** When `strategy_stage` is `Micro Capital`, `Limited
+Capital` or `Production` and a new version's `confidence` differs from its
+predecessor's:
+
+- **On a Revision**, `content` carries `confidence_review`: three strings,
+  `(review_id, review_version, review_integrity_hash)`, naming a stored REVIEW whose
+  outcome is `Remain Current Stage`, whose subject is the predecessor (by
+  `subject_version` and `subject_integrity_hash`), whose `stage_at_review` and
+  `resulting_stage` both equal the current stage, whose `resulting_confidence`
+  equals the new `confidence`, and which carries ADR-016 rule 9's
+  `human_authorization`. `save()` refuses the Revision otherwise, and rule 3c
+  re-checks it on read (one more read). On every other Revision the key is absent.
+- **On an Append**, the rung's own review must record `resulting_confidence` equal
+  to the new `confidence` and carry ADR-016 rule 9's `human_authorization`. **A
+  demotion is never blocked by this:** the person demoting leaves `confidence`
+  unchanged, and then no authorization is asked for (25d). A later Revision can
+  lower it with a human yes.
+
+Below the capital stages a Revision may change `confidence` freely (DRAFTER). Today
+no strategy can hold a capital stage (ADR-016 rule 5), so this rule binds nothing
+until one can; ADR-016's 26f closure applies to it as to every capital authorization.
 
 **DRAFTER: from the first rung, not only on capital stages.** 25c rules the capital
 stages. This draft freezes the specification from the first rung, because every
@@ -4396,10 +4548,16 @@ identifier cannot reset the count of variants tried.
 lowest stage it can establish. It never refuses in a way that would block a
 demotion."** The mechanism is DRAFTER. Finding B2.
 
-`get(id)` with no version is the **current-stage read** for an identifier whose
-stored versions are STRATEGY. Today it returns whatever `latest()` names
+**The read, and its return value (DRAFTER).** The current-stage read is a new
+repository method, `current_stage(id)`, returning a `StageRead`: the `stage` read,
+the `version` of the tip it was read from, the tips that `disagree`, and a tuple of
+`repairs` (step 6). It returns a stage, not an artifact, because the stage it reads
+can be lower than the `strategy_stage` of every stored version (step 4). **`get(id)`
+with no version, on an identifier whose stored versions are STRATEGY, raises and
+names `current_stage()`**: today it returns whatever `latest()` names
 (`framework/artifacts/repository.py:168-171`), which is the version a forger or a
-deleted file can choose. Instead:
+deleted file can choose, and a caller reading its `strategy_stage` would be reading
+exactly that. The read:
 
 1. **Readable versions.** Rule 3a's scan: every stored version of the identifier
    that parses, verifies its integrity hash, is `ArtifactType.STRATEGY`, and passes
@@ -4407,32 +4565,126 @@ deleted file can choose. Instead:
 2. **Tips.** The readable versions whose ladder is not a proper prefix of another
    readable version's ladder. Versions with equal ladders are one tip; `latest()`
    picks among them, as today.
-3. **Establish each tip.** A tip whose last rung is downward is established by
-   step 1 alone (25d; the first clause of rule 3e's counting rule). Any other tip is
-   established only if it passes rule 3c. A tip that is not established is replaced
-   by its predecessor (its `parent_hash`), which is tried the same way, until one is
-   established or the chain ends.
-4. **One established stage:** return that version. **More than one: return the one
-   with the lowest stage** — `Retired` lowest of all, then by `STRATEGY_LADDER`
-   position — and report that the versions disagree, naming them.
-5. **Nothing established:** raise, naming why. **Every consumer of the capital read
-   treats a raise as zero capital** (rule 8). A refusal to read never keeps capital
-   deployed.
+3. **Find each tip's base — second-pass finding 2N1.** Walk back from the tip. A
+   version is the **base** when its ladder is empty (`Idea`), or when it passes
+   rule 3c **and its last rung is upward**. Otherwise step to the readable version
+   its `parent_hash` names, provided that version's ladder is a prefix of the
+   current one's, and try again. **If the walk ends without a base — a predecessor
+   missing, unreadable, or not a prefix — the read raises** (step 7).
+4. **The tip's stage is the lower of the base's stage and every downward rung's
+   `to_stage` after the base**, in the tip's own ladder. Upward rungs after the base
+   are ignored: their reviews did not establish them. Downward rungs after the base
+   lower the stage **whether or not their reviews resolve** — RULED (26a), "A
+   downward step whose review does not resolve lowers the stage read now". **A
+   downward rung may only lower a stage that is already established; it never
+   supplies one.**
+5. **Stored downward reviews lower the read too — second-pass finding 2N2.** Through
+   the subject index (below), take every stored REVIEW whose `subject_id` is this
+   identifier that passes integrity, whose `resulting_stage` is `Retired` or below
+   its `stage_at_review` on `STRATEGY_LADDER`, and whose subject — the stored version
+   named by `subject_version` and `subject_integrity_hash` — is readable. **It
+   applies to a tip when the subject's ladder is a prefix of the tip's ladder** (the
+   subject is at or before the tip's position) **and the tip's ladder does not carry
+   that review as its rung at the subject's position.** It then lowers that tip's
+   stage to the lower of its stage and the review's `resulting_stage`. Integrity
+   alone qualifies it, not the validator: a demotion is never refused (25d, 18b). A
+   review the tip's ladder does carry is already in the history, and an honest
+   re-climb after it is not lowered again.
+6. **The repair flag — RULED (26a): "It is flagged for a human to repair."** The
+   flag's shape is DRAFTER. `StageRead.repairs` holds one entry per defect this read
+   saw, each `(identifier, version, rung_index, review_id, review_version, reason)`,
+   with `rung_index`, `review_id` and `review_version` `None` where they do not
+   apply, and `reason` one of exactly five codes:
+   - `DOWNWARD_REVIEW_UNRESOLVED` — a downward rung after the base whose review is
+     not stored, fails integrity, is not a REVIEW, carries another hash, or fails
+     rule 3b condition 5. It lowered the read (step 4);
+   - `UPWARD_REVIEW_UNRESOLVED` — an upward rung after the base whose review does
+     not resolve. It was ignored (step 4);
+   - `VERSION_FAILS_3C` — a version the walk stepped past because it failed rule
+     3c, with 3c's refusal appended to the code;
+   - `STORED_DEMOTION_NOT_IN_LADDER` — a review applied by step 5;
+   - `NO_BASE` — the walk found no base (step 7).
 
-**Why the B2 attack dies twice.** Save refuses `v7` (rule 3e). If `v7` is dropped into
-the directory by hand instead, the tips are `v6` (the demotion's ladder) and nothing
-else, because `v7`'s ladder equals `v5`'s, which is a prefix of `v6`'s; `v6` ends
-downward and is established without its deleted review; the read returns
-`Paper Trading`. **An honest re-climb is not a disagreement:** after a demotion at
-`v6` and climbs at `v7` to `v9`, `v6`'s ladder is a prefix of `v9`'s, so there is one
-tip.
+   `StageRead.needs_repair` is `True` whenever `repairs` is non-empty. **The flag is
+   recomputed from the store on every read. It is never stored, so nothing can clear
+   it but a repair of the store itself**: a person restoring a deleted file from git
+   history, removing a forged file in a reviewed commit, or appending a correcting
+   rung with a review that resolves (owner selection 6). Belay never repairs itself.
+   Rule 8 says what a consumer does with a flagged read; rule 3f's sweep lists every
+   flag in the store. An honest demotion is never flagged: its rung's review
+   resolves.
+7. **The result.** **One tip: its stage. More than one: the lowest** — `Retired`
+   lowest of all, then by `STRATEGY_LADDER` position — with the disagreeing tips
+   named. **If any tip has no base, the read raises**, naming the tip and carrying
+   the repairs. **Every consumer of the capital read treats a raise as zero
+   capital** (rule 8). A refusal to read never keeps capital deployed.
+
+**Why the base must end upward, found by execution while drafting this revision.**
+The first wording of step 3 was the pass's: "the nearest version that passes 3c". The
+model then built this: an honest strategy at `Paper Trading` (`v4`); a forged `v5`
+that climbs, in one file, to `Production`, naming reviews that do not exist; a
+**genuine**, integrity-valid `Demote` review of `v5` to `Limited Capital`, which
+anyone can write, because a downward review has no grade floor (18b); and `v6`
+appending that rung. `v6` passes rule 3c: its predecessor `v5` is stored, readable
+and a legal Append, and its last review resolves and satisfies condition 5. Under
+that wording `v6` was the base and the read was `Limited Capital`, a capital stage
+supplied by a downward rung. With the base required to end upward, the walk passes
+`v6` (ends downward) and `v5` (fails 3c) and stops at `v4`: the read is `Paper
+Trading`, with the four forged upward rungs flagged.
+
+**Why the walk accepts any stored prefix, not only a predecessor one rung shorter.**
+A forged file can add several rungs at once. Requiring exactly one would end the walk
+at it and raise, so one forged file would take an honest strategy at `Paper Trading`
+to zero. 25d asks for "the lowest stage it can establish", and the honest base is
+still there to establish.
+
+**The attacks, as this read answers them** (each executed in the scratch model named
+in the revision history):
+
+- **One hand-signed file, seven rungs up to `Production` and one down to `Limited
+  Capital`, no reviews and no predecessor on disk** (the second pass's model C). No
+  base: the read raises, which is zero capital.
+- **A forged extension of an honest `Paper Trading` ladder, ending downward at
+  `Micro Capital`** (model C2). Base `v4`; the read is `Paper Trading`, flagged.
+- **One forged file stepping `Paper Trading → Retired`** (model D). The read is
+  `Retired`, flagged `DOWNWARD_REVIEW_UNRESOLVED`. The forged version is not counted
+  (rule 3e), so the frontier is still `v4` and an honest Append saves. `Retired` is
+  not final (26a).
+- **B2 by deleting the demoted version file** (model F). With the demoting version
+  deleted and its `Demote` review still stored, step 5 applies the review to the
+  remaining tip, the version at `Production`: the read is `Paper Trading`, flagged
+  `STORED_DEMOTION_NOT_IN_LADDER`.
+- **B2 by deleting the demotion review** (the previous revision's attack). The
+  demoting version is still a tip; its base is the version before it; step 4 lowers
+  the read by its downward rung. `Paper Trading`, flagged
+  `DOWNWARD_REVIEW_UNRESOLVED`. **An honest re-climb is not a disagreement**: after a
+  demotion and later climbs, the demoting version's ladder is a prefix of the newest,
+  so there is one tip.
+
+**The residual — stated, not closed.** If **both** the demoting version file and its
+`Demote` review are deleted, nothing left in the store records the demotion, and the
+read returns the stage before it. The model shows exactly that: `Production`, with
+no flag. **Only git history shows it**, because the artifact root is tracked
+(ADR-014 rule 2) and a deletion is a commit. Storage is append-only by rule, not by
+mechanism; the defence against deleting two files is the same as against any other
+edit of a tracked directory: write access and review.
+
+**The subject index — required infrastructure (DRAFTER).** Step 5 needs every stored
+review whose subject is this identifier, and the repository lists only one
+identifier's versions (`framework/artifacts/repository.py:69-84`). ADR-016 needs the
+same index for reports (its rule 3 check 7). **It is derived from the store's
+contents, rebuildable by a full scan, and never a separately maintained file**, so
+deleting or editing the index cannot hide a review; an index that disagrees with a
+scan is a defect the sweep reports. Listed in the Required Follow-Up. Until it
+exists, step 5 is a full scan of stored REVIEWs.
 
 **Cost, stated.** The previous draft's read opened two extra artifacts (SELECTED
 9e(iii), "Two extra reads, bounded"). This read also lists and parses every stored
-version of the one identifier — no review, no other identifier — and, in the honest
-case of one tip, still makes 9e(iii)'s two extra reads. A damaged record costs two
-more reads per step walked back. 25d is the later ruling; the growth is stated here
-so the owner can see it against 9e(iii).
+version of the one identifier, runs rule 3c's reads (now more than two, rule 3c) on
+each version the walk tries — one in the honest case, two when the tip is an honest
+demotion — and reads the stored downward reviews of this identifier through the
+index. 25d, 26a and 26e are the later rulings; the growth is stated here so the owner
+can see it against 9e(iii).
 
 `get(id, version)` with an explicit version is unchanged by 3h: it returns that
 version after integrity, the validator and rule 3c, or raises. It is a historical
@@ -4497,26 +4749,56 @@ already does for its own 2026-07-28 correction.
   store and the validator has none.
 - **(f) Evidence gathered before a demotion cannot buy a climb back — RULED (25i):
   "Evidence gathered before a demotion cannot be reused to climb back."** Finding
-  S3. Mechanism DRAFTER. **Refused by ladder position, never by timestamp**: a
-  record's `timestamp` is whatever its creator passed
-  (`framework/artifacts/evidence.py:28-30`), so a date comparison is the author's
-  to choose. Let `d` be the index in the subject's ladder of its most recent
-  downward rung (a `Demote`; a `Retire` has no successor). When a review whose
-  outcome is `Promote` is saved, `save()` refuses it when:
+  S3. **RULED (26d): "25i's 'evidence' means the data. A report computed after a
+  demotion over data from before it is still evidence from before the demotion."**
+  Mechanism DRAFTER.
+
+  **The demotion index — RULED (26a): an unresolved downward step "never bars
+  earlier evidence under 25i".** Let `d` be the index, in the subject's ladder, of
+  its most recent downward rung **whose review resolves**: stored, integrity-valid,
+  typed REVIEW, carrying the rung's hash, and satisfying rule 3b condition 5 (a
+  `Demote`; a `Retire` has no successor). A downward rung whose review does not
+  resolve is not in the index, and neither is a stored review applied only by rule
+  3h step 5; both lower the read and are flagged, and neither bars evidence
+  (second-pass finding 2N4: one unreviewed file used to bar every piece of honest
+  evidence from before it). When a review whose outcome is `Promote` is saved,
+  `save()` refuses it when:
   - any of its evidence records, compared by `hash`, is also on the review named by
     any rung at index `d` or earlier; or
-  - any report it binds under ADR-016 is about a subject version whose ladder has
-    `d` rungs or fewer — that is, a version from before the demotion was recorded.
-    ADR-016's reports carry `subject_id` and `subject_integrity_hash`, which is what
-    makes this checkable.
+  - **any report it binds under ADR-016 has a data window that starts on or before
+    the demotion's anchor** (second-pass finding 2N11). The window is the report's
+    own `sample_period_start`, which `metric_artifact()` writes into `content`, inside
+    the report's signature (`framework/metrics/reporting.py:101-105`, `:227-231`). The **anchor** is the
+    later of two dates: the `created` date of the review of rung `d`, which the
+    rung's integrity hash fixed when the demotion was appended; and the latest
+    `sample_period_end` of every report bound by any review at index `d` or
+    earlier, so the anchor is never earlier than the data already used. *(Replaced
+    2026-09-25. The previous check compared the report's subject version, so a
+    report recomputed after the demotion over pre-demotion data, tagged with a
+    post-demotion subject version, passed. 26d ruled that the data is what counts.)*
 
-  Both checks read the reviews and subject versions the ladder already names, so
-  they run in `save()` and in rule 3f's sweep, not in rule 3c's two reads. A
-  record re-created from the same pre-demotion observation has a new hash and passes
-  the first check; the second check is what stops it wherever the record is bound
-  to a report, which ADR-016 requires on every upward move from `Paper Trading` up —
-  and a demotion never lands below `Paper Trading`
-  (`framework/artifacts/validator.py:57-102`).
+  Both checks read the reviews and reports the ladder already names, so they run in
+  `save()` and in rule 3f's sweep, not in rule 3c. A record re-created from the same
+  pre-demotion observation has a new hash and passes the first check; the second
+  check is what stops it wherever the record is bound to a report, which ADR-016
+  requires on every upward move from `Paper Trading` up — and a demotion never lands
+  below `Paper Trading` (`framework/artifacts/validator.py:57-102`).
+
+  **What this costs, stated so the owner sees it (DRAFTER reading of 26d).** Read
+  literally, 26d bars any data dated on or before the demotion, not only data a
+  report used before it. ADR-016 rule 8 requires a significance report whose data
+  is adequate under amended ADR-012, which requires at least 10 years (Part 22b).
+  **So a strategy demoted from a capital stage cannot re-enter one for at least ten
+  years after the demotion.** Paper trading after the demotion is new data and is
+  not barred, but it does not shorten the ten-year backtest span. This follows from
+  26d and 22b together; the narrower reading, "data a report used before the
+  demotion", is put to the owner at ratification rather than chosen here.
+
+  **What the anchor cannot stop.** The `created` date is written by whoever writes
+  the demotion review. A demoter who backdates it can let data from between the
+  backdated date and the real demotion be reused; the second half of the anchor
+  stops only data that was already bound. A demoter who post-dates it bars more
+  evidence than 26d requires, which is a denial of capital, not a grant.
 
 **`evidence_level` is re-derived**, which ADR-005 rule 5 already requires and
 `framework/artifacts/validator.py:226-238` already does. No new taxonomy:
@@ -4553,20 +4835,22 @@ finding B7.)*
 
 | Rung reached (`to_stage`) | Minimum `EvidenceLevel` — **upward moves only** |
 |---|---|
-| Research | ADR-016 rule 1 |
-| Validation | ADR-016 rule 1 |
-| Paper Trading | ADR-016 rule 1, and its rules 3 and 8 |
-| Promotion Review | ADR-016 rule 1, and its rule 3 |
-| Micro Capital | ADR-016 rules 1-3, 5, 8 and 9 |
-| Limited Capital | ADR-016 rules 1-3, 5, 8 and 9 |
-| Production | ADR-016 rules 1-3, 5, 8 and 9 |
+| Research | ADR-016 rule 1, and its rule 6 check 1 |
+| Validation | ADR-016 rule 1, and its rule 6 check 1 |
+| Paper Trading | ADR-016 rule 1, and its rules 3, 6 and 8 |
+| Promotion Review | ADR-016 rule 1, and its rules 3 and 6 |
+| Micro Capital | ADR-016 rules 1-3, 5, 6, 8 and 9 |
+| Limited Capital | ADR-016 rules 1-3, 5, 6, 8 and 9 |
+| Production | ADR-016 rules 1-3, 5, 6, 8 and 9 |
 | Retired | no floor — clause 1 below; ADR-016 rule 1 |
 
 **Which ADR-016 version applies (25g; finding N4 and S1).** A review records the
 `bar_version` it was judged under (ADR-016 rule 10). A stored review is validated
 against the bar version it records, never re-judged against a later one, and
 `save()` accepts only the current version — so a raised bar applies from each
-strategy's next step (RULED 25g). ADR-016 pins each version's constants to its
+strategy's next step (RULED 25g). **A ladder's reviews never go down in
+`bar_version`** (DRAFTER; second-pass finding 2N7, applied in ADR-016 rule 10), so a
+hand-written review cannot claim an older, laxer bar. ADR-016 pins each version's constants to its
 ratified text with a conformance test; that test, not a grade test, is what catches
 a floor that is lowered, including a `D` floor removed outright, which no
 promotion test can detect because nothing is below `D`.
@@ -4694,17 +4978,21 @@ that writer and reader "cannot drift apart". `subject_integrity_hash` and
 
 **ADR-016 adds its own keys to the same constant** (finding B7; the previous draft
 stopped at thirteen): `bar_version`, `criterion_evidence`, `evidence_reports`,
-`variants_tried` and `human_authorization`, defined in ADR-016 rules 2, 3, 6, 9 and
-10. With them `FIELDS` has eighteen entries. They are settled in the same window and
+`reports_considered`, `variants_tried` and `human_authorization`, defined in ADR-016
+rules 2, 3, 6, 9 and 10. With them `FIELDS` has nineteen entries. *(Changed
+2026-09-25: eighteen became nineteen when ADR-016 separated the reports a review
+considered from those it binds, second-pass finding 2N5.)* They are settled in the same window and
 for the same reason: no REVIEW has been stored yet.
 
 **Keys that do not apply to an outcome (DRAFTER; finding N3).** `review_fields()`
 requires every key in `FIELDS` to be present (`framework/artifacts/review.py:193-199`),
 so an outcome-specific key is always there. **Where it does not apply it holds
 `None`, and the validator refuses any other value**: `variants_tried` on anything
-but a `Promote`; `criterion_evidence` and `human_authorization` on anything but an
-upward move into a capital rung; `evidence_reports` on anything but an upward move
-into `Paper Trading` or above. A key that carries a value nothing checks would read
+but a `Promote`; `criterion_evidence` on anything but an upward move into a capital
+rung; `human_authorization` on anything but an upward move into a capital rung or a
+review that authorizes a confidence change on a capital stage (rule 3g, 26c);
+`evidence_reports` and `reports_considered` on anything but an upward move into
+`Paper Trading` or above. A key that carries a value nothing checks would read
 as evidence while being none. `resizing_note` keeps its present meaning (ADR-004's
 re-sizing prose, `None` where there is none).
 
@@ -4777,11 +5065,14 @@ the factory refuses at *issue* and the validator at *read*, and F-007 is precise
 the finding that a check at one of those is not a check at the other. Rule 6 is
 DRAFTER too.
 
-### Rule 8 — One capital authority: `get(id).strategy_stage`
+### Rule 8 — One capital authority: `current_stage(id).stage`
 
-**Finding S11. DRAFTER, resting on RULED 25d and 25j.** The current-stage read of
-rule 3h, `ArtifactRepository.get(id).strategy_stage` with no version, **is the only
-statement of a strategy's stage that anything in Belay may act on for capital.**
+**Finding S11. DRAFTER, resting on RULED 25d, 25j and 26a.** The current-stage read
+of rule 3h, `ArtifactRepository.current_stage(id).stage`, **is the only statement of
+a strategy's stage that anything in Belay may act on for capital.** *(Changed
+2026-09-25: this was `get(id).strategy_stage`. Rule 3h now reads a stage that can be
+lower than any stored version's own, so it returns a stage, and `get(id)` with no
+version refuses on a STRATEGY identifier.)*
 Every other statement of a stage or an approval is a description, and where it
 disagrees with this read, this read wins:
 
@@ -4794,8 +5085,14 @@ disagrees with this read, this read wins:
 - Any stage in a dashboard, a report, a review's `resulting_stage`, or a
   strategy version other than the one this read returns.
 
-**A read that raises means zero capital** (rule 3h step 5, 25d). No consumer may
+**A read that raises means zero capital** (rule 3h step 7, 25d). No consumer may
 fall back to another source when the read refuses.
+
+**A flagged read is acted on at the stage it reads, and shown to a person (26a).**
+When `needs_repair` is `True`, the stage read is still the capital stage — it is
+already the lowest the record supports — and every consumer that presents the
+strategy to a person shows the repairs with it. No consumer may raise the stage
+while a flag stands.
 
 Both files above are frozen by ADR-002 and are the owner's. **This rule edits
 neither.** It proposes that, on ratification, each carries a one-line pointer to
@@ -4948,10 +5245,12 @@ demotion destination too.)*
 35. `save()` and `get()` refuse an invalid STRATEGY and an invalid REVIEW, and still
     accept a REPORT with no capital claim that would not otherwise validate. *(Rule
     3.0, including its stated asymmetry.)*
-36. **`get()` opens exactly two extra artifacts and no more** — asserted by reading a
-    strategy at `Production` from a repository holding only it, its predecessor and
-    its last rung's review, with every earlier version and review absent, and
-    observing that it succeeds. **This test asserts the limitation, not a guarantee,
+36. **`get()` opens exactly the extra artifacts rule 3c names and no more** —
+    asserted by reading a strategy at `Production` from a repository holding only
+    it, its predecessor, its last rung's review and the reports that review binds,
+    with every earlier version, review and report absent, and observing that it
+    succeeds. *(Changed 2026-09-25: this said "exactly two"; 26e added the bound
+    reports.)* **This test asserts the limitation, not a guarantee,
     and its docstring must say so, naming rule 3f as what covers the rest.** *(The
     inverse of the previous draft's test 25, which asserted that `get()` resolved
     nothing.)*
@@ -4991,11 +5290,14 @@ S3.)*
 
 44. **The executed attack, at save.** `v5` at `Production`; `v6` demotes it to
     `Paper Trading` with an evidenced `Demote`; `v6`'s review file is deleted from
-    the temporary root. `v7`, a Revision of `v5` at `Production`, is refused by
-    `save()` **naming the frontier** — `v6` still counts because it ends downward.
+    the temporary root. *(Changed 2026-09-25 under 26a.)* `v6` no longer counts
+    toward the frontier, so `v7`, a Revision of `v5` at `Production`, **saves**; and
+    the current-stage read still returns `Paper Trading`, flagged
+    `DOWNWARD_REVIEW_UNRESOLVED` naming `v6`'s rung. Asserts both, so the test
+    fails if the save is refused (26a: "nothing more") or if the read rises.
 45. **The same attack, by hand.** `v7` is written directly into the directory,
-    re-signed. The current-stage read returns `v6` at `Paper Trading` and reports
-    no disagreement, because `v7`'s ladder is a prefix of `v6`'s. A variant where
+    re-signed. The current-stage read returns `Paper Trading` from tip `v6` and
+    reports no disagreement, because `v7`'s ladder is a prefix of `v6`'s. A variant where
     the hand-written `v7` *appends* an upward rung to `v5` with a forged review
     returns the lower of the two tips and reports the disagreement, naming both.
 46. **S2: a damaged record does not block a demotion.** A strategy at `Limited
@@ -5007,7 +5309,7 @@ S3.)*
 47. **An honest re-climb is not a disagreement.** Demote at `v6`, climb at `v7` to
     `v9`: the current-stage read returns `v9` and reports nothing; and when every
     stored version fails to establish, the read raises rather than returning a
-    stage (rule 3h step 5).
+    stage (rule 3h step 7). The honest demotion is not flagged.
 
 *B3 — reading a stage without checking the bar (rules 3c and 3f):*
 
@@ -5015,10 +5317,16 @@ S3.)*
     `Promotion Review`, a `Promote` review to `Micro Capital` with **no evidence**,
     and a strategy at `Micro Capital` naming both. `get(id, version)` refuses,
     naming the review's missing evidence (rule 4(c)); the current-stage read does
-    not return `MICRO_CAPITAL`.
+    not return `MICRO_CAPITAL`. **Second-pass finding 2N12, added 2026-09-25:** the
+    same three files with an evidenced review at `Paper Trading` whose bound report
+    is not stored, and separately one whose bound significance report has
+    `significant: false`: rule 3c refuses each, naming the report and, for the
+    second, ADR-016 rule 8; the read walks back past it. Before 26e both read back
+    as `Paper Trading`.
 49. The same with evidence at the floor on all seven criteria: refused, naming
-    `MINIMUM_PAPER_TRADING` and 18d. This is the check that makes 3c's residual
-    unreachable today; the test fails if the closure is moved out of the validator.
+    `MINIMUM_PAPER_TRADING` and 18d; and naming ADR-016's human-authorization
+    closure and 26f. The test fails if either closure is moved out of the
+    validator.
 50. The same pattern one rung up for each live rung, `Micro Capital → Limited
     Capital` and `Limited Capital → Production`: refused, naming the live-duration
     minimum and 25e.
@@ -5032,9 +5340,55 @@ S3.)*
 52. After a demotion from `Micro Capital` to `Paper Trading`, a `Promote` back to
     `Promotion Review` carrying an evidence record that was on the review of a rung
     at or before the demotion is refused naming 25i and the rung; one binding a
-    report whose subject version predates the demotion is refused naming the
-    subject version's ladder length. The same record with a timestamp moved later
+    report whose data window starts on or before the demotion's anchor is refused
+    naming both dates (rule 4(f), 26d). The same record with a timestamp moved later
     is still refused, which is what "by ladder position" means.
+
+*The second pass (2N1-2N4, 2N10-2N12; 25d, 26a, 26c, 26d, 26e). Each was run in the
+scratch model named in the revision history; each asserts the named result.*
+
+53. **2N1, model C.** One hand-signed file: seven rungs `Idea` to `Production` and
+    one down to `Limited Capital`, naming reviews that are not stored, with a
+    `parent_hash` naming nothing. The current-stage read **raises**, naming
+    `NO_BASE`. Before this revision it returned `LIMITED_CAPITAL`.
+54. **2N1, model C2.** An honest strategy at `Paper Trading` (`v4`) and a forged
+    `v5` extending it, in one file, up to `Limited Capital` and down to `Micro
+    Capital`. The read returns `Paper Trading` from `v4`'s base, flagged: three
+    `UPWARD_REVIEW_UNRESOLVED`, one `DOWNWARD_REVIEW_UNRESOLVED`, one
+    `VERSION_FAILS_3C`. Before this revision it returned `MICRO_CAPITAL`.
+55. **The base ends upward (model C3).** The same honest `v4`; a forged `v5` at
+    `Production`; a genuine, stored, integrity-valid `Demote` review of `v5` to
+    `Limited Capital`; `v6` appending it. Asserts that `v6` passes rule 3c **and**
+    that the read is `Paper Trading`. The first half is what makes the test
+    meaningful: it fails if "passes 3c" alone is ever taken as a base again.
+56. **2N2, model F.** A strategy demoted `Production → Paper Trading` at `v9`, with
+    its `Demote` review stored. Delete `v9`'s file: the read returns `Paper
+    Trading`, flagged `STORED_DEMOTION_NOT_IN_LADDER`. Delete the review too: the
+    read returns `Production` with no flag, and the test's docstring names this as
+    the stated residual that only git history shows, so nobody mistakes the
+    assertion for a guarantee. And the honest pair: after a demotion and a re-climb
+    whose ladder carries the `Demote` rung, the stored review is not applied again.
+57. **2N3.** An honest strategy at `Paper Trading`; a Revision changing only
+    `confidence`. Rule 3c passes, with the review's subject found by rule 3a's scan
+    as the version with ladder `L[:-1]`; and a second Revision of that Revision
+    passes too. Under the previous wording both failed condition 5.
+58. **2N4 and 26a, model D.** One forged file stepping `Paper Trading → Retired`
+    with no stored review. The read returns `Retired`, flagged
+    `DOWNWARD_REVIEW_UNRESOLVED`; the frontier is still the honest `v4`, and an
+    honest `Paper Trading → Promotion Review` Append from `v4` saves; and a later
+    `Promote` binding evidence from before the forged rung is not refused by rule
+    4(f), because the forged rung is not in the demotion index.
+59. **2N10 and 26c.** A Revision of a version at `Micro Capital` changing only
+    `confidence`, with no `confidence_review`: refused by `save()` and by rule 3c,
+    naming 26c. With a `confidence_review` naming a `Remain Current Stage` review
+    whose `resulting_confidence` differs: refused naming both values. The same
+    Revision at `Paper Trading` saves. (Today no strategy can reach `Micro
+    Capital`; the test builds the store by hand, as test 48 does.)
+60. **2N11 and 26d.** After a demotion whose anchor is 2026-03-31, a `Promote`
+    binding a report computed afterwards over 2016-01-04 to 2026-06-30, tagged with
+    a post-demotion subject version, is refused naming the window's start and the
+    anchor. The same with a window starting 2026-04-01 is not refused by rule
+    4(f).
 
 ---
 
@@ -5052,6 +5406,11 @@ Positive:
 - a funded strategy's rules cannot be swapped under its identifier (rule 3g, 25c)
 - a damaged or deleted record can lower the stage Belay reads, never raise it, and
   never block a demotion (rules 3b, 3e, 3h; 25d)
+- a downward step can lower an established stage and never supply one, and a
+  downward step whose review does not resolve is flagged for a person and changes
+  nothing else (rule 3h; 26a)
+- reading a stage re-checks the last step's bound reports and ADR-016 rule 8
+  (rule 3c; 26e)
 - one read, and only one, states a strategy's capital stage (rule 8)
 - the REVIEW record stops being a statement *about* a strategy and becomes a thing
   the strategy must *produce* to move
@@ -5085,13 +5444,21 @@ Negative:
 - **a post-`Idea` strategy's title, tags, summary, author and editorial lifecycle
   are frozen** with the rest of its specification (rule 3g, DRAFTER beyond 25c's
   capital stages). A correction means a new identifier
-- **anyone who can write one signed file can force a strategy's stage down** (rule
-  3e's counting rule). Accepted under 25d as a denial of capital, never a grant
+- **anyone who can write one signed file can force the stage Belay reads down**
+  (rule 3h), and one file with no base makes the read raise. Accepted under 25d as a
+  denial of capital, never a grant. Since 26a such a file no longer blocks saves or
+  bars evidence, and it is flagged on every read until a person repairs it
+- **a strategy demoted from a capital stage cannot re-enter one for at least ten
+  years** under rule 4(f)'s literal reading of 26d with Part 22b (rule 4(f))
+- **a funded strategy's confidence cannot change without a recorded human yes**
+  (rule 3g, 26c)
 - **a mistake three versions back can no longer be revised in place.** Owner
   selection 6; correction is forward-only
-- **`get()` is no longer one integrity check.** Two extra artifact reads on every
-  in-scope read, and it can now refuse a file it used to return. The current-stage
-  read (rule 3h) also lists every stored version of the identifier
+- **`get()` is no longer one integrity check.** Extra reads on every in-scope read
+  (two, plus one per report the last review binds, plus one on a Revision), and it
+  can now refuse a file it used to return. The current-stage read (rule 3h) also
+  lists every stored version of the identifier and reads its stored downward
+  reviews through a subject index that does not exist yet
 - `save()` and `get()` acquire a validation failure mode on the path a promotion gate
   sits on
 - committed artifacts per rung, permanent and tracked under ADR-014 rule 2, with no
@@ -5118,15 +5485,23 @@ Negative:
   earlier six rungs' reviews and the predecessor's own ancestors need not exist.
   **The falsification pass of 2026-09-24 showed those three files could carry a
   review with no evidence at all (B3).**
-- **Against this revision: still three files, but they must now pass the bar.** Rule
-  3c runs the full validator on the review, so it must carry evidence meeting
-  ADR-016's self-contained checks — and **no capital rung can be reached this way
-  today**, because each is closed by a `None` constant that the validator reads
-  (18d, 25e). What three files can still buy is a zero-capital stage with bound
-  reports that do not exist; rule 3f's sweep finds that (B3's residual, rule 3f).
+- **Against the 2026-09-24 revision: one file**, if its last rung was downward
+  (second-pass finding 2N1). Executed: `LIMITED_CAPITAL` with no review on disk.
+- **Against this revision: three files, and the stored reports they bind.** Rule 3c
+  runs the full validator on the review, resolves every report it binds and applies
+  ADR-016 rule 8 (26e); a downward last rung only lowers a stage the walk has
+  already established (rule 3h). **No capital rung can be reached this way today**,
+  because each is closed by a `None` constant the validator reads (18d, 25e, 26f).
+  **`Paper Trading` cannot either**: its review must bind a stored significance
+  report that passes rule 8, which needs the amended ADR-012's recorded conditions,
+  and no module writes them. What three files can still buy is `Research` or
+  `Validation`, where no report is bound. *(Replaced 2026-09-25: this bullet said
+  three files could buy "a zero-capital stage with bound reports that do not exist";
+  26e removed that.)*
 - **To forge a history that also survives rule 3f's sweep: fifteen files** for a
   strategy at `PRODUCTION` — eight strategy versions and seven reviews, each
-  evidenced, each internally consistent, each resolving.
+  evidenced, each internally consistent, each resolving — plus every report those
+  reviews bind, each stored at the grade its producing module writes.
 
 **So `get()` raises the floor from one file to three, and only the sweep raises it to
 fifteen.** Stating the three honestly is the point: the previous draft claimed a
@@ -5134,7 +5509,9 @@ guarantee it did not have.
 
 **And none of this stops an insider** — though ADR-016 rule 9 (25f) now requires a
 recorded human authorization on every capital rung, and refuses a reviewer declared
-as an AI. That is a recorded declaration, not an authenticated identity. `ArtifactIntegrity.sign()`
+as an AI. That is a recorded declaration, not an authenticated identity, **and so
+ADR-016 keeps every capital rung closed until a human authorization can be verified,
+not only declared (26f)**. `ArtifactIntegrity.sign()`
 (`framework/artifacts/integrity.py:71-80`) is a **checksum, not a signature**: SHA256
 over the artifact's own contents, no key, so anyone who can call it can produce a
 valid hash for any content. Nothing in `framework/` authenticates an author.
@@ -5217,8 +5594,28 @@ would then record one strategy's history under the other's name.
 **Refusing to read a damaged record.** Rejected by 25d. A refusal on read also
 refused the demotion that the damage called for (S2).
 
-**Excluding a failed-3c version from the frontier whichever way it went.** The third
-draft's rule; rejected by 25d on B2's executed evidence.
+**~~Excluding a failed-3c version from the frontier whichever way it went.~~ No
+longer rejected — adopted again in rule 3e, 2026-09-25.** The third draft's rule,
+rejected in the 2026-09-24 revision on B2's executed evidence. 26a ruled that an
+unresolved downward step does "nothing more" than lower the read, and the second
+pass showed that counting it made a one-file `Retire` final (2N4). B2 is now stopped
+at the read (rule 3h steps 4 and 5), not at the frontier. Struck through rather than
+deleted so the reversal is visible.
+
+**Counting a downward last rung without its review, as the 2026-09-24 revision
+did.** Rejected by 26a and on the second pass's executed evidence (2N1, 2N4): one
+file with no reviews read as `Limited Capital`, and one file retired a strategy
+permanently.
+
+**Taking "the nearest version that passes 3c" as the base.** The second pass's own
+wording of the fix. Rejected on this revision's executed evidence (rule 3h, model
+C3): a genuine `Demote` review stacked on a forged version passes 3c and would
+supply `Limited Capital`. The base must also end upward.
+
+**Ignoring a tip that has no base.** It establishes nothing, so ignoring it looks
+safe. Rejected because a genuine demotion whose predecessor file was deleted is such
+a tip, and ignoring it would read the stage before the demotion. The read raises
+instead, which is zero capital (25d).
 
 **A twelfth relationship type, e.g. `Promoted By`.** Rejected.
 `framework/artifacts/relationships.py:1-12` records that `Knowledge/Relationships.md`
@@ -5247,15 +5644,15 @@ in favour of declare-and-reconcile — rule 5.
   regression check"; nothing on GitHub records such a check. #15, #17 and #18 have
   no reviews, and the second review posted on PR #7 on 2026-09-22 found none. What
   is evidenced is CI, and that later review.)*
-- **Part 25 on `main`.** The owner's 25a-25j are recorded on branch
-  `claude/kind-knuth-9g7xlr` and not yet merged. Rules here that cite 25x rest on
-  that record
+- **Parts 25 and 26 on `main`.** The owner's 25a-25j and 26a-26f are recorded on
+  branch `claude/kind-knuth-9g7xlr` and not yet merged. Rules here that cite 25x or
+  26x rest on that record
 - **ratify or amend**, after ADR-016 is revised and a fresh independent pass has
   tried to break both
 - **a fresh independent pass, BEFORE implementation, on this ADR and ADR-016
-  together.** The owner's chosen different-AI pass on Issue #21 is still owed. Three
-  passes have now found eight blocking defects in drafts whose citations and
-  measurements were each time correct —
+  together.** The owner's chosen different-AI pass on Issue #21 is still owed. Four
+  passes have now found ten blocking defects in this ADR, in drafts whose citations
+  and measurements were each time correct —
   which is the standing lesson that verifying an ADR's *facts* is not attacking its
   *rules*. ADR-014's Status block records what happened when the ordering was reversed:
   19 defect-grade errors across 93 claims, eight in committed code
@@ -5263,7 +5660,16 @@ in favour of declare-and-reconcile — rule 5.
   against unchanged code. **Rule 5 before any REVIEW artifact is committed**, or it
   becomes a migration of append-only records
 - **rule 3h's current-stage read, with rule 3b's downward append, landed in the same
-  change as rule 3e's counting rule.** Separately, each reopens B2 or S2
+  change as rule 3e's counting rule.** Since 26a the frontier no longer stops B2;
+  only the read does. Separately, each reopens B2, S2 or 2N4
+- **the subject index — required infrastructure for rule 3h step 5 and ADR-016 rule
+  3 check 7.** Every stored REVIEW and REPORT, listed by `subject_id`, derived from
+  the store and rebuildable by a full scan, never a separately maintained file. It
+  lands in the same change as rule 3h, or step 5 runs as a full scan until it does.
+  Without step 5, deleting one version file undoes a demotion (2N2)
+- **the repair flag reaches a person.** `scripts/status.py` reports every strategy
+  whose current-stage read carries `needs_repair`, and rule 3f's sweep lists every
+  repair entry (rule 3h step 6, 26a)
 - **rule 3f's chain sweep**, in the shape ADR-014 rule 7 and
   `tests/data/test_store.py:238-267` use. It is what rule 3c's one level deliberately
   does not do, and the residual-risk count above depends on it existing
@@ -5296,11 +5702,23 @@ rulings:**
    summary, author and editorial lifecycle frozen with the rest (rule 3g).
 3. The current-stage read's cost against 9e(iii)'s "two extra reads" (rule 3h).
 4. A raise on the capital read meaning zero capital (rules 3h and 8).
-5. Whether rule 3c should also resolve bound reports on a capital rung, before any
-   capital rung opens (rule 3f, B3's residual).
+5. ~~Whether rule 3c should also resolve bound reports on a capital rung.~~
+   Settled: RULED 26e, for the last rung's review whenever it binds reports
+   (rule 3c).
 6. One `Validated By` edge covering downward rungs too (rule 1, N6).
 7. A pointer from ADR-004 rule 4, `strategies/Registry.md` and
    `Operations/README.md` to this ADR, which only the owner may add (rules 4 and 8).
+8. The current-stage read's shape: `current_stage(id)` returning a `StageRead`, and
+   `get(id)` with no version refusing on a STRATEGY identifier (rules 3h and 8).
+9. The repair flag's five codes, and a flagged read acted on at the stage it reads
+   (rules 3h and 8).
+10. Rule 4(f)'s anchor (the later of the demotion review's `created` date and the
+    latest data end already bound), and the literal reading of 26d that bars any
+    data dated before a demotion, at a cost of at least ten years off capital for a
+    demoted strategy; the alternative is "data a report used before the demotion"
+    (rule 4(f)).
+11. Confidence below the capital stages revisable freely, and the
+    `confidence_review` shape (rule 3g, 26c).
 
 **What happens to a strategy whose authorizing review is later found to be wrong.**
 Owner selection 6 settles the *direction* — correction is forward, by appending a
@@ -5311,8 +5729,9 @@ when the fault is in a review rather than in the strategy. `Superseded By`
 **The denial of service that "longest history wins" admits.** Rule 3e. A forger who
 writes three consistent files can own an identifier permanently, because nothing can
 be deleted and identifiers are never reused. No mitigation inside this ADR; the
-defences are access control, git review and rule 3f. Since 25d, a single forged
-downward file does the same more cheaply, and only lowers the stage.
+defences are access control, git review and rule 3f. A single forged downward file
+no longer owns the identifier (26a, rule 3e): it lowers the read and is flagged
+until a person repairs it.
 
 **Who may sign, and whether Belay needs a real signature rather than a checksum.** The
 largest question this ADR touches and much wider than F-007 — it reaches every artifact
