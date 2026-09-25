@@ -42,7 +42,7 @@ open pull requests and Issues on GitHub, `python -m pytest -q`,
 | #20 | ADR-016 draft, Part 22, the ADR-012 amendment draft (`docs/proposals/ADR-016-evidence-bar-DRAFT.md`) | Moves with ADR-015 |
 | #33 | Parts 32-34 and the final-text-round session close | Open |
 | #36 | F-032 to F-036 fixes, Parts 35-36, ADR-017's draft (grade from provenance) | **The fourth pass broke attempt three** (four blocking). Not to be ratified; attempt four is owed |
-| this branch | Part 37 (ADR-017 promises option A), the fourth pass's session record | Merge after #36 |
+| #37 | Part 37 (ADR-017 promises option A), the fourth pass's session record | Merge after #36 |
 
 Both merge cleanly onto this `main` and pass (704), except that each one
 appends to the end of `docs/OwnerDecisions.md` or `docs/OperatorChecklist.md`.
