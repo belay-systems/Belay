@@ -4285,7 +4285,7 @@ minimums, 18d and 25e), the recorded human authorization (25f), `variants_tried`
 and `bar_version` (25g, 25h). **Resolving the bound reports and rule 8 are now in
 this read too (26e, the fourth bullet above).** The ADR-016 checks that read *other*
 reviews or the whole store — rule 3 check 7 (every report considered is listed),
-rule 6 checks 3-4, rule 10's non-decreasing `bar_version`, and rule 4(f) — still run
+rule 6 checks 3-5, rule 10's non-decreasing `bar_version`, and rule 4(f) — still run
 only in `save()` and in rule 3f's sweep. If any read called `get()`, reading a
 strategy at `PRODUCTION` would walk seven predecessors and seven reviews and each
 review would want its subject. `framework/artifacts/repository.py:129-166` argues
@@ -4461,7 +4461,7 @@ the whole store.
 **What the sweep adds to rule 3c.** Rule 3c checks the last rung, including its
 bound reports and ADR-016 rule 8 (26e). The sweep checks every rung, every
 predecessor back to `Idea`, the store-wide checks rule 3c does not make (ADR-016
-rule 3 check 7, rule 6 checks 3-4, rule 10's non-decreasing `bar_version`, rule
+rule 3 check 7, rule 6 checks 3-5, rule 10's non-decreasing `bar_version`, rule
 4(f)), and lists every repair flag rule 3h raises. *(Replaced 2026-09-25, finding
 2N12: this paragraph was the residual "a forged review whose bound reports do not
 exist passes rule 3c". 26e ruled that 3c resolves them, so the residual is gone,
