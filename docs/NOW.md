@@ -14,19 +14,19 @@ said before lives in `docs/sessions/` and in git history
 
 ## Where things stand
 
-Written 2026-09-25, for `main` as it stands once #14, #24, #31 and #32 have
-merged, in that order. #32 is the last of them.
+Written at the close of 2026-09-25, for `main` once #37 has merged. #37 carries
+no code: Parts 37-40, this session's record and this file.
 
-- **Suite:** 704 passed, 1 skipped, 5 xfailed (`python -m pytest -q`). That was
-  the result of the merge rehearsal on a scratch copy of `main`.
-- **`python scripts/status.py`:** exits 0, 40 open findings. F-019 closed with
-  #24.
-- **ADRs on `main`:** 14 (`grep -c "^## ADR-" docs/DECISIONS.md`).
-  ADR-015 (#7) and ADR-016 (#20) are drafts on branches, neither ratified.
-- **Owner rulings on `main`:** Parts 1-19, 21 and 23-31. Part 20 (#22) is not
-  adopted (Part 30), and #22 is closed. Part 22 is on #20.
-- **Review gate:** `python scripts/review_due.py` gives the next finding
-  number and is the only authority on it. Do not restate its answer here.
+- **Suite:** 704 passed, 1 skipped, 5 xfailed on `main` (`python -m pytest -q`).
+- **`python scripts/status.py`:** exits 0.
+- **ADRs on `main`:** 14 (`grep -c "^## ADR-" docs/DECISIONS.md`). ADR-015 (#7),
+  ADR-016 (#20) and ADR-017 (#36) are drafts on branches, none ratified.
+- **Owner rulings on `main`:** Parts 1-19, 21, 23-31 and 37-40. Part 20 is not
+  adopted (Part 30). Part 22 is on #20, Parts 32-34 on #33, Parts 35-36 on #36;
+  each is a proposal until it merges. Parts 37-40 refer to Parts 35-36 and read
+  fully once #36 lands.
+- **Review gate:** `python scripts/review_due.py` gives the next finding number
+  and is the only authority on it. Do not restate its answer here.
 - **Contributors help and never gate** (Part 30). Work lands on the owner's
   word, through the Owner bypass.
 
@@ -38,37 +38,32 @@ open pull requests and Issues on GitHub, `python -m pytest -q`,
 
 | PR | What | State |
 |---|---|---|
-| #7 | ADR-015: a strategy's stage is carried, not asserted (F-007, F-014) | The final text round: item 1 below |
-| #20 | ADR-016 draft, Part 22, the ADR-012 amendment draft (`docs/proposals/ADR-016-evidence-bar-DRAFT.md`) | Moves with ADR-015 |
+| #36 | F-032 to F-036 fixes, Parts 35-36, ADR-017's draft (grade from provenance) | **Attempt three was broken by the fourth pass** (four blocking). Not to be merged or ratified as it stands: attempt four goes here (item 1) |
 | #33 | Parts 32-34 and the final-text-round session close | Open. Goes red against #36's finding-number test if #36 merges first (#36's `docs/NOW.md` says how to fix it) |
-| #36 | F-032 to F-036 fixes, Parts 35-36, ADR-017's draft (grade from provenance) | **The fourth pass broke attempt three** (four blocking). Not to be ratified; attempt four is owed |
-| #37 | Parts 37-40 (ADR-017 promises option A; prices bound to the record; results name their record; attempt four picks the method), the fourth pass's session record | Merge after #36 |
+| #7 | ADR-015: a strategy's stage is carried, not asserted (F-007, F-014) | The final text round: item 2 below |
+| #20 | ADR-016 draft, Part 22, the ADR-012 amendment draft | Moves with ADR-015 |
 
-#7 and #20 merge cleanly onto this `main` and pass (704), except that each
-appends to the end of `docs/OwnerDecisions.md` or `docs/OperatorChecklist.md`:
-there, keep `main`'s text first and add the branch's text after it. **That rule
-does not hold for `docs/NOW.md`**, which #33, #36 and #37 each rewrite: keeping
-both sides gives two next-task lists and fails the build. Resolve `docs/NOW.md`
-to the branch merging second's own intent, with one list.
+**Merging any of these into `main`:** for `docs/OwnerDecisions.md` and
+`docs/OperatorChecklist.md`, keep both sides. **Not for `docs/NOW.md`**, which each
+rewrites: keeping both sides gives two next-task lists and fails the build. Take
+`main`'s `docs/NOW.md` and carry over what is still true.
 
 ## Highest Priority Next Task
 
-1. **ADR-017 (#36): build attempt four.**
-   - The fourth independent pass on #36 broke attempt three three ways, all posted there:
-     the repository and store it trusts are folders the caller picks, record paths
+1. **ADR-017 attempt four, on #36.** Start from
+   `docs/proposals/ADR-017-attempt-four-session-brief.md`, which has the phases,
+   the tests to write first, and the owner questions to expect.
+   - The fourth independent pass on #36 broke attempt three three ways: the
+     repository and store it trusts are folders the caller picks, record paths
      escape them with `..`, and prices are not bound to the record.
-   - The owner chose option A (Part 37): guard against honest
-     mistakes and make faking visible in review; not "impossible".
-   - The owner then ruled: Level C needs the prices used to match what the fetch
-     received (Part 38), and every Level C metric artifact names the fetch record
-     behind its grade (Part 39).
-   - **Attempt four picks the method** that binds the prices, and its independent
-     pass checks the choice (Part 40, kept by the owner on the corrected facts).
-     Read Part 40's "What the owner was told that was wrong" first: re-reading the
-     stored bytes needs new code and passes a parser change silently; a stored
-     fingerprint fails loudly and needs ADR-014 rule 5 revisited to recover.
-   - **Next:** attempt four on #36, built to Parts 37-40 and the fourth pass's
-     findings; then its own independent pass; then ratification. Not before.
+   - The owner ruled what attempt four must meet: option A, guard against honest
+     mistakes and make faking visible in review (Part 37); Level C only on the
+     prices the fetch received (Part 38); every metric artifact over a fetch names
+     its record (Part 39); attempt four picks how the prices are bound, and its
+     independent pass checks the choice (Part 40).
+   - **Read Part 40's "What the owner was told that was wrong" before choosing a
+     method.** The owner was twice told something wrong while deciding.
+   - Then its own independent pass; then the owner ratifies or rejects. Not before.
 2. **Finish the evidence bar the way Part 28e rules.**
    - **Step 1, the final text round on #7 and #20, with no redesign:**
      - fix the two blocking findings of Issue #21's fourth pass (F4-3 and

@@ -967,6 +967,13 @@ stated, and re-fetching would not give `RPT-0001` a fingerprint.
 What a later re-check does when the record is missing or has changed was not
 asked, and is left open there.
 
+## Later — merge #36, after attempt four and its independent pass
+
+#36 holds attempt three, which the fourth pass broke. #37 (Parts 37-40) was merged
+first on the owner's word, "merge approved if needed". #36 merges only on the owner's
+word, once attempt four is built to Parts 37-40 and its own independent pass is
+answered. `docs/proposals/ADR-017-attempt-four-session-brief.md` has the plan.
+
 ## Later — ratify or reject ADR-017
 
 After attempt four is built to Parts 37-39 and has had its own independent pass.

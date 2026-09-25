@@ -76,8 +76,8 @@ every metric artifact built after it (none is stored).
 - `docs/OwnerDecisions.md` — Parts 37 to 40.
 - `docs/OperatorChecklist.md` — five Done entries (option A, the two follow-ups,
   the method, and keeping Part 40), and ratification (Later).
-- `docs/NOW.md` — "Where things stand" (the review-gate line), "In flight", and the
-  next-task list.
+- `docs/NOW.md` — rewritten at close for `main` once #37 has merged.
+- `docs/proposals/ADR-017-attempt-four-session-brief.md` — the next session's brief.
 - This record.
 
 No code changed.
@@ -178,10 +178,13 @@ owner did not say; a count without its command; and the merge rule below, which 
 - **Left open by Parts 38 and 39:** how an adjustment is recorded; refusal or
   Level D on a mismatch; what a later re-check does when a named record is missing
   or has changed; that the named record is committed.
-- **Merge order.** Parts 37-40 refer to Parts 35 and 36, so this branch merges
-  after #36. For `docs/OwnerDecisions.md` and `docs/OperatorChecklist.md`, keep the
-  text already on `main` first and add this branch's after it. **Not for
-  `docs/NOW.md`:** keeping both sides fails the build. Take #36's `docs/NOW.md`,
-  **replace** its item 1 (the fourth pass, now done) with this branch's ADR-017 item,
-  and add the #37 row. Keeping #36's item 1 as well also passes the tests, so nothing
-  would catch the stale item.
+- **Merge order, reversed at close.** The records above said #37 merges after #36.
+  At close the owner said "merge approved if needed", and #37 was merged first: the
+  owner's rulings bind only once on `main` (the review procedure treats a Part on an
+  unmerged branch as a proposal), and the next session starts from `main`. #36 was
+  **not** merged: the fourth pass's blocking findings stand against it, and attempt
+  four is built there. When #36 later merges `main`, keep both sides in
+  `docs/OwnerDecisions.md` (placing Parts 35-36 before Part 37) and
+  `docs/OperatorChecklist.md`, and take `main`'s `docs/NOW.md`. The brief says so.
+- **Set up for the next session:** `docs/proposals/ADR-017-attempt-four-session-brief.md`,
+  named from `docs/NOW.md`'s item 1.
