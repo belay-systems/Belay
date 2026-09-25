@@ -167,9 +167,9 @@ false citation survived inside an Accepted decision until ADR-007
 anything described in the present tense. Confirm each exists. Aspiration written
 as fact is how a project loses track of what it is.
 
-**E5. HANDOFF as claim.** `docs/HANDOFF.md` is a session's account of its own
-work. Spot-check its most load-bearing assertions against the code. It is the
-document with the strongest incentive to be generous.
+**E5. HANDOFF as claim.** `docs/NOW.md` and `docs/sessions/` are a session's
+account of its own work. Spot-check their most load-bearing assertions against
+the code. They are the documents with the strongest incentive to be generous.
 
 **E6. Prose the tooling must parse.** `docs/DocumentStandard.md` exists to let
 tooling index documents deterministically; it is unapplied, so `scripts/status.py`

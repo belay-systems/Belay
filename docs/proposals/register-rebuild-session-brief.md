@@ -78,7 +78,7 @@ review's F-007, F-012, F-008 and F-011 respectively.
    a line that exists, so moving code moves the citations that name it.
 4. **The independent verification pass runs before a change lands, not after.**
    This repository has lost a session's work to getting that ordering wrong.
-5. Close the session per `AGENTS.md` steps 13 and 14 — update `docs/HANDOFF.md`,
+5. Close the session per `AGENTS.md` steps 13 and 14 — rewrite `docs/NOW.md`,
    and record anything only the owner can do in `docs/OperatorChecklist.md`.
    These are no longer honour-system: rule 4's tests fail when they are skipped.
 

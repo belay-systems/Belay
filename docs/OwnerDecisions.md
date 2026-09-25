@@ -2863,6 +2863,615 @@ both loud and both safe.
 Whether the gate should ever read four-digit numbers. At the ceiling it stops
 and names the file.
 
+---
+
+# Part 16 — Ruled 2026-09-22: the second contributor gets Admin, overruling 15b
+
+**Question put.** The owner reported the second contributor's organization
+invitation accepted and asked a session to grant Write access — the mechanical
+step 15b already authorized. Before the session could act, the owner said: "i
+manually gave [the second contributor] Admin perms." `gh`-equivalent lookup
+(`list_repository_collaborators`) confirmed: `eternalaether5`, `role_name:
+"admin"`, on the live repository. That is beyond 15b's ruling and reopens the
+tradeoff 15b named: with Admin, `eternalaether5` can bypass the `main: review`
+ruleset (its bypass condition is "any organization owner, through a pull
+request" — `docs/HANDOFF.md:5446-5453`), so the code-owner review requirement
+binds nobody but whoever the two owners choose to have it bind; and the
+owner's account is no longer the only one that can recover the organization.
+The session put three options: dial back to Write (matching 15b), keep Admin
+and update the ruling, or leave it unrecorded. The owner selected the second.
+
+**Owner said: "Keep Admin, update the ruling".**
+
+### What it settles
+
+`eternalaether5` holds Admin on `belay-systems/Belay`, not Write. 15b's role
+choice is overruled; 15b's reasoning is not wrong, it is a cost the owner has
+now chosen to accept knowingly rather than one the owner needs re-explained.
+`.github/CODEOWNERS:11`'s "Unknown owner" condition (`docs/OperatorChecklist.md`,
+"`.github/CODEOWNERS` is invalid while the invitation is pending") clears on
+this grant regardless of role — GitHub counts a code owner once the login has
+write access or above, and Admin includes write.
+
+### What it does not settle
+
+- **The `main: review` bypass is now live, not hypothetical.** Any merge
+  either owner's login pushes through as an organization owner skips the
+  code-owner check. Nothing in the repository enforces the second pair of eyes
+  Part 11a and `.github/CODEOWNERS`'s own comment describe once both
+  logins can bypass it. Whether that is acceptable day to day, or worth a
+  ruleset change, is the owner's — the session did not weaken it before
+  being asked to stand down.
+- **Organization recovery is no longer sole-owner.** Unchanged from what 15b
+  named as the cost of *not* doing this; now it applies.
+- How Belay is owned between the two, per 15b, is still unwritten.
+
+## 16a. Correction to Part 16 above, made within the same pull request before merge
+
+**Part 16 as first written conflated two different GitHub permissions.**
+`.github/rulesets/main-review.json`'s `bypass_actors` names
+`"actor_type": "OrganizationAdmin"` — GitHub's organization **Owner** role.
+`eternalaether5` was made an organization **Member** (Part 15b), and nothing
+in this session changed that. The grant this Part records is a *repository*
+collaborator permission (`list_repository_collaborators` returns it as
+`role_name`, a repository-scoped field), a separate axis from organization
+role entirely. **`eternalaether5` cannot bypass `main: review`'s PR-time
+review requirement.** That bypass is exercised only by an organization
+owner — at the time of writing, the account that created the organization
+(Part 14a).
+
+**What repository Admin grants instead, and why it still matters:**
+`scripts/public_settings.py:216` manages `main: review` and `main: checks`
+through `repos/{repo}/rulesets` — a repository-scoped endpoint. GitHub's
+documented permission model for it: anyone with **admin access to the
+repository** may create, edit or delete a repository-level ruleset, a
+separate check from that ruleset's own bypass list. So `eternalaether5`, with
+repository Admin, can edit or delete `main: review` or `main: checks`
+directly (Settings → Rules → Rulesets) — no pull request, no bypass
+mechanism invoked, nothing for `bypass_actors` to gate. That is a different
+and structurally larger exposure than "skips one review": it is "can turn
+the requirement off". Repository Admin also grants managing repository
+secrets and Actions settings, adding or removing other collaborators,
+changing visibility, and deleting or transferring the repository — none of
+it exclusive to organization Owners.
+
+**Not independently verified live against this repository** — that would
+need `eternalaether5`'s own credentials or an organization-owner API check
+this session does not have. Stated from GitHub's documented, stable
+ruleset-permission model, not from a reproduced call, and flagged as such
+rather than counted as evidence.
+
+### What this settles
+
+Part 16's heading and its "What it settles" section stand: the owner holds
+knowingly to Admin. Its "What it does not settle" bypass claim above is
+superseded by this section wherever the two disagree.
+
+### What it does not settle
+
+Whether the owner still wants Admin now that the actual exposure is named
+correctly — put to the owner in the same session as a direct question, not
+assumed either way here.
+
+## 16b. Resolved: `eternalaether5` is Write, not Admin — 15b restored
+
+**Question put.** Given 16a's corrected exposure, the session asked whether
+to keep Admin (and accept it), keep Admin and move the rulesets to
+organization level (closing the ruleset-edit/delete gap while keeping
+Admin's other grants), or dial back to Write. Before building anything for
+the organization-level option, the session checked whether it would even
+work: `https://github.com/organizations/belay-systems/settings/rules` →
+**New ruleset** shows the picker, but with a standing banner — **"Organization
+rulesets won't be enforced until you upgrade this organization account to
+GitHub Team."** Screenshotted by the owner. Free-organization rulesets can be
+created but do nothing; building them would have produced a false sense of
+protection, not a real one. That option was dropped without being built.
+
+**Owner said: "maybe i just give him write access"**, then, after the owner
+changed it on GitHub: **"done."** `list_repository_collaborators` confirms:
+`eternalaether5`, `role_name: "write"`.
+
+### What it settles
+
+`eternalaether5` holds Write on `belay-systems/Belay`. Part 15b's original
+role choice is restored — Part 16's Admin grant stood for under two hours,
+corrected once its actual cost was understood rather than the one first
+assumed. The `main: review` and `main: checks` rulesets, unmodified
+throughout, now bind `eternalaether5` exactly as they were designed to:
+no bypass, no ability to edit or delete either ruleset, no repository
+settings, secrets or Actions access, no ability to add or remove other
+collaborators.
+
+### What it does not settle
+
+**Upgrading `belay-systems` to GitHub Team, which is the only way an
+organization-level ruleset would actually enforce here**, was surfaced and
+not pursued — it costs money and creates a paid subscription, which is the
+owner's decision alone (`AGENTS.md`, "Decisions that are the owner's
+alone"). If the owner wants organization-level protection later, that
+upgrade is the prerequisite; nothing here rules it in or out.
+
+---
+
+**What Part 16 does not touch.** Parts 1 through 15 stand except where 16
+says otherwise. No finding is opened or closed and no ADR changes status.
+
+---
+
+# Part 17 — Ruled 2026-09-22 (same session, minutes later): `eternalaether5` becomes an organization Owner, overruling 15b and 16b
+
+**Owner said:** "git recommends atleast 2 owners... so im giving him owner
+status again. sorry. the fix can be a new issue. log it." Confirmed live:
+`list_repository_collaborators` now reports `eternalaether5`,
+`role_name: "admin"` — the repository-level effect of organization Owner,
+which grants implicit admin on every repository in the organization. This is
+not the same change as Part 16's repository-Admin grant, corrected back out
+in 16b; organization Owner is a different and larger thing, on a different
+axis than either Part 16 or 16b considered.
+
+**What this reopens, precisely, having learned from Part 16's first mistake
+not to guess:** organization Owner satisfies
+`bypass_actors: [{"actor_type": "OrganizationAdmin"}]` in both
+`.github/rulesets/main-review.json` and (empty list, so moot)
+`main-checks.json`. Unlike Part 16's repository Admin, this bypass is real:
+either owner's login can now skip `main: review`'s required approving
+review and code-owner check on any pull request. `.github/CODEOWNERS`'s own
+comment — "Nobody can approve their own pull request, so this still means a
+second pair of eyes on ordinary work" — no longer holds as a GitHub-enforced
+fact for either owner; it holds only as a convention both choose to follow.
+Organization Owner additionally grants: full organization administration
+(billing, removing or adding owners, deleting the organization), not merely
+repository administration.
+
+**Why the owner did it anyway:** GitHub itself recommends an organization
+carry more than one Owner, so that no single lost or locked account strands
+the organization permanently — the same risk Part 15b named as the cost of
+*not* doing this ("the owner's is then the only account that can recover
+the organization"), now resolved in the other direction. This is a real
+tradeoff between two risks, not a lapse: account-recovery risk against
+review-bypass risk. The owner chose to accept the second to remove the
+first, and asked for the remedy to be tracked as follow-up work rather than
+solved in this moment.
+
+### What it settles
+
+`eternalaether5` is an organization Owner. Parts 15b and 16b's Member-only
+position is overruled a second time, this time deliberately and with the
+bypass consequence named up front rather than discovered after the fact.
+
+### What it does not settle
+
+**How the review-bypass gap gets closed, if it does.** The owner asked for
+an Issue rather than a fix in this session. Filed as Issue (linked from
+`docs/OperatorChecklist.md`) rather than solved here, because the honest
+options need more than one message's thought: e.g. swapping
+`bypass_actors` from `OrganizationAdmin` to a specific team whose membership
+the owners control more granularly, accepting the bypass as a documented
+convention-only gate, or something not yet considered. Nothing here decides
+between them.
+
+---
+
+**What Part 17 does not touch.** Parts 1 through 16 stand except where 17
+says otherwise. No finding is opened or closed and no ADR changes status.
+
+## 17a. Notes from the independent pass, 2026-09-25, made before merge
+
+A fresh-context falsification pass on this pull request found four places
+where the record says more than its evidence. None changes a ruling. Family
+wording in Part 16's quotation is redacted, as in Part 11a.
+
+- **"Confirmed live" above is an inference.** `role_name: "admin"` is also
+  what Part 16's repository-Admin grant returned. On 2026-09-25,
+  `list_repository_collaborators` with `affiliation=direct` returned no one,
+  so the Admin does not come from a direct repository grant. That fits
+  organization Owner, but an organization base permission or a team would
+  look the same. No organization-membership call is on record.
+- **"This bypass is real" is also inferred.** It rests on the ruleset naming
+  `OrganizationAdmin`, and on the check of `current_user_can_bypass` recorded
+  in `docs/OperatorChecklist.md`. That check was run for the original owner's
+  login, never for `eternalaether5`.
+- **Part 11a said governance records are "enforced by `.github/CODEOWNERS`
+  once a ruleset on `main` exists".** Under this Part that holds only as a
+  convention, for either owner. Part 30 (on #32) rules that no contributor's
+  review is required at all.
+- **Part 16's sentence** that the owner's account "is no longer the only one
+  that can recover the organization" was untrue for repository Admin, and
+  16a did not correct it. It became true only under Part 17.
+
+# Part 21 — Ruled 2026-09-22/23: step 2 of the Stage 3 order starts now, and how F-019 is fixed
+
+Part 20 is on pull request #22 and not yet on `main`; this Part is numbered
+after it. The owner's words are quoted exactly.
+
+## 21a. Step 2 may start while step 1 waits for review
+
+**Question put.** Part 9a orders the Stage 3 blockers in five steps. Step 1
+(F-007 and F-014) waits on the independent pass on ADR-015 and ADR-016
+(Issue #21), and nothing else in the build could move until it cleared. Step 2
+(F-019) changes no rule and does not touch ADR-015. The session recommended
+letting step 2 start now, with step 1 still first the moment its review clears.
+
+**Owner said: "aligned. let step 2 start now, while step 1 waits for review."**
+
+### What it settles
+
+- **Part 9a's order now reads "step 1 first when it is ready".** A later step
+  may proceed while an earlier one is blocked on review rather than on work,
+  for step 2 as ruled here.
+
+### What it does not settle
+
+- Whether step 3 (F-003, F-008, F-016) may also start before step 1. Not asked.
+
+## 21b. F-019 is fixed with seven tests and no change to behaviour
+
+**Question put.** F-019 was registered under Part 9b, and no fix was ruled. The
+session re-applied the report's mutations to `main` at `1590b34`. All seven
+that belong to F-019 still left the suite green: 659 passed with each one
+applied. The eighth row, `framework/data/survivorship.py:138`, is F-016 and
+belongs to step 3. Two options were put: (1) seven regression tests, one per
+guard, each shown red against its mutation first, and no production code
+change; (2) the same, plus the report's two optional boundary tests on
+`framework/metrics/statistics.py`, which would pin cut-offs that belong to
+F-004's unruled numbers. The session recommended (1).
+
+**Owner said: "Seven tests, one per guard, with no change to how Belay
+behaves".**
+
+### What it settles
+
+- **Seven regression tests, one per guard, and no production code change.**
+- **The two boundary cases are not pinned.** They wait for F-004's numbers.
+
+### What it does not settle
+
+- F-019's closure. It closes when those tests are merged after an independent
+  pass, per `AGENTS.md` point 4, not when they are written.
+
+# Part 24 — Ruled 2026-09-24: `markdown-it-py` is a declared dev dependency
+
+**Question put.** The tests of #23 parse the review skill with `markdown-it-py`.
+It was installed only because `rich`, a runtime dependency, requires it. If a
+future `rich` dropped it, those tests would fail to import, for a reason nobody
+could see from `pyproject.toml`. The session recommended declaring it.
+
+**Owner said: "Declare it".**
+
+### What it settles
+
+- `pyproject.toml`'s `dev` extra lists `markdown-it-py>=2.2.0`. The tests that
+  import it were run against 3.0.0 and 2.2.0 (the floor `rich` requires), and
+  both pass.
+
+# Part 25 — Ruled 2026-09-24: ten principles for the evidence bar (ADR-015, ADR-016)
+
+**Question put.** A falsification pass on ADR-015 (#7) and ADR-016 (#20),
+posted on Issue #21, found that neither is ready. As drafted, one made-up
+evidence record passes every rule for a capital rung. A stage can be read
+without its evidence being checked. A funded strategy's rules can be swapped,
+and a demotion undone by deleting one file. The pass listed ten questions only
+the owner can answer. The session put each one with a recommendation, and all
+of them follow one principle: when in doubt, less capital.
+
+**Owner said: "aligned to all 10 recommendations".**
+
+### What it settles
+
+- **25a. Distinct evidence.** "One evidence record per promotion criterion"
+  (18a) means seven distinct records. Each is backed by its own stored report,
+  of a kind suited to its criterion.
+- **25b. Part 22 is joined to the ladder.** The Paper Trading rung and every
+  capital rung rest on a significance report that passed at a critical value
+  of at least 3.0. It must also have enough data, as amended ADR-012 defines.
+- **25c. The specification is fixed on a capital stage.** A strategy's rules
+  cannot change while it holds a capital stage. A changed specification is a
+  new strategy with a new identifier, and it starts at Idea.
+- **25d. Fail toward less capital.** When the record is damaged or the
+  versions disagree, Belay reads the lowest stage it can establish. It never
+  refuses in a way that would block a demotion.
+- **25e. The live rungs stay closed until a duration is ruled.** Limited
+  Capital and Production stay closed until a minimum live duration is ruled,
+  in the same way as Part 18d's minimum for paper trading.
+- **25f. A human authorizes capital.** A recorded human yes is required
+  before any capital rung, and an AI is never the approving reviewer of one.
+- **25g. A raised bar applies from each strategy's next step.** It does not
+  re-judge past steps. No strategy holds capital today.
+- **25h. Refuse trial counts beyond the hurdle.** A `variants_tried` count
+  above what the 3.0 hurdle covers is refused until the owner rules on a
+  correction. This does not contradict 18e, which applies no correction.
+- **25i. No reuse after a demotion.** Evidence gathered before a demotion
+  cannot be reused to climb back.
+- **25j. Trading outside Belay is out of scope, and says so.** Trading done
+  outside Belay, for example by a user's own connected AI, is out of scope
+  for these ADRs. Belay's documents state that limitation plainly.
+
+### What it does not settle
+
+The numbers: the live duration minimums in 25e, and the correction for trial
+counts in 25h. It also does not ratify either ADR. Both stay PROPOSED until
+they are revised, a fresh independent pass has tried to break them, and the
+owner ratifies them. The owner's chosen different-AI pass on Issue #21 is
+still owed.
+
+# Part 26 — Ruled 2026-09-24: six more principles for the evidence bar
+
+**Question put.** A second falsification pass on the redrafts of ADR-015 (#7)
+and ADR-016 (#20), posted on Issue #21, found two new blocking holes in how
+ADR-015 reads a strategy's stage after a downward step. It also found six
+questions only the owner can answer. The session put each one with a
+recommendation.
+
+**Owner said: "Aligned".**
+
+### What it settles
+
+- **26a. A downward step whose review does not resolve lowers the stage read
+  now, and nothing more.** It never makes a Retire final and never bars
+  earlier evidence under 25i. It is flagged for a human to repair.
+- **26b. The trial cap uses an overall false-positive rate of 5%.** It is
+  computed from each significance report's own degrees of freedom, not from a
+  fixed count. It applies only where 25b's 3.0 hurdle applies: Paper Trading
+  and the capital rungs.
+- **26c. Confidence on a capital stage is a capital decision.** Changing a
+  funded strategy's confidence needs a recorded human yes, as in 25f.
+- **26d. 25i's "evidence" means the data.** A report computed after a
+  demotion over data from before it is still evidence from before the
+  demotion.
+- **26e. Reading a stage re-checks its evidence.** The current-stage read
+  resolves the last review's bound reports and applies ADR-016 rule 8, not
+  only the validator.
+- **26f. Capital waits for verification.** The capital rungs stay closed
+  until a human authorization can be verified, not only declared.
+
+### What it does not settle
+
+How a human authorization is verified. It also does not ratify either ADR;
+both stay PROPOSED until they are revised, a fresh independent pass has tried
+to break them, and the owner ratifies them.
+
+# Part 27 — Ruled 2026-09-25: seven more principles for the evidence bar
+
+**Question put.** A third falsification pass on ADR-015 (#7) and ADR-016
+(#20), posted on Issue #21, found nothing left that grants capital. It found
+one blocking way the lock jams shut on an honest strategy, and seven questions
+only the owner can answer. The session put each one with a recommendation.
+
+**Owner said: "aligned".**
+
+### What it settles
+
+- **27a. This replaces 26d.** After a demotion, a climb back requires new paper
+  or live trading evidence gathered after the demotion. A backtest may reuse
+  historical data. 26d, read as covering all data dated before the demotion,
+  would have barred about ten years of history: a permanent ban in effect.
+  27a supersedes it.
+- **27b.** Keep the current-stage read (`current_stage`). It also reports the
+  confidence that was approved.
+- **27c. Unsaved trials are a stated gap in the evidence bar, not a 25j
+  matter.** A trial run but never stored is a stated residual of ADR-016.
+  Follow-up: Belay's own tools store every run automatically.
+- **27d. A later review names what it supersedes.** When two downward reviews,
+  or a downward and a Promote, exist about the same version, the later review
+  must name the one it supersedes. Once a position, or any later one, is backed
+  by a resolving review, an older stored downward review about it stops
+  applying.
+- **27e.** 25i's bar on reuse after a demotion follows a strategy across
+  identifiers, including a re-registered unchanged specification.
+- **27f.** Reading a capital stage verifies the whole chain, not only the
+  last step.
+- **27g. Raising a stage is a capital decision.** A repair that raises the
+  stage read needs a recorded human yes, as in 25f.
+
+### What it does not settle
+
+It does not ratify either ADR. Both stay PROPOSED until they are revised, a
+fresh independent pass has tried to break them, and the owner ratifies them.
+The owner is asking the second contributor for the different-AI pass on
+Issue #21.
+
+# Part 28 — Ruled 2026-09-25: four more principles, and how the evidence bar is finished
+
+**Question put.** A fourth falsification pass on ADR-015 (#7) and ADR-016
+(#20), posted on Issue #21, found nothing that reaches capital without a
+verified human yes. It did find ADR-015 contradicting itself: one rule
+requires a human authorization on repair reviews, and another forbids that
+field there. It also found a forged file that blocks promotion permanently,
+and four questions only the owner can answer. The session also said that four
+rounds of prose had each added rules with new edge cases, and that every
+important finding was caught by running a model of the rules, not by reading
+them. It proposed a different way to finish.
+
+**Owner said: "aligned, yes to the plan".**
+
+### What it settles
+
+- **28a.** A hand-written upward step cannot cancel a pending genuine demotion
+  or retirement, at any stage. The review at that position must name it in
+  `supersedes` and carry a recorded human yes (25f, 27g).
+- **28b.** A repair or supersession that raises a funded strategy's confidence
+  needs the verified human yes of 26f, like any other confidence change on a
+  capital stage (26c).
+- **28c. A wrong date is repairable.** A mistaken or future-dated demotion date
+  must not ban a strategy and its descendants permanently. A correction of the
+  date, approved by a human, is allowed.
+- **28d.** A Retired strategy may be re-registered and climb again, carrying
+  its lineage (27e) and every bar that follows it. The ADRs say so.
+- **28e. How it is finished.**
+  1. One final text round fixes the two blocking findings and applies 28a-28d,
+     with no redesign.
+  2. The current-stage read is then built as code. Every attack from the
+     falsification passes on Issue #21 becomes a test that must fail, and the
+     ADRs describe what the code does.
+  3. The second contributor's different-AI pass on Issue #21 runs in parallel,
+     on the current text.
+
+### What it does not settle
+
+It does not ratify either ADR. The code in 28e is capital-path code: it lands
+through review like any other, and it opens no capital rung. Every rung stays
+closed by its unruled constants.
+
+## Notes on Parts 24-28 from the independent pass, 2026-09-25, made before merge
+
+A fresh-context falsification pass on this pull request found the following.
+None of it changes what the owner said. It marks where the record goes beyond
+what is on file, so the owner can confirm or correct it.
+
+1. **The recommendations the owner answered "aligned" to are not on file.**
+   Parts 25-28 say each question was put with a recommendation. The questions
+   are in the pass comments on Issue #21, but the recommendations were put in
+   the session's chat, and that chat is not part of this repository. These
+   lines go beyond the questions as recorded on Issue #21, so they are **the
+   session's wording until the owner confirms them**:
+   - 25b's "at least" 3.0;
+   - 25c's "starts at Idea";
+   - 26a's "flagged for a human to repair" and "never makes a Retire final";
+   - 27b's second sentence;
+   - 27c's follow-up that Belay's own tools store every run;
+   - 27d taking both of the pass's alternatives;
+   - 28a's "at any stage" and its recorded human yes;
+   - the plan in 28e.
+2. **Part 28's premise is overstated.** Not every important finding came from
+   running a model: pass 1's B1-B3 and pass 4's F4-3 were argued from the
+   text.
+3. **25g against 26e and 27f is not reconciled.** 25g says a raised bar does
+   not re-judge past steps. 26e and 27f re-check evidence when a stage is
+   read. Neither says whether that check uses the bar in force at each step or
+   today's bar. It is open.
+4. **25h and 26b change 18e's role**, from a count that "corrects nothing" to a
+   refusal gate, without saying they amend 18e.
+5. **28e and 18g.** Part 28 does not say whether a fresh pass on the final
+   text is still required before ratification. `AGENTS.md` point 4 requires
+   one. Under Part 30 (on #32), a fresh session satisfies it, and the
+   different-AI pass is welcome but not waited on.
+6. **"Every attack becomes a test that must fail"** in 28e means the attack
+   must fail: the test passes when the attack is refused.
+7. **Part 24's floor is the session's choice.** It is lowered here from 3.0
+   to 2.2.0, the floor `rich` requires; the tests pass at both. 27a no longer
+   puts quotation marks around words 26d did not use.
+
+
+---
+
+# Part 29 — Ruled 2026-09-25: current state apart from history; the handoff is split
+
+**Question put.** The owner asked: "is there any precedent or known first
+principles about capped or other structure for our handoff and other growing
+files to be more better?" The session measured the problem:
+
+- `docs/HANDOFF.md` was 5,857 lines, more than any agent reads in one pass.
+- It held six next-task headings, and the current one was the last, while
+  `AGENTS.md` said the top-most block was current.
+- The test for that list checked the stale one.
+
+The session gave the precedents and first principles, now written up in
+`docs/proposals/growing-files.md`. It put one question: **does Immutable Law VII
+protect the knowledge, or the file layout?** It recommended "the knowledge",
+because text moved to a kept file, or rewritten while git keeps every earlier
+version, is not discarded.
+
+**Owner said: "well yeah i want you to write it all up, and implement it
+accordingly … surgical implementation".**
+
+This lifts the owner's parking of the same concern on 2026-09-23 ("Raise it
+with the owner when there is time to hash it out. Do not restructure these
+files before then"), which is recorded in `docs/HANDOFF.md` on #20's branch.
+
+### What it settles
+
+- **29a. Law VII protects knowledge, not a file's layout.** A file whose job is
+  current state may be rewritten. What the rewrite removes survives in git and
+  in the session record.
+- **29b. `docs/NOW.md` holds the current state.** It has the one
+  "Highest Priority Next Task" and the "Working Agreement". It is rewritten at
+  every session close and capped at 200 lines.
+- **29c. `docs/sessions/` holds history**, one file per session. A record is
+  never edited after it merges.
+- **29d. `docs/FINDINGS.md` is the findings register**, one row per finding.
+- **29e. `docs/HANDOFF.md` is frozen as the archive**, in place, so none of its
+  line citations moves. Its title line was edited in place to say it is
+  frozen; nothing was removed.
+- **29f. A test holds each of these rules** (`tests/test_handoff_files.py`).
+
+### Session choices, not the owner's words
+
+- **Freezing the archive in place.** The session first described moving it to
+  a new path. Reading the code changed that: `scripts/status.py` parsed it,
+  code comments cite its sections, and frozen reports cite its lines.
+- **The caps:** 200 lines and 16,000 bytes for `docs/NOW.md`, and 300 lines for
+  a session record.
+- **Parts 26-28 were taken** on #31's branch, so this Part is 29.
+
+### What it does not settle
+
+**Phase 2 is not settled.** That is the same split for `docs/DECISIONS.md`,
+this file, `docs/OperatorChecklist.md` and `CHANGELOG.md`. It waits until #7,
+#20 and #31 have landed, and it comes back to the owner as its own questions.
+
+---
+
+# Part 30 — Ruled 2026-09-25: contributors help; they never gate
+
+**Stated, not asked.** While this session was getting the open pull requests
+ready, the owner said: **"leave nothing for [the second contributor]"**, and
+then: **"contributors help where/when we cant. never need them for review,
+this was a solo project before and should be able to continue as such with
+help from others".** (Family wording is redacted as in Part 11a.)
+
+### What it settles
+
+- **30a. No contributor's review or approval is ever required for work to
+  land.** The owner, or a session acting on the owner's explicit word, may
+  land work alone. Contributors help where and when the owner cannot.
+- **30b. The independent pass stays** (`AGENTS.md`, "How work is claimed and
+  landed", point 4). A fresh session told to falsify the work satisfies it. A
+  pass by a different AI is welcome, never a gate. This covers Issue #21's
+  different-AI pass, which is no longer something the evidence bar waits on.
+- **30c. Part 20 is not adopted.** Part 20 is recorded only on #22's branch,
+  never on `main`. It required a second review for every merge and removed the
+  Owner bypass. The bypass stays as the solo merge path, and #22 is closed as
+  superseded.
+
+### Session readings, not the owner's words
+
+- **Issue #16 is moot.** It asked how to restore an enforced second review
+  once both contributors were organization Owners. Under 30a no second review
+  is wanted. The second contributor's permissions are unchanged: Part 17
+  stands.
+- **`.github/CODEOWNERS` is unchanged.** On `main` it already names only the
+  owner on the governance paths. The catch-all line naming both contributors
+  asks GitHub for a code-owner review, which the Owner bypass satisfies.
+
+### What it does not settle
+
+- Whether the rulesets should stop asking for a review at all, rather than
+  having it bypassed each time. That is a repository setting, and only the
+  owner changes those.
+
+---
+
+# Part 31 — Ruled 2026-09-25: the labeled lines in Parts 25-28 stand
+
+**Question put.** The independent pass on #31 found that the recommendations
+the owner answered "aligned" to in Parts 25-28 were put in chat, not on file.
+The notes after Part 28 list each line that goes beyond the questions recorded
+on Issue #21 as the session's wording until the owner confirms it. The
+owner was asked to confirm or correct them.
+
+**Owner said: "aligned to recommendation".**
+
+### What it settles
+
+- **31a.** Every line listed in item 1 of the notes after Part 28 stands as
+  recorded. They are the owner's rulings, not only the session's wording.
+
+### What it does not settle
+
+Items 2-7 of those notes are not rulings. They are gaps and readings for the
+final text round on ADR-015 and ADR-016 (Part 28e, step 1). The open ones are
+25g against 26e and 27f, 25h and 26b against 18e, and 28e against 18g.
+
 # Part 22 — Ruled 2026-09-23: sample adequacy, "how much data is enough" (F-004's numbers)
 
 The seven questions of the sample-adequacy proposal, as corrected on pull
