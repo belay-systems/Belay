@@ -48,12 +48,16 @@ Merge `main` into #36's branch (a merge commit; never rebase or force-push). Exp
 conflicts in three files:
 
 - `docs/OwnerDecisions.md` — keep every Part from both sides. Place #36's Parts 35
-  and 36 immediately before Part 37, so the file reads in number order. No text
-  changes.
+  and 36 immediately before Part 37, so Parts 35-40 run in order, with a `---` line
+  between Part 36 and Part 37. No text changes.
 - `docs/OperatorChecklist.md` — keep both sides, `main`'s text first.
 - `docs/NOW.md` — **do not keep both sides**: two next-task lists fail
-  `tests/test_handoff_files.py`. Take `main`'s file and carry over any fact from
-  #36's "Where things stand" that is still true; this session rewrites it at close.
+  `tests/test_handoff_files.py`. Take `main`'s file, then carry over what is still
+  true from #36's version: its "Where things stand" facts, and its next-task items
+  that `main` lacks — close F-032 to F-036 once #36 merges; F-003 is now
+  load-bearing; the survey of `pytest.raises` calls with no `match=`; and
+  `scripts/verify_clone.py` not having run. Keep one list. This session rewrites the
+  file at close.
 
 Run `python -m pytest -q`. Report the count and stop.
 
@@ -63,12 +67,15 @@ On #36's branch, against the pass's numbering:
 
 - **B4** — `docs/OperatorChecklist.md`, "Open — ratify or reject ADR-017": the
   guarantee it gives the owner ("on disk in the repository where it says it is,
-  these are its bytes, this is its series") is false in every clause. Replace it
-  with what attempt four actually guarantees, once it does.
+  these are its bytes, this is its series") is false in every clause. Mark it
+  withdrawn now; write what attempt four actually guarantees in Phase 5, once it
+  does.
 - **D1** — ADR-017's Decision item 3 still describes attempt one's signature.
 - **D2** — Part 36's "What it settles" (36a-36c) holds the mechanism, the guarantee
   and "35a is delivered", beyond the owner's words "yes require the stored fetch
   record". Move them to "Session readings" with a "Corrected" note; do not delete.
+  `docs/OwnerDecisions.md` is the owner's file: this is a proposal on an unmerged
+  branch, and the moved text must be shown to the owner before #36 merges.
 - **D4** — docstrings in `framework/metrics/reporting.py` (`Disclosure.evidence_level`,
   `FetchedDisclosure`) and `framework/data/fetch_record.py` (`disclosure_from`'s
   "Five checks") still state attempt two's guarantees.
@@ -97,7 +104,9 @@ All must fail against attempt three. Show that, then stop.
 
 - **Roots are not parameters.** Read records only from the repository's own
   `artifacts/` and bytes only from `data/market/`. Resolve every joined path and
-  require it to stay under its root.
+  require it to stay under its root. This is the pass's sketch, recorded in Part 37
+  as a session reading for this attempt to confirm, not a ruling; B1 and B2 are
+  what it must defeat.
 - **Bind the prices (Parts 38 and 40).** Choose the method and write down why and
   which weakness is accepted. **Read Part 40's "What the owner was told that was
   wrong" first.** In short:
@@ -110,8 +119,9 @@ All must fail against attempt three. Show that, then stop.
     `RPT-0001` need not be migrated; it cannot back Level C in any case.
   The owner chose to leave this to you and your independent pass, knowing the
   session recommended the fingerprint.
-- **Name the record (Part 39).** On every metric artifact computed over a fetch,
-  including Level D ones on adjusted prices. The evidence record's `provenance`
+- **Name the record (Part 39).** On every metric artifact computed over a fetch —
+  and, by Part 39's session reading, Level D ones on adjusted prices too, so they
+  can be regraded once the adjustment is recorded. The evidence record's `provenance`
   line is the described place; the four `Disclosure` fields must not change
   (`tests/test_governance_conformance.py`).
 - Then mutate each new guard one at a time on a **committed** tree and show exactly

@@ -166,8 +166,8 @@ taken. Also fixed:
 Part 37's blockchain note misstated what the owner was told about B2; 39a narrowed
 "every result" to Level C inside "What it settles" (moved to a reading, which now
 keeps adjusted-price results naming their record); quote marks around words the
-owner did not say; a count without its command; and the merge rule below, which said
-"add" where it must say "replace".
+owner did not say; a count without its command; and the `docs/NOW.md` merge rule,
+which said "add" where it must say "replace" (superseded at close; see below).
 
 ## What is open
 

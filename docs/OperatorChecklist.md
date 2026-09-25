@@ -976,5 +976,5 @@ answered. `docs/proposals/ADR-017-attempt-four-session-brief.md` has the plan.
 
 ## Later — ratify or reject ADR-017
 
-After attempt four is built to Parts 37-39 and has had its own independent pass.
+After attempt four is built to Parts 37-40 and has had its own independent pass.
 Not on attempt three.

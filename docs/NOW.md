@@ -15,7 +15,8 @@ said before lives in `docs/sessions/` and in git history
 ## Where things stand
 
 Written at the close of 2026-09-25, for `main` once #37 has merged. #37 carries
-no code: Parts 37-40, this session's record and this file.
+no code: Parts 37-40, owner items in `docs/OperatorChecklist.md`, the attempt-four
+brief, this session's record and this file.
 
 - **Suite:** 704 passed, 1 skipped, 5 xfailed on `main` (`python -m pytest -q`).
 - **`python scripts/status.py`:** exits 0.
@@ -39,7 +40,7 @@ open pull requests and Issues on GitHub, `python -m pytest -q`,
 | PR | What | State |
 |---|---|---|
 | #36 | F-032 to F-036 fixes, Parts 35-36, ADR-017's draft (grade from provenance) | **Attempt three was broken by the fourth pass** (four blocking). Not to be merged or ratified as it stands: attempt four goes here (item 1) |
-| #33 | Parts 32-34 and the final-text-round session close | Open. Goes red against #36's finding-number test if #36 merges first (#36's `docs/NOW.md` says how to fix it) |
+| #33 | Parts 32-34 and the final-text-round session close | Open. Goes red against #36's finding-number test once #36 merges: it names a finding number above the register in four places under `docs/`. Fix: write "the number after F-030" instead, or the bracketed form when quoting |
 | #7 | ADR-015: a strategy's stage is carried, not asserted (F-007, F-014) | The final text round: item 2 below |
 | #20 | ADR-016 draft, Part 22, the ADR-012 amendment draft | Moves with ADR-015 |
 
