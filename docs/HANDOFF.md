@@ -5680,12 +5680,8 @@ said review due 2026-09-23. The routine fires 2026-09-25.
    decision.
 2. **A fresh independent pass on ADR-015 and ADR-016 together**, told to
    falsify them, before either is put to the owner for ratification.
-3. **Then the seven questions in the sample-adequacy proposal**, one at a time.
-   **Use the copy on pull request #7's branch (`adr/015-stage-is-carried`), not
-   the one on `main`.** `main` still carries the pre-Issue-#6 text, which
-   recommends Candidate 2H on arithmetic the second pass showed was wrong (a
-   monthly series would need 756 months, 63 years). Added 2026-09-22 after the
-   second review of #15/#17/#18. Its question 7 (one ruling or two for backtest adequacy and
+3. **Then the seven questions in `docs/proposals/sample-adequacy-definition.md`**,
+   one at a time. Its question 7 (one ruling or two for backtest adequacy and
    paper length) is partly answered by 18d, which referred paper length to the
    Investment Committee. Put it with that stated.
 4. **Part 19's open questions**, one at a time: whether an AI-made change to a
