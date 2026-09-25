@@ -1,4 +1,4 @@
-# 2026-09-25 — the fourth falsification pass on ADR-017, and Parts 37-39
+# 2026-09-25 — the fourth falsification pass on ADR-017, and Parts 37-40
 
 ## What was asked
 
@@ -12,8 +12,9 @@ aims:
 3. check that Part 36 and ADR-017 claim nothing more than the owner ruled.
 
 Then, after the pass, the owner asked for help choosing between the two threat
-models it raised, chose option A (Part 37), and answered the two follow-ups
-(Parts 38 and 39).
+models it raised, chose option A (Part 37), answered the two follow-ups (Parts 38
+and 39), and, once told the fingerprint was not the only method, left the method to
+attempt four (Part 40).
 
 ## What was done
 
@@ -72,9 +73,9 @@ every metric artifact built after it (none is stored).
 
 ## Files changed
 
-- `docs/OwnerDecisions.md` — Parts 37, 38 and 39.
-- `docs/OperatorChecklist.md` — one open question (fingerprint, or either method),
-  three Done entries (option A and the two follow-ups), and ratification (Later).
+- `docs/OwnerDecisions.md` — Parts 37 to 40.
+- `docs/OperatorChecklist.md` — four Done entries (option A, the two follow-ups,
+  and the method), and ratification (Later).
 - `docs/NOW.md` — "Where things stand" (the review-gate line), "In flight", and the
   next-task list.
 - This record.
@@ -115,7 +116,8 @@ record or what the owner must hear:
   thing that catches" changed prices. Re-parsing the stored bytes, already
   hash-checked, is a second method that changes no fetch record. Verified: each
   source has a parser (`_parse` in `framework/data/dolthub.py` on #36). Recorded in
-  Part 38 and put back to the owner as one question.
+  Part 38 and put back to the owner, who left the method to attempt four and its
+  independent pass (Part 40).
 - **Re-fetching does not give `RPT-0001` a fingerprint.** Identical bytes return the
   existing record (ADR-014 rule 5, and `fetch_and_record` on #36), and changing a
   saved record's signed content is a migration under ADR-014. The ADR-014 cost was
@@ -141,15 +143,14 @@ merge"), rather than being edited away.
 
 ## What is open
 
-- **One question with the owner:** keep the stored fingerprint as the method, or
-  rule only that prices must match what was received and let attempt four choose.
-  In `docs/OperatorChecklist.md`.
-- **Attempt four of ADR-017**, on #36, built to Parts 37-39 and the fourth pass's
-  findings, then its own independent pass. Not before.
+- **Attempt four of ADR-017**, on #36, built to Parts 37-40 and the fourth pass's
+  findings. It picks the method that binds the prices and says which weakness it
+  accepts; its own independent pass checks that choice. Ratification after, not
+  before.
 - **Left open by Parts 38 and 39:** how an adjustment is recorded; refusal or
   Level D on a mismatch; what a later re-check does when a named record is missing
   or has changed; that the named record is committed.
-- **Merge order.** Parts 37-39 refer to Parts 35 and 36, so this branch merges
+- **Merge order.** Parts 37-40 refer to Parts 35 and 36, so this branch merges
   after #36. For `docs/OwnerDecisions.md` and `docs/OperatorChecklist.md`, keep the
   text already on `main` first and add this branch's after it. **Not for
   `docs/NOW.md`:** keeping both sides fails the build. Take #36's `docs/NOW.md` and

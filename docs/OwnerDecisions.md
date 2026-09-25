@@ -3615,7 +3615,7 @@ sent"; recording adjustments properly can come later, as its own piece of work.
   bind the prices **without changing what a fetch record carries**. Found by the
   independent pass on this record, not by the session. The ruling stands as given;
   whether to keep the fingerprint as the method or let the next attempt choose
-  between the two is put back to the owner (`docs/OperatorChecklist.md`).
+  between the two was put back to the owner, who left it to attempt four (Part 40).
 - **The cost to ADR-014 was not stated.** Adding a field to fetch records changes
   what they are signed over, and ADR-014 records that once a record is saved,
   "every later change to the signed content" is "a migration of permanent"
@@ -3714,3 +3714,60 @@ ruled in Part 38 is checked only once, by the same code that produces the result
   review" needs it; not asked separately.
 - **Ratification of ADR-017.** Unchanged from Part 37: owed after attempt four and
   its own independent pass.
+
+---
+
+# Part 40 — Ruled 2026-09-25: attempt four chooses how the prices are bound
+
+**A correction to how Part 38 was reached, put back to the owner.** Like Parts
+37-39, it reads correctly once #36 has merged, and is a proposal until it is on
+`main`.
+
+**Why the question arose.** When the owner ruled Part 38 ("yes to fingerprint"),
+they had been told a stored fingerprint was "the only thing that catches" prices
+changed after the fetch. The independent pass on these records showed that was
+false: `disclosure_from` already reads the stored raw bytes and checks their hash,
+and every source has a parser for those bytes, so re-parsing them and comparing is a
+second method. The two differ in cost. A stored fingerprint changes what every fetch
+record carries — under ADR-014 a migration of the saved `RPT-0001` — but is fixed at
+fetch time. Re-parsing changes no record, but depends on the parser at the time of
+the check, so a parser change could make old data stop matching or match
+differently.
+
+**Question put**, in the session, with a recommendation:
+
+> Do you want to keep the fingerprint as the method, or rule only the rule?
+
+Explained with it: the rule is the same either way — Level C only when the prices
+used are exactly what the vendor sent, and adjusted prices are Level D until the
+adjustment is recorded. *Recommended: rule only the rule* — let attempt four pick
+the method with the code in front of it, and let its independent pass check that
+choice; the method is repository mechanics, which the owner delegates.
+
+**Owner said: "Let attempt four pick the method with the code in front of it, and
+let its independent pass check that choice".**
+
+### What it settles
+
+- **40a. Attempt four picks the method that binds the prices to the fetch record.**
+  Part 38a's stored fingerprint is one option, not a requirement.
+- **40b. Attempt four's independent pass checks that choice.**
+- **40c. Part 38b and 38c stand.** Level C requires the prices a result is computed
+  over to match what the fetch received; prices adjusted after the fetch are not
+  Level C until the adjustment is itself recorded.
+
+### Session readings, not the owner's words
+
+- **The choice is read as open to either method put to the owner**, or another that
+  binds the prices at least as tightly, provided attempt four states which it chose,
+  why, and which weakness it accepts (a migration of saved records, or exposure to
+  parser changes).
+- **Part 39's "its fingerprint"** is read as whatever identifies the prices under the
+  method chosen — for a re-parse, the record's existing `content_hash` of the raw
+  bytes may be enough. Part 39's session readings already said so.
+
+### What it does not settle
+
+- **Which method.** Attempt four's, as ruled.
+- **Everything Parts 38 and 39 left open**, unchanged.
+- **Ratification of ADR-017.** Unchanged from Part 37.

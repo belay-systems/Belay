@@ -42,7 +42,7 @@ open pull requests and Issues on GitHub, `python -m pytest -q`,
 | #20 | ADR-016 draft, Part 22, the ADR-012 amendment draft (`docs/proposals/ADR-016-evidence-bar-DRAFT.md`) | Moves with ADR-015 |
 | #33 | Parts 32-34 and the final-text-round session close | Open. Goes red against #36's finding-number test if #36 merges first (#36's `docs/NOW.md` says how to fix it) |
 | #36 | F-032 to F-036 fixes, Parts 35-36, ADR-017's draft (grade from provenance) | **The fourth pass broke attempt three** (four blocking). Not to be ratified; attempt four is owed |
-| #37 | Parts 37-39 (ADR-017 promises option A; price fingerprint; results name their record), the fourth pass's session record | Merge after #36 |
+| #37 | Parts 37-40 (ADR-017 promises option A; prices bound to the record; results name their record; attempt four picks the method), the fourth pass's session record | Merge after #36 |
 
 #7 and #20 merge cleanly onto this `main` and pass (704), except that each
 appends to the end of `docs/OwnerDecisions.md` or `docs/OperatorChecklist.md`:
@@ -53,20 +53,19 @@ to the branch merging second's own intent, with one list.
 
 ## Highest Priority Next Task
 
-1. **ADR-017 (#36): one question to the owner, then attempt four.**
+1. **ADR-017 (#36): build attempt four.**
    - The fourth independent pass on #36 broke attempt three three ways, all posted there:
      the repository and store it trusts are folders the caller picks, record paths
      escape them with `..`, and prices are not bound to the record.
    - The owner chose option A (Part 37): guard against honest
      mistakes and make faking visible in review; not "impossible".
-   - The owner then ruled both follow-ups: Level C needs the prices used to match
-     what the fetch received (Part 38, by a stored fingerprint), and every Level C
-     metric artifact names the fetch record behind its grade (Part 39).
-   - **Open with the owner:** the owner was told the fingerprint was the only
-     method, which was wrong; re-parsing the stored bytes is a second. Whether to
-     keep the fingerprint or let attempt four choose is in
-     `docs/OperatorChecklist.md`.
-   - **Then:** attempt four on #36, built to Parts 37-39 and the fourth pass's
+   - The owner then ruled: Level C needs the prices used to match what the fetch
+     received (Part 38), and every Level C metric artifact names the fetch record
+     behind its grade (Part 39).
+   - **Attempt four picks the method** that binds the prices — a stored fingerprint
+     or re-parsing the stored bytes — states which weakness it accepts, and its
+     independent pass checks the choice (Part 40).
+   - **Next:** attempt four on #36, built to Parts 37-40 and the fourth pass's
      findings; then its own independent pass; then ratification. Not before.
 2. **Finish the evidence bar the way Part 28e rules.**
    - **Step 1, the final text round on #7 and #20, with no redesign:**

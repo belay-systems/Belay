@@ -855,7 +855,14 @@ The owner answered "aligned to recommendation" (`docs/OwnerDecisions.md` Part
 
 # 2026-09-25 — owner items from the fourth pass on ADR-017 (#36)
 
-## Open — 2026-09-25: the fingerprint, or either method that binds the prices?
+## Done — 2026-09-25: attempt four chooses how the prices are bound
+
+**Answered. Owner said "Let attempt four pick the method with the code in front of
+it, and let its independent pass check that choice"** — recorded as
+`docs/OwnerDecisions.md` **Part 40**. Part 38's rule stands; the stored fingerprint
+is one option, not a requirement.
+
+### The question as it was put: the fingerprint, or either method that binds the prices?
 
 **Why this is back with you.** When you ruled Part 38 ("yes to fingerprint") you
 had been told the fingerprint was *the only thing* that catches prices changed after
@@ -883,8 +890,7 @@ choice?
 
 *Recommended: rule only the rule.* The method is repository mechanics, which you
 delegate, and both methods have a real weakness the next attempt should weigh with
-the code in front of it. Your Part 38 answer is recorded exactly as given until you
-say otherwise.
+the code in front of it.
 
 ## Done — 2026-09-25: what should ADR-017 promise? (option A)
 
