@@ -16,7 +16,7 @@ Every Belay engineering session must follow this sequence:
 
 1. Synchronize with the repository.
 2. Review this AGENTS.md file.
-3. Review docs/HANDOFF.md.
+3. Review docs/NOW.md.
 4. Review constitution/README.md.
 5. Review docs/Architecture.md.
 6. Review docs/ROADMAP.md.
@@ -26,7 +26,7 @@ Every Belay engineering session must follow this sequence:
 10. Implement.
 11. Verify.
 12. Update documentation affected by changes.
-13. Update docs/HANDOFF.md at session close.
+13. Rewrite docs/NOW.md at session close, and add a record under docs/sessions/.
 14. Update docs/OperatorChecklist.md with any action only the owner can take.
 
 ---
@@ -52,19 +52,19 @@ checked it against the repository.
 
 **Shared knowledge lives here, not in a provider's memory.** If you learn
 something the next agent needs, write it into the repository: state into
-`docs/HANDOFF.md`, owner rulings into `docs/OwnerDecisions.md`, lessons that
+`docs/NOW.md`, owner rulings into `docs/OwnerDecisions.md`, lessons that
 bind every agent into this file. A lesson that exists only in one provider's
 memory, skills or project settings is invisible to every other contributor, and
 for Belay's purposes it does not exist. Provider-specific files (for example
 `CLAUDE.md` or `.claude/skills/`) may exist as thin conveniences. They must
 never be the only place a rule is written.
 
-**`docs/HANDOFF.md` is thousands of lines long, because nothing in it is ever
-deleted.** You do not need all of it to start. Read "Belay Session Handoff" (the
-opening section), "Highest Priority Next Task", and "Working Agreement"; consult
-"Open Findings" for the finding you are working on. The rest is the archive of
-earlier sessions. Later entries stand in front of earlier ones without rewriting
-them, so within a section, the top-most dated block is the current one.
+**Start from `docs/NOW.md`, which is short enough to read in one pass.** It
+has the current state, the one "Highest Priority Next Task", and the "Working
+Agreement". Open findings are in `docs/FINDINGS.md`. Each session's record is in
+`docs/sessions/`. `docs/HANDOFF.md` is the archive, frozen on 2026-09-25: read
+only the sections a task needs. The rules, and the reasons for them, are
+under "Files that grow" at the end of this file (Part 29).
 
 **The adversarial review is a procedure, not a product feature.** Some documents
 refer to it by one provider's command name (`/belay-review`). For any other
@@ -415,7 +415,54 @@ This file does not name the current priority, on purpose. It named one until
 the work moved on, so an agent following this file literally would have started
 on finished work.
 
-The current priority is whatever `docs/HANDOFF.md` says under "Highest Priority
+The current priority is whatever `docs/NOW.md` says under "Highest Priority
 Next Task", narrowed by the open Issues on GitHub. Run `python scripts/status.py`
 to see the repository's real state; it is re-derived on every run and outranks
 any prose, including this file.
+
+# Files that grow
+
+The owner ruled this on 2026-09-25 (`docs/OwnerDecisions.md` Part 29). The full
+reasoning and the precedents are in `docs/proposals/growing-files.md`.
+
+**Why.** An agent's file reader takes a few thousand lines, or about 25,000
+tokens, at a time. By 2026-09-25, `docs/HANDOFF.md` had reached 5,857 lines,
+because nothing was ever deleted from it, and no agent could read it in one
+pass. Its current next-task list sat at the bottom, under five superseded ones,
+while this file said the top-most block was current. The file held two jobs, the
+current state and the history, and the history buried the state.
+
+**The rules.**
+
+- **Keep current state apart from history.** State lives in a short file that
+  is *rewritten* at every session close: `docs/NOW.md`, capped at 200 lines.
+  History lives in files that are *written once*: `docs/sessions/`, one file per
+  session, never edited after it merges. Law VII protects knowledge, not a file's
+  layout. Nothing a rewrite removes is lost, because it stays in the session
+  record and in git.
+- **One record per file, for anything that only grows.** A dated record in its
+  own file is found by name, read whole, and never shifts another record's
+  lines. `reports/review/` has worked this way from the start.
+- **Cite by a name that does not move.** Use a heading, a finding's title or
+  F-number, or a Part or ADR number. Never cite `docs/NOW.md` or
+  `docs/FINDINGS.md` by line number, because both are rewritten. The line
+  citations into the frozen archive stay valid, because it never changes.
+- **The archive is corrected by a later record, never edited.** A session that
+  finds something wrong in `docs/HANDOFF.md` writes the correction in its own
+  `docs/sessions/` record and names the lines it corrects.
+- **A test holds each rule** (`tests/test_handoff_files.py`). In this repository
+  a convention alone has not held (Issue #9).
+
+**Not yet done.** `docs/DECISIONS.md`, `docs/OwnerDecisions.md`,
+`docs/OperatorChecklist.md` and `CHANGELOG.md` have the same shape. They are
+split the same way once the pull requests appending to them have landed. See
+`docs/proposals/growing-files.md`, phase 2. Until then, append to them as before.
+
+# Contributors help; they never gate
+
+The owner ruled this on 2026-09-25 (`docs/OwnerDecisions.md` Part 30). Belay
+was a solo project and must be able to continue as one. Other contributors
+help where and when the owner cannot. **No contributor's review or approval is
+ever required for work to land.** The independent pass in "How work is claimed
+and landed", point 4, is still required, and a fresh session told to falsify
+the work satisfies it. A pass by a different AI is welcome, never a gate.

@@ -95,8 +95,8 @@ Read, in this order, before forming any opinion:
    outside the list a reviewer thinks they are reading (F-025,
    `reports/review/2026-09-04-review.md:404`).
 3. `docs/ROADMAP.md` — what is claimed built.
-4. `docs/HANDOFF.md` — the last session's account of itself. Treat as a claim,
-   not a fact.
+4. `docs/NOW.md` and the newest record in `docs/sessions/` — the last session's
+   account of itself. Treat as a claim, not a fact.
 
 ---
 

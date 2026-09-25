@@ -847,3 +847,8 @@ correct each line listed in "Notes on Parts 24-28 from the independent pass" at
 the end of `docs/OwnerDecisions.md`. The recommendations you answered
 "aligned" to are in the archived session "Belay threads status".
 
+
+## Done — 2026-09-25: the labeled lines in Parts 25-28 confirmed
+
+The owner answered "aligned to recommendation" (`docs/OwnerDecisions.md` Part
+31). This closes the Open item "confirm the labeled lines in Parts 25-28".

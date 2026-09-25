@@ -3351,3 +3351,123 @@ what is on file, so the owner can confirm or correct it.
    to 2.2.0, the floor `rich` requires; the tests pass at both. 27a no longer
    puts quotation marks around words 26d did not use.
 
+
+---
+
+# Part 29 — Ruled 2026-09-25: current state apart from history; the handoff is split
+
+**Question put.** The owner asked: "is there any precedent or known first
+principles about capped or other structure for our handoff and other growing
+files to be more better?" The session measured the problem:
+
+- `docs/HANDOFF.md` was 5,857 lines, more than any agent reads in one pass.
+- It held six next-task headings, and the current one was the last, while
+  `AGENTS.md` said the top-most block was current.
+- The test for that list checked the stale one.
+
+The session gave the precedents and first principles, now written up in
+`docs/proposals/growing-files.md`. It put one question: **does Immutable Law VII
+protect the knowledge, or the file layout?** It recommended "the knowledge",
+because text moved to a kept file, or rewritten while git keeps every earlier
+version, is not discarded.
+
+**Owner said: "well yeah i want you to write it all up, and implement it
+accordingly … surgical implementation".**
+
+This lifts the owner's parking of the same concern on 2026-09-23 ("Raise it
+with the owner when there is time to hash it out. Do not restructure these
+files before then"), which is recorded in `docs/HANDOFF.md` on #20's branch.
+
+### What it settles
+
+- **29a. Law VII protects knowledge, not a file's layout.** A file whose job is
+  current state may be rewritten. What the rewrite removes survives in git and
+  in the session record.
+- **29b. `docs/NOW.md` holds the current state.** It has the one
+  "Highest Priority Next Task" and the "Working Agreement". It is rewritten at
+  every session close and capped at 200 lines.
+- **29c. `docs/sessions/` holds history**, one file per session. A record is
+  never edited after it merges.
+- **29d. `docs/FINDINGS.md` is the findings register**, one row per finding.
+- **29e. `docs/HANDOFF.md` is frozen as the archive**, in place, so none of its
+  line citations moves. Its title line was edited in place to say it is
+  frozen; nothing was removed.
+- **29f. A test holds each of these rules** (`tests/test_handoff_files.py`).
+
+### Session choices, not the owner's words
+
+- **Freezing the archive in place.** The session first described moving it to
+  a new path. Reading the code changed that: `scripts/status.py` parsed it,
+  code comments cite its sections, and frozen reports cite its lines.
+- **The caps:** 200 lines and 16,000 bytes for `docs/NOW.md`, and 300 lines for
+  a session record.
+- **Parts 26-28 were taken** on #31's branch, so this Part is 29.
+
+### What it does not settle
+
+**Phase 2 is not settled.** That is the same split for `docs/DECISIONS.md`,
+this file, `docs/OperatorChecklist.md` and `CHANGELOG.md`. It waits until #7,
+#20 and #31 have landed, and it comes back to the owner as its own questions.
+
+---
+
+# Part 30 — Ruled 2026-09-25: contributors help; they never gate
+
+**Stated, not asked.** While this session was getting the open pull requests
+ready, the owner said: **"leave nothing for [the second contributor]"**, and
+then: **"contributors help where/when we cant. never need them for review,
+this was a solo project before and should be able to continue as such with
+help from others".** (Family wording is redacted as in Part 11a.)
+
+### What it settles
+
+- **30a. No contributor's review or approval is ever required for work to
+  land.** The owner, or a session acting on the owner's explicit word, may
+  land work alone. Contributors help where and when the owner cannot.
+- **30b. The independent pass stays** (`AGENTS.md`, "How work is claimed and
+  landed", point 4). A fresh session told to falsify the work satisfies it. A
+  pass by a different AI is welcome, never a gate. This covers Issue #21's
+  different-AI pass, which is no longer something the evidence bar waits on.
+- **30c. Part 20 is not adopted.** Part 20 is recorded only on #22's branch,
+  never on `main`. It required a second review for every merge and removed the
+  Owner bypass. The bypass stays as the solo merge path, and #22 is closed as
+  superseded.
+
+### Session readings, not the owner's words
+
+- **Issue #16 is moot.** It asked how to restore an enforced second review
+  once both contributors were organization Owners. Under 30a no second review
+  is wanted. The second contributor's permissions are unchanged: Part 17
+  stands.
+- **`.github/CODEOWNERS` is unchanged.** On `main` it already names only the
+  owner on the governance paths. The catch-all line naming both contributors
+  asks GitHub for a code-owner review, which the Owner bypass satisfies.
+
+### What it does not settle
+
+- Whether the rulesets should stop asking for a review at all, rather than
+  having it bypassed each time. That is a repository setting, and only the
+  owner changes those.
+
+---
+
+# Part 31 — Ruled 2026-09-25: the labeled lines in Parts 25-28 stand
+
+**Question put.** The independent pass on #31 found that the recommendations
+the owner answered "aligned" to in Parts 25-28 were put in chat, not on file.
+The notes after Part 28 list each line that goes beyond the questions recorded
+on Issue #21 as the session's wording until the owner confirms it. The
+owner was asked to confirm or correct them.
+
+**Owner said: "aligned to recommendation".**
+
+### What it settles
+
+- **31a.** Every line listed in item 1 of the notes after Part 28 stands as
+  recorded. They are the owner's rulings, not only the session's wording.
+
+### What it does not settle
+
+Items 2-7 of those notes are not rulings. They are gaps and readings for the
+final text round on ADR-015 and ADR-016 (Part 28e, step 1). The open ones are
+25g against 26e and 27f, 25h and 26b against 18e, and 28e against 18g.

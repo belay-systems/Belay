@@ -20,7 +20,7 @@ below is reference you consult, not reading you do up front.
 
 | Document | Answers |
 |---|---|
-| [`HANDOFF.md`](HANDOFF.md) | What state is the project in, what happened last, what is next. **Long by design — nothing is ever deleted.** Read its opening section, "Highest Priority Next Task", and "Working Agreement"; the rest is archive |
+| [`NOW.md`](NOW.md) | What state is the project in and what is next. **Start here**; it is short by rule. Open findings: [`FINDINGS.md`](FINDINGS.md). What happened in each session: [`sessions/`](sessions/). Everything before 2026-09-25: [`HANDOFF.md`](HANDOFF.md), a frozen archive |
 | [`DECISIONS.md`](DECISIONS.md) | Every architectural decision, as numbered ADRs, with the reasoning and the alternatives rejected |
 | [`ROADMAP.md`](ROADMAP.md) | What is built, what is next, and the order |
 | [`Architecture.md`](Architecture.md) | How the pieces fit together |

@@ -1,7 +1,7 @@
 """The handoff between sessions, held by tests rather than by good intentions.
 
-`AGENTS.md` steps 13 and 14 require every session to update `docs/HANDOFF.md` and
-`docs/OperatorChecklist.md` before it closes. Until this file existed those were
+`AGENTS.md` steps 13 and 14 require every session to rewrite `docs/NOW.md` and
+update `docs/OperatorChecklist.md` before it closes. Until this file existed those were
 rules with nothing behind them — and this repository has already paid twice for
 that shape of rule. `constitution/Paper_First_Capital_Doctrine.md:45` states
 "Promotion requires evidence" and went unimplemented for the life of the project
@@ -41,14 +41,14 @@ def read(path: Path) -> str:
     return path.read_text(encoding="utf8")
 
 
-def section(text: str, heading: str) -> str:
-    """Return the body under a top-level `# heading`, to the next `# ` or EOF.
+def section(text: str, heading: str, level: int = 1) -> str:
+    """Return the body under a `# heading` of `level`, to the next one or EOF.
 
     Matched on the exact heading line rather than a prefix: `docs/HANDOFF.md`
     carries two `# Closed Findings` headings, and a prefix match would silently
-    return only the first.
+    return only the first. `docs/NOW.md` and `docs/FINDINGS.md` use level 2.
     """
-    pattern = rf"^# {re.escape(heading)}\s*$(.*?)(?=^# |\Z)"
+    pattern = rf"^{'#' * level} {re.escape(heading)}\s*$(.*?)(?=^#{{1,{level}}} |\Z)"
     return "\n".join(m.group(1) for m in re.finditer(pattern, text, re.S | re.M))
 
 
@@ -58,9 +58,9 @@ def section(text: str, heading: str) -> str:
 def test_the_next_task_list_does_not_name_a_finding_that_is_already_closed():
     """The one staleness failure that actually misleads a reader.
 
-    `AGENTS.md:19` puts `docs/HANDOFF.md` in every session's mandatory reading and
+    `AGENTS.md:19` puts `docs/NOW.md` in every session's mandatory reading and
     "Highest Priority Next Task" is what a session acts on. A finding that has
-    moved to `# Closed Findings` while still being named here sends the next
+    been closed while still being named there sends the next
     session at work that no longer exists — and nothing about the document's
     appearance says so.
 
@@ -69,15 +69,15 @@ def test_the_next_task_list_does_not_name_a_finding_that_is_already_closed():
     here, and requiring registration first would make the test refuse a correct
     handoff.
     """
-    text = read(HANDOFF)
-    named = set(re.findall(r"\bF-(\d{3})\b", section(text, "Highest Priority Next Task")))
-    closed = set(re.findall(r"\bF-(\d{3})\b", section(text, "Closed Findings")))
+    named = set(re.findall(r"\bF-(\d{3})\b", next_task_list()))
+    # Closed in the frozen archive, or in docs/FINDINGS.md's Closed table.
+    closed = set(re.findall(r"\bF-(\d{3})\b", closed_findings()))
 
     stale = sorted(named & closed)
     assert not stale, (
-        "docs/HANDOFF.md's next-task list names "
+        "docs/NOW.md's next-task list names "
         + ", ".join(f"F-{n}" for n in stale)
-        + ", which is in # Closed Findings. Either the finding was closed and the "
+        + ", which is closed. Either the finding was closed and the "
         "list was not updated, or it was reopened and not moved back."
     )
 
@@ -90,7 +90,7 @@ def test_every_path_the_next_task_list_names_still_exists():
     which `.gitignore:26` keeps out of every clone. The instruction was
     unfollowable from the moment it was written and nothing said so.
     """
-    body = section(read(HANDOFF), "Highest Priority Next Task")
+    body = next_task_list() or pytest.fail("docs/NOW.md has no next-task list")
 
     missing = sorted(
         {
@@ -101,7 +101,7 @@ def test_every_path_the_next_task_list_names_still_exists():
         }
     )
     assert not missing, (
-        "docs/HANDOFF.md's next-task list cites files that do not exist in this "
+        "docs/NOW.md's next-task list cites files that do not exist in this "
         f"repository: {missing}. An instruction nobody can follow is worse than "
         "no instruction, because it reads as actionable."
     )
@@ -122,7 +122,7 @@ def test_no_session_brief_is_orphaned():
 
     pointers = "".join(
         read(p)
-        for p in [HANDOFF, CHECKLIST, REPO / "docs" / "OwnerDecisions.md"]
+        for p in [HANDOFF, NOW, CHECKLIST, REPO / "docs" / "OwnerDecisions.md"]
         if p.exists()
     ) + "".join(read(p) for p in (REPO / "docs" / "proposals").glob("*.md"))
 
@@ -163,8 +163,8 @@ def test_agents_md_still_requires_both_close_out_steps():
     """
     text = read(REPO / "AGENTS.md")
 
-    assert "docs/HANDOFF.md at session close" in text, (
-        "AGENTS.md no longer requires updating docs/HANDOFF.md at session close"
+    assert re.search(r"^13\. Rewrite docs/NOW\.md at session close\b.*docs/sessions/", text, re.M), (
+        "AGENTS.md step 13 no longer requires rewriting docs/NOW.md and a docs/sessions/ record"
     )
     assert "docs/OperatorChecklist.md" in text, (
         "AGENTS.md no longer requires recording owner-only actions in "
@@ -880,3 +880,23 @@ def test_agents_md_says_where_an_unattended_run_reports_outside_text():
         "AGENTS_OUTSIDE_TEXT says. If deliberate, change the constant in the same "
         "diff.\n  file: " + found + "\n  test: " + pinned
     )
+
+
+# ------------------------------------ the handoff files since 2026-09-25 (Part 29)
+#
+# Appended rather than placed beside `HANDOFF` above, so that no line citation
+# into this file moves. Python resolves these names when a test runs.
+
+NOW = REPO / "docs" / "NOW.md"
+FINDINGS = REPO / "docs" / "FINDINGS.md"
+SESSIONS = REPO / "docs" / "sessions"
+
+
+def next_task_list() -> str:
+    """The one next-task list a session acts on, in `docs/NOW.md`."""
+    return section(read(NOW), "Highest Priority Next Task", level=2)
+
+
+def closed_findings() -> str:
+    """Every closed finding: the archive's, and the register's since 2026-09-25."""
+    return section(read(HANDOFF), "Closed Findings") + section(read(FINDINGS), "Closed", level=2)

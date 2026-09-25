@@ -8,7 +8,7 @@ assignees: ""
 
 ## What needs doing
 
-<!-- One task. If it names a finding, give its F-number from docs/HANDOFF.md. -->
+<!-- One task. If it names a finding, give its F-number from docs/FINDINGS.md. -->
 
 ## How we will know it is done
 

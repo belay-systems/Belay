@@ -51,7 +51,7 @@ the project's real state from the repository on every run.
 ## What makes a good first task
 
 Something self-contained whose result continuous integration can check: closing
-one finding from the register in `docs/HANDOFF.md`, adding a missing test, or
+one finding from the register in `docs/FINDINGS.md`, adding a missing test, or
 running an independent pass on somebody else's open pull request or proposal.
 An independent pass is real work here, not a courtesy.
 
