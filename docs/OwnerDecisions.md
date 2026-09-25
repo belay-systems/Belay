@@ -3538,3 +3538,85 @@ welcome but never waited for (Part 30b)."
 
 It does not say how rule 10's mechanism changes; that is drafter's text, on
 #20 and #7, for the fresh pass to attack. It does not ratify either ADR.
+
+# Part 33 — Ruled 2026-09-25: how step 1 finishes, and three answers to the fifth pass
+
+**Question put.** A fifth falsification pass, on ADR-015 at `ddda627` (#7) and
+ADR-016 at `5714814` (#20), posted on Issue #21, found both not ready. It found
+one blocking finding in each ADR: F5-2, capital without a verified yes when
+several repairs exist, and F5-5, capital rungs that need 10 years of paper
+trading. It also raised three questions only the owner can answer. The
+session said that no money can move today, because every capital rung is
+closed by unruled constants, and that this is the fifth text pass in a row to
+find blocking holes. It put four questions, one at a time, each with a
+recommendation.
+
+### 33a. How step 1 finishes
+
+**Question.** "The final text round has blocking holes. How should step 1
+finish?" The answer chosen read: "Close the text round now, in five parts.
+1) Fix only what is wording: F5-2's definition, the two contradicting tests,
+one mislabeled RULED line, and the stale lines. 2) Put your Part 32 edits in
+too. 3) Record every other attack from this pass as a test the code must
+refuse. 4) Put the new questions to you, one at a time (F5-5 first). 5) Push,
+with one fresh pass on the diff. Then step 2 (the code) starts when you say
+go."
+
+**Owner chose: "Small fixes, then code (Recommended)".**
+
+### 33b. F5-5: the 3.0 report on a capital rung is a backtest
+
+**Question.** "On a capital rung, which report must pass the 3.0 test with
+enough data (25b)?" The answer chosen read: "The 3.0
+significance-and-adequacy check always uses a backtest over 10+ years of
+history, bound alongside the seven evidence records rather than as one of
+them. The capital rungs still need the B- or A-grade Statistical performance
+record from paper or live trading, and still wait for the paper and live
+lengths the Committee sets (18d, 25e)."
+
+**Owner chose: "A backtest report (Recommended)".**
+
+### 33c. F5-1: a repair sets aside forgeries only
+
+**Question.** "May a repair set aside a genuine, properly reviewed
+demotion?" The answer chosen read: "A repair may set aside only a file that
+doesn't hold up: one with no valid base, or whose own chain fails the checks.
+A genuine demotion is lifted only by a later review that names it with a
+human yes (28a)."
+
+**Owner chose: "No, forgeries only (Recommended)".**
+
+### 33d. F5-7: a date correction never moves a demotion earlier
+
+**Question.** "May a correction to a demotion's date (28c) move it earlier
+than the day the demotion was actually recorded?" The answer chosen read: "A
+correction can move the date later (for example, fixing a future-dated
+typo), but never before the day the demotion was recorded in Belay."
+
+**Owner chose: "No, never earlier (Recommended)".**
+
+### What it settles
+
+- **33a.** Step 1 of 28e ends with wording fixes, the Part 32 and Part 33
+  edits, and one fresh pass on that diff. Every other finding of the fifth
+  pass becomes a test in step 2 that passes only when the attack is refused.
+  Step 2 still waits on the owner's "go".
+- **33b.** 25b's significance report is a backtest report on the Paper
+  Trading rung and on every capital rung, kept apart from the seven records of
+  18a and 25a. Paper and live lengths stay with 18d and 25e.
+- **33c.** A repair review may set aside only a version that has no valid
+  base, or whose own chain fails the checks. A genuine demotion or retirement
+  is lifted only as 28a says.
+- **33d.** A correction under 28c may move a demotion's date later, never
+  earlier than the day the demotion was recorded in Belay.
+
+### Session readings, not the owner's words
+
+- "The day the demotion was recorded in Belay" (33d) is read as the `created`
+  of the stored version that appended the demotion rung, as the fifth pass
+  proposed for F5-7.
+
+### What it does not settle
+
+It does not ratify either ADR. Under 32c, a fresh pass on the text as
+ratified still comes right before ratification.
