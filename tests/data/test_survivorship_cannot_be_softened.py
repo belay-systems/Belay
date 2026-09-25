@@ -170,14 +170,17 @@ def _stored_fetch(tmp_path, source=None):
     Owner ruling Part 36 made a stored fetch the only route to a Level C
     disclosure, so these tests need a real store rather than a hand-built series.
     """
-    return fetch_and_record(
+    store = SeriesStore(root=tmp_path / "market")
+    repository = ArtifactRepository(tmp_path / "artifacts")
+    fetch = fetch_and_record(
         identifier="RPT-0600",
         source=source or SOURCE,
         symbol="AAPL",
         requested=REQUESTED,
-        store=SeriesStore(root=tmp_path / "market"),
-        repository=ArtifactRepository(tmp_path / "artifacts"),
+        store=store,
+        repository=repository,
     )
+    return fetch, store, repository
 
 
 def test_the_metric_disclosure_carries_the_sources_answer(tmp_path):
@@ -187,8 +190,10 @@ def test_the_metric_disclosure_carries_the_sources_answer(tmp_path):
     Read off the **signed record** since Part 36, not off the source handed in, so
     a caller cannot pair a real vendor's name with a series it never returned.
     """
+    fetch, store, repository = _stored_fetch(tmp_path)
+
     disclosure = disclosure_from(
-        fetch=_stored_fetch(tmp_path), assumptions="Daily closes."
+        fetch=fetch, assumptions="Daily closes.", store=store, repository=repository
     )
 
     assert disclosure.data_source == SOURCE.name
@@ -197,10 +202,14 @@ def test_the_metric_disclosure_carries_the_sources_answer(tmp_path):
 
 def test_additional_limitations_are_appended_never_substituted(tmp_path):
     """A caller may add what they know without removing what rule 5 requires."""
+    fetch, store, repository = _stored_fetch(tmp_path)
+
     disclosure = disclosure_from(
-        fetch=_stored_fetch(tmp_path),
+        fetch=fetch,
         assumptions="Daily closes.",
         additional_limitations="Covers one regime only.",
+        store=store,
+        repository=repository,
     )
 
     assert "Covers one regime only." in disclosure.known_limitations

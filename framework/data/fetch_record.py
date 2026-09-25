@@ -466,91 +466,116 @@ _PROVENANCE_KEYS = frozenset(
 def disclosure_from(
     fetch: Fetch,
     assumptions: str,
+    store: SeriesStore,
+    repository: ArtifactRepository,
     additional_limitations: str = "",
 ) -> FetchedDisclosure:
-    """Build a metric `Disclosure` from a **stored** fetch, and refuse otherwise.
+    """Build a metric `Disclosure` from a stored fetch, and refuse otherwise.
 
     **This is ROADMAP Stage 2's purpose stated as a function.** Every metric
     artifact carries a `data_source` and a `sample_period`, and until Stage 2 both
     were typed at the call site — which is why every number Belay had ever computed
-    said, inside its own signature, that the series was supplied by hand and
-    described no real instrument.
+    said, inside its own signature, that the series was supplied by hand.
 
-    **Why this takes a `Fetch` and not a source and a series.** Owner ruling
-    2026-09-25, `docs/OwnerDecisions.md` Part 36: Level C requires the stored fetch
-    record. The previous form took a `MarketDataSource` and a `DailyBarSeries`, and
-    a `DailyBarSeries` is a frozen dataclass any caller can build — so eight bars
-    typed into a Python file, passed in with a real source, produced a Level C
-    artifact carrying that vendor's name and licence. The grade and the source
-    string agreed and both were wrong. That is the same substitution `fetch_record`
-    prevents for the *source* argument, arriving through the *series* door, and it
-    was found by an independent pass rather than by the author of the code it broke.
+    **Nothing the caller hands in is trusted except the identifier.** Owner ruling
+    Part 36. `fetch` is used to learn *which* record to look for; the record itself
+    is re-read from `repository`, the bytes are resolved from `store.root` and the
+    record's own signed `store_path`, and the disclosure is built from what came
+    off disk. The caller's `fetch.record` and `fetch.stored.path` are deliberately
+    ignored.
 
-    A `Fetch` cannot be obtained without `fetch_and_record` having run: it carries
-    the parsed series, the stored bytes, and the signed record. Everything this
-    function returns is read from that record's **signed content**, so a forged
-    disclosure needs a forged signature.
+    **Why it has to work that way, and it took three attempts to get here.**
 
-    **Four checks, and each refuses rather than downgrading.** A caller reaching
-    this function is claiming a fetch; an unverifiable claim is an error, not a
-    Level D result, and silently handing back Level D would be the flattering
-    direction for the *caller* while hiding a broken store.
+    - Attempt one took a `MarketDataSource` and a `DailyBarSeries`. A
+      `DailyBarSeries` is a frozen dataclass anyone can build, so eight typed bars
+      with a real source produced Level C carrying that vendor's name.
+    - Attempt two took a `Fetch` and checked its record's signature. `Fetch` and
+      `StoredSeries` are also plain dataclasses, and **the signature is an unkeyed
+      hash whose `sign` is a public classmethod** — so a caller supplied the seven
+      provenance keys, signed the result, and got Level C claiming a licensed
+      vendor, a 25-year window and no survivorship bias. `MarketDataSource` was
+      never instantiated, so the survivorship guard never ran.
 
-    1. The record validates — signed and untampered.
-    2. Its signed content carries every provenance key `fetch_record` writes, so a
-       REPORT of another kind cannot pass as a fetch record.
-    3. The bytes the record names are on disk and hash to what it is signed over.
-       This is the "stored" in the ruling: `content_hash` is the record's claim
-       about bytes, and this is the comparison that makes the claim checkable.
-       `fetch_record` runs the same check at write time; this runs it at read time,
-       because a store can lose or rewrite a file in between.
-    4. The window and the survivorship answer are read from the record, never from
-       a caller.
+    Both were found by independent passes, not by the author. The lesson is that
+    `ArtifactValidator` proves a record is *internally consistent*, never that
+    `fetch_record` wrote it. No key set and no marker field can close that, because
+    the adversary is the caller in this process and it can reach anything the code
+    can reach.
 
-    The window comes from `covered_start`/`covered_end` — the bars that actually
-    arrived — never from what was requested. A disclosure stating the requested
-    window would claim coverage the data does not have, which is the same class of
-    error as a source asserting survivorship properties it has not established.
+    **The guarantee this does give, stated exactly.** *This record is in the
+    repository on disk, these are the bytes it names, and the series is the one it
+    describes.* It is **not** "these bytes came from the vendor". Nothing available
+    here can prove that: it would need a signature from the source. A caller
+    determined to fake provenance must now write a permanent, discoverable record
+    into the repository rather than construct an object in memory — a real cost
+    that leaves evidence, which is the honest ceiling absent keyed signing.
 
-    `additional_limitations` is appended, never substituted, so a caller can add
-    what they know without removing what ADR-013 rule 5 requires — the same shape
-    `framework/metrics/statistics.py` uses for ADR-012 rule 7.
-
-    **There is still no `survivorship` parameter and no `source_name` parameter**,
-    for the reason `fetch_record` gives: taking the name rather than the source let
-    a fabricated disclosure be paired with a real source's identity. This form is
-    stronger again — it takes neither, and reads both off the signed record.
+    Five checks, each refusing rather than downgrading. A caller reaching this
+    function is claiming a fetch; an unverifiable claim is an error, not a Level D
+    result, and quietly returning Level D would flatter the caller while hiding a
+    broken store. **Refusal is this session's reading, not the owner's** — the
+    ruling settled what Level C requires, not what happens on failure.
     """
-    ArtifactValidator().validate(fetch.record)
+    identifier, version = fetch.record.id, fetch.record.version
+    stored_record = repository.get(identifier, version)
+    if stored_record is None:
+        raise ValueError(
+            f"no record {identifier} version {version} in the repository at "
+            f"{repository.root}. Owner ruling Part 36: Level C requires the stored "
+            "fetch record, so a record that exists only in the caller's hands "
+            "cannot earn it."
+        )
 
-    content = dict(fetch.record.content)
-    # Checked by shape rather than by a marker key, and that is forced: adding a
-    # `record_type` field to the record's content would change what every fetch
-    # record is signed over, invalidating `artifacts/RPT-0001/1.0.0.yaml` — the one
-    # fetch record this repository holds.
+    content = dict(stored_record.content)
+    # Read off the stored record, never off `fetch.record`. Checked by shape rather
+    # than a marker key because a marker is exactly as forgeable as these are — the
+    # discriminator is that the record came out of the repository, not its fields.
     missing = sorted(_PROVENANCE_KEYS - content.keys())
     if missing:
         raise ValueError(
-            f"{fetch.record.id} is not a fetch record: its signed content is "
-            f"missing {', '.join(missing)}. Only a record written by "
-            "`fetch_record` carries the provenance this disclosure claims."
+            f"{identifier} is not a fetch record: its signed content is missing "
+            f"{', '.join(missing)}. Only a record written by `fetch_record` carries "
+            "the provenance this disclosure claims."
         )
 
+    # The record's OWN signed path, resolved against the store root. Taking the
+    # path from `fetch.stored` let a caller point at any file whose bytes happened
+    # to hash to the record's digest, which made ADR-014 rule 6's `store_path`
+    # inert at read time — the rule exists so a record can name its own bytes.
+    path = store.root / content["store_path"]
     digest = content["content_hash"]
-    path = fetch.stored.path
     if not path.is_file():
         raise ValueError(
-            f"no file at {path}. The record names bytes that are not there, so "
-            "nothing here can claim the series came from a stored fetch. Owner "
-            "ruling Part 36: Level C requires the stored record."
+            f"no file at {path}, which is where {identifier} says its bytes are. "
+            "A record naming bytes that are not there cannot support a Level C "
+            "grade."
         )
     on_disk = hashlib.sha256(path.read_bytes()).hexdigest()
     if on_disk != digest:
         raise ValueError(
-            f"the file at {path} hashes to {on_disk}, and the record is signed "
-            f"over bytes hashing to {digest}. The stored series is not the one this "
-            "record describes, so a Level C grade over it would be a verifiable "
-            "statement about the wrong data."
+            f"the file at {path} hashes to {on_disk}, and {identifier} is signed "
+            f"over bytes hashing to {digest}. The stored series is not the one the "
+            "record describes."
+        )
+
+    # The series the metric will be computed over must be the one the record
+    # describes. Without this, a genuine fetch could have its series swapped and the
+    # disclosed window and the actual bars would be disjoint, at Level C.
+    covered = SamplePeriod(
+        start=date.fromisoformat(content["covered_start"]),
+        end=date.fromisoformat(content["covered_end"]),
+    )
+    if len(fetch.series.bars) != content["observations"]:
+        raise ValueError(
+            f"the series carries {len(fetch.series.bars)} bars and {identifier} "
+            f"records {content['observations']}. The disclosure would describe a "
+            "different series from the one the metric is computed over."
+        )
+    if fetch.series.period() != covered:
+        raise ValueError(
+            f"the series covers {fetch.series.period().start} to "
+            f"{fetch.series.period().end} and {identifier} records {covered.start} "
+            f"to {covered.end}. Same refusal, by window rather than by count."
         )
 
     limitations = content["known_limitations"]
@@ -560,9 +585,6 @@ def disclosure_from(
     return FetchedDisclosure(
         assumptions=assumptions,
         data_source=content["data_source"],
-        sample_period=SamplePeriod(
-            start=date.fromisoformat(content["covered_start"]),
-            end=date.fromisoformat(content["covered_end"]),
-        ),
+        sample_period=covered,
         known_limitations=limitations,
     )

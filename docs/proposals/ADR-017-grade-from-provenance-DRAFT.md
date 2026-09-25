@@ -89,17 +89,21 @@ six inputs determining capital.
 fetch record. Otherwise it carries Level D.** Ruled as Part 35a and, after the gap
 below, again as **Part 36** — "yes require the stored fetch record".
 
-`disclosure_from` takes a `Fetch`: the parsed series, the stored bytes, and the signed
-record over them. It refuses unless
+`disclosure_from` trusts nothing the caller hands in but the record's identifier:
 
-1. the record validates — signed and untampered;
-2. its signed content carries every provenance key `fetch_record` writes, so a REPORT
-   of another kind cannot pass as a fetch record;
-3. the bytes the record names are on disk and hash to what it is signed over;
-4. the vendor name, covered window and survivorship answer are read from that record.
+1. the record is **re-read from the repository** (`repository.get`, which verifies
+   integrity on read). A record that exists only in the caller's hands is refused;
+2. its signed content must carry every provenance key `fetch_record` writes;
+3. the bytes are resolved from **`store.root` and the record's own signed
+   `store_path`** — never the caller's `fetch.stored.path` — and must exist and hash
+   to what the record is signed over;
+4. the series must be the record's own, by observation count and by covered window;
+5. the vendor name, window and survivorship answer are read off that stored record.
 
 Each failure **refuses**. A caller reaching the function is claiming a fetch, and
 handing back Level D instead would flatter the caller while hiding a broken store.
+**Refusal is this session's choice, not the owner's** — the ruling settled what
+Level C requires, not what happens when it is not met.
 
 **This document's first draft ruled the same sentence and built something weaker**, and
 the history is kept because Law VIII makes it an asset: the first implementation took a
@@ -193,34 +197,52 @@ true today and held by no test: `grep -n "EvidenceLevel\|\.level" tests/metrics/
 returns nothing. That is the shape of F-019 and F-032 and it is owed a test, which this
 document should not be ratified without.
 
-## The hole that is closed, and the one that remains
+## What is closed, what is not, and the ceiling
 
-**Closed by Part 36.** The route described in this document's first draft — a real
-`MarketDataSource` plus hand-typed bars — no longer exists: `disclosure_from` takes
-neither argument. Verified against the implementation:
+**Two implementations were broken here before this one.** Both by independent
+passes, both in the flattering direction:
+
+| attempt | what it enforced | how it fell |
+|---|---|---|
+| 1 | came through `disclosure_from` | `DailyBarSeries` is caller-buildable: eight typed bars + a real source → Level C with that vendor's name |
+| 2 | the caller's record validates | `Fetch` is caller-buildable and `ArtifactIntegrity.sign` is **public and unkeyed** → Level C claiming a licensed vendor, 25 years, no survivorship bias, with `MarketDataSource` never instantiated |
+
+**Verified against this implementation:**
 
 ```
-the old attack (source= + series=)        -> TypeError: unexpected keyword argument 'source'
-a Fetch forged around a signed non-record -> ValueError: is not a fetch record
-a genuine stored fetch                     -> FetchedDisclosure, EvidenceLevel.HISTORICAL
-the stored bytes tampered after signing    -> ValueError: is not the one this record describes
-the stored bytes deleted                   -> ValueError: no file at ...
-the record tampered after signing          -> ValueError: integrity ... mismatch
+a hand-built Fetch never saved to the repository -> ValueError: in the repository at ...
+a stored REPORT with no provenance keys          -> ValueError: is not a fetch record
+a genuine record re-signed with a new vendor     -> ignored; the STORED name is used
+the caller's stored.path repointed at a decoy    -> ignored; resolved from store_path
+the record's own bytes deleted                   -> ValueError: no file at ...
+the record's own bytes rewritten                 -> ValueError: not the one the record describes
+the series swapped (count, and window)           -> ValueError, both ways
+a GENUINE stored fetch                           -> FetchedDisclosure, HISTORICAL
 ```
 
-**What remains, stated precisely.** A caller can construct a `FetchedDisclosure`
-directly. That is narrower than what Part 36 closed, and different in kind: it is an
-explicit claim, greppable by class name, rather than something that happens by using
-the ordinary function. It is recorded here rather than fixed because closing it means
-making the class private or binding it to a record too, and neither is worth the
-coupling for a line that announces itself.
+**The ceiling, and it is the honest part.** The integrity hash is unkeyed and
+`sign` is public, so **nothing here can prove a record came from `fetch_record`**.
+What this raises is the cost: faking provenance now means writing a permanent,
+discoverable record into the repository rather than constructing an object in
+memory. That is a real cost that leaves evidence, and it is the best available
+without keyed signing.
 
-**One honest limit on the "stored" check.** It proves the bytes on disk match what the
-record is signed over *at the moment the disclosure is built*. It does not prove the
-bytes came from the vendor rather than being written by whoever also wrote the record —
-that would need a signature from the source, which Belay has no way to obtain. What it
-does close is every route that does not involve running `fetch_and_record` and keeping
-its output intact.
+Keyed signing was sized and **rejected for this purpose**: it collides with
+`AGENTS.md`'s "the same inputs must give the same outputs, on any machine", needs an
+amendment to ADR-005 (Accepted and Implemented), touches 26 test files — and
+decisively, **it would not stop the adversary here.** Every forgery above was
+written by a caller in this process, which can reach a key as easily as the code
+can. It defends against an outsider, which is a different threat.
+
+**Limits that remain, and there is more than one** — an earlier draft called one of
+these "the one honest limit":
+
+- Authenticity, as above.
+- A caller can construct a `FetchedDisclosure` directly, or subclass `Disclosure`
+  and override `evidence_level`. The earlier draft excused the first as "greppable
+  by class name"; the subclass route is not, so that mitigation is weaker than
+  claimed.
+- The byte check is at build time. It says nothing about the file a minute later.
 
 ## Alternatives rejected
 
@@ -236,45 +258,39 @@ its output intact.
 
 ## Verification
 
-**Discharged by the independent pass of 2026-09-25 16:35 UTC** (on #36), which ran what
-this section previously listed as owed:
-
-- **The mutation.** `disclosure_from` returning a plain `Disclosure` turns the suite red
-  with **exactly one** extra failure,
-  `test_a_derived_disclosure_grades_the_metric_historical_and_a_hand_built_one_does_not`.
-  The guard is asserted, not assumed.
-- **Vacuity.** Reverting `metric_artifact` to `level=EvidenceLevel.HISTORICAL` fails both
-  changed tests. Neither passes vacuously.
-- **The conformance claim.** A real fifth field (`from_fetch: bool = False`) added to
-  `Disclosure` does fail
-  `test_the_disclosure_block_names_everything_a_backtest_must_document`. The
-  property/subclass design is forced, as claimed.
-- **Round-trip and copies.** `ArtifactSerializer.dump`/`load`, `dataclasses.replace`,
-  `pickle` and `deepcopy` all preserve the grade; the subclass loses no inherited
-  validation.
-- **The suite.** 710 passed, 1 skipped, 5 xfailed at `9d91870`.
-
-**Part 36's five guards are each asserted by their own test.** Every guard in
-`disclosure_from` mutated one at a time against the committed tree: **each turns the
-suite red on exactly one test, and it is that guard's test.** 715 passed at baseline.
+**Every guard mutated one at a time, against a committed tree.** Baseline 719
+passed, 1 skipped, 5 xfailed. Eight guards, and each turns the suite red:
 
 ```
-MUTANT record validation removed      -> FAILED test_a_disclosure_is_refused_when_the_record_was_tampered_with
-MUTANT returns a plain Disclosure     -> FAILED test_a_derived_disclosure_grades_the_metric_historical_and_a_hand_built_one_does_not
-MUTANT provenance shape check removed -> FAILED test_a_disclosure_cannot_be_derived_from_a_record_that_is_not_a_fetch_record
-MUTANT bytes-missing check removed    -> FAILED test_a_disclosure_is_refused_when_the_stored_bytes_are_gone
-MUTANT bytes-changed check removed    -> FAILED test_a_disclosure_is_refused_when_the_stored_bytes_changed_under_the_record
-                                         (1 failed, 714 passed, 1 skipped, 5 xfailed — each)
+repository re-read -> caller's record   FAILED …needs_a_record_that_is_actually_in_the_repository
+                                        FAILED …tampered_record_handed_in_by_the_caller_is_ignored
+provenance shape check removed          FAILED …stored_record_that_is_not_a_fetch_record_is_refused
+bytes from the caller's path            FAILED …bytes_are_resolved_from_the_records_own_signed_path
+bytes-missing check removed             FAILED …stored_bytes_are_gone
+bytes-changed check removed             FAILED …stored_bytes_changed_under_the_record
+series count check removed              FAILED …records_window_but_extra_bars_is_refused_by_count
+series window check removed             FAILED …right_length_but_the_wrong_window_is_refused
+returns a plain Disclosure              FAILED …grades_the_metric_historical_and_a_hand_built_one_does_not
 ```
 
-**One of those tests exists only because the mutation found it missing.** The record
-validation guard originally survived its own removal at 714 passing — a guard asserted by
-nothing, in code written by the session whose whole subject was guards asserted by
-nothing. It was caught by mutating the new code rather than by reading it, which is the
-argument for doing that on every guard rather than trusting a green suite.
+Seven fail exactly one test. **The repository re-read fails two, and that is
+correct rather than sloppy:** it is the guard that both refuses the forgery and
+makes the caller's record irrelevant, so two distinct claims rest on it. Contorting
+the tests to make it one would hide that.
+
+**Two of those tests were vacuous when first written, and the mutation is what
+caught them.** The path-resolution test wrote the *same* bytes to its decoy, so it
+passed whichever path was read; the count test used bars outside the record's
+window, so the window check caught it first. Both survived their own mutation at 719
+passing. They are rewritten — the decoy now holds different bytes, and the count
+test adds a bar *inside* the window using a fixture whose bars are eight days apart,
+because the ordinary fixture's adjacent days leave no date to insert.
+
+**Reverting the production code with the tests left in place** fails every touched
+test, so none passes vacuously now.
 
 **Still owed before ratification:**
 
 - **A test for `significance_artifact`'s Level D**, which nothing asserts.
-- **An independent pass over this revision.** Part 36's implementation and this
-  document's rewrite have had none.
+- **An independent pass over this revision.** Three have run; each broke the
+  implementation it was given. This one has had none.

@@ -17,7 +17,7 @@ said before lives in `docs/sessions/` and in git history
 Written 2026-09-25, for `main` at `95e5a4a`, plus this branch
 (`claude/brave-pascal-e7401x`, Issue #35) which is not yet merged.
 
-- **Suite:** 715 passed, 1 skipped, 5 xfailed (`python -m pytest -q`) on this
+- **Suite:** 719 passed, 1 skipped, 5 xfailed (`python -m pytest -q`) on this
   branch. `main` at `95e5a4a` is 704. **Re-derive this rather than carrying it
   forward:** the line read "709" through two consecutive commits, which was the
   *passing* count of a red run, so fixing the failure moved it while the sentence
@@ -40,13 +40,15 @@ Written 2026-09-25, for `main` at `95e5a4a`, plus this branch
   series came from a recorded fetch (F-033, drafted as ADR-017, **not ratified**),
   and `pandas`/`jinja2`/`python-dateutil` are removed with `numpy` not declared
   (F-036). Both are implemented on this branch.
-- **F-033 is now implemented as ruled.** The owner answered "yes require the
-  stored fetch record" (**Part 36**), closing the gap an independent pass found in
-  Part 35's implementation. `disclosure_from` takes a `Fetch` and verifies the
-  record's signature, its provenance keys, and that the bytes it names are on disk
-  and hash to what it is signed over. Five guards, each asserted by its own test
-  and each mutation-checked. **ADR-017 still owes the owner's ratification** and
-  has had no independent pass since it was rewritten.
+- **F-033: the third implementation of Part 36 is standing.** Two earlier ones
+  were broken by independent passes — the second let a caller build a `Fetch` and
+  sign its own record, because `ArtifactIntegrity.sign` is public over an unkeyed
+  hash. `disclosure_from` now re-reads the record from the repository, resolves
+  bytes from `store.root` plus the record's signed `store_path`, and binds the
+  series to it. Eight guards, all mutation-asserted. **The guarantee is "this
+  record is on disk where it says it is" — not "it came from the vendor", which
+  nothing here can prove.** ADR-017 still owes ratification and **has had no pass
+  on this revision.**
 - **F-036 is verified** in a fresh virtual environment: the install pulls none of
   the four packages, the suite passes, `status.py` exits 0, all six `scripts/` run
   and the dashboard renders. See

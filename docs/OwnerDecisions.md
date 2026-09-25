@@ -3576,39 +3576,61 @@ it decides what a metric artifact must carry and touches ADR-014.
 
 ### What it settles
 
-- **36a. Level C requires the stored fetch record.** `disclosure_from` takes a
-  `Fetch` — the parsed series, the stored bytes and the signed record — and
-  refuses anything it cannot verify. A `Fetch` cannot be had without
-  `fetch_and_record` having run.
-- **36b. Four things are checked, and each refuses rather than downgrading.** The
-  record validates; its signed content carries every provenance key
-  `fetch_record` writes; the bytes it names are on disk and hash to what it is
-  signed over; and the vendor name, covered window and survivorship answer are
-  read from the record, never from a caller.
-- **36c. Refusal, not a quiet Level D.** A caller reaching that function is
-  claiming a fetch. Handing back Level D instead would flatter the caller while
-  hiding a broken store.
-- **36d. Part 35a is delivered by this, and was never wrong.** The gap was
-  between the ruling and the code. The ruling stands as recorded.
+- **36a. Level C requires the stored fetch record.** `disclosure_from` trusts
+  nothing the caller hands in but the record's identifier: it re-reads the record
+  from the repository, resolves the bytes from the store root and the record's own
+  signed `store_path`, and checks the series against the record.
+- **36b. What that guarantees, stated exactly.** *This record is on disk in the
+  repository where it says it is, these are the bytes it names, and this is the
+  series it describes.* It is **not** "these bytes came from the vendor". Nothing
+  available can prove that — see the note on the signature below.
+- **36c. Part 35a is delivered by this, and was never wrong.** The gap was between
+  the ruling and the code. The ruling stands as recorded.
+
+**Corrected 2026-09-25, before this was acted on, and the correction matters.**
+36a first read: *"A `Fetch` cannot be had without `fetch_and_record` having run."*
+**That was false**, and it sat here in "What it settles" where it read as part of
+the ruling. `Fetch` and `StoredSeries` are plain dataclasses and
+`ArtifactIntegrity.sign` is a **public classmethod over an unkeyed hash**, so a
+caller built a `Fetch` around a record it signed itself and obtained a Level C
+disclosure claiming a licensed vendor, a 25-year window and no survivorship bias —
+without `MarketDataSource` ever being instantiated, so the survivorship guard never
+ran. Found by the third independent pass. The ruling was right both times; the
+implementation was wrong twice, in the same direction.
 
 ### Session readings, not the owner's words
 
+- **Refusal rather than a quiet Level D.** The question asked what Level C
+  requires, not what happens when it is not met. "No stored record, therefore
+  Level D" is an equally faithful reading. Refusal is the stricter choice and this
+  session's, not the owner's. Listed under "What it settles" until the third pass
+  pointed out it did not belong there.
+- **Reading the record back from the repository** as the way to anchor trust. The
+  owner ruled that the stored record is required, not how to establish that one is
+  stored.
 - **How a fetch record is told apart from any other report.** By the presence of
-  the provenance keys, not by a new marker field. A marker would change what
-  every fetch record is signed over and invalidate
-  `artifacts/RPT-0001/1.0.0.yaml`, the one fetch record this repository holds.
-  The owner ruled the requirement, not this mechanism.
-- **That ADR-017 carries this rather than a new ADR-018.** ADR-017 is unratified
-  and is about exactly this question, so its Decision was rewritten to the ruled
-  form. A second ADR for the same decision would split it across two documents.
+  the provenance keys. **The justification first given for this was also wrong:**
+  it claimed a marker field would invalidate `artifacts/RPT-0001/1.0.0.yaml`.
+  Tested — it would not. That artifact's hash is over its own stored content, and
+  changing the emitting code cannot alter a file on disk. The real reason a marker
+  is no better is that it is exactly as forgeable; what does the work is the record
+  having come out of the repository at all.
+- **That ADR-017 carries this rather than a new ADR-018.** It is unratified and is
+  about exactly this question.
 
 ### What it does not settle
 
 - **ADR-017's ratification.** Still owed, and still the owner's alone.
 - **Any change to `constitution/Evidence_Standards.md`.** Untouched.
-- **The one remaining route to a hand-made Level C:** constructing a
-  `FetchedDisclosure` directly. Narrower than what this closes, an explicit and
-  greppable claim rather than a by-product of the ordinary path, and not raised
-  to the owner as a question.
+- **Authenticity.** The integrity hash is unkeyed, so no check here can prove a
+  record came from `fetch_record` rather than from a caller. What this raises is
+  the *cost*: a caller faking provenance must now write a permanent, discoverable
+  record into the repository instead of constructing an object in memory. Keyed
+  signing would change that and was put to the owner as a sizing question: it
+  collides with the determinism rule, needs an ADR-005 amendment, and — decisively
+  — would not stop an in-process caller, which is the adversary here.
+- **Remaining narrower routes:** constructing a `FetchedDisclosure` directly, or
+  subclassing `Disclosure` to override `evidence_level`. Neither is greppable by
+  the class name the earlier draft relied on.
 - **F-003.** Nothing calls `disclosure_from` in production yet, so every metric
   artifact is still Level D. Unchanged by this ruling.
