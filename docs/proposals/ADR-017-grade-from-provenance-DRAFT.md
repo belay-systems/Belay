@@ -289,8 +289,15 @@ because the ordinary fixture's adjacent days leave no date to insert.
 **Reverting the production code with the tests left in place** fails every touched
 test, so none passes vacuously now.
 
+**`significance_artifact`'s Level D is now asserted.**
+`test_the_significance_artifact_is_graded_research_not_historical` was added after the
+third pass pointed out this document stated the consequence as fact while no test
+covered it — F-019's and F-032's shape, in a governing document. Confirmed not
+vacuous: reinstating the hardcoded `EvidenceLevel.HISTORICAL` in `metric_artifact`
+fails it, along with the two other tests that assert the same line.
+
 **Still owed before ratification:**
 
-- **A test for `significance_artifact`'s Level D**, which nothing asserts.
 - **An independent pass over this revision.** Three have run; each broke the
-  implementation it was given. This one has had none.
+  implementation it was given. This one has had none, and the absence of a fourth is
+  not evidence.

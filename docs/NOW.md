@@ -17,7 +17,7 @@ said before lives in `docs/sessions/` and in git history
 Written 2026-09-25, for `main` at `95e5a4a`, plus this branch
 (`claude/brave-pascal-e7401x`, Issue #35) which is not yet merged.
 
-- **Suite:** 719 passed, 1 skipped, 5 xfailed (`python -m pytest -q`) on this
+- **Suite:** 720 passed, 1 skipped, 5 xfailed (`python -m pytest -q`) on this
   branch. `main` at `95e5a4a` is 704. **Re-derive this rather than carrying it
   forward:** the line read "709" through two consecutive commits, which was the
   *passing* count of a red run, so fixing the failure moved it while the sentence
