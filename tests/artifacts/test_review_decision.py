@@ -405,3 +405,34 @@ def test_an_artifact_typed_review_but_not_built_here_is_refused():
 
     with pytest.raises(ValueError):
         review_fields(hollow)
+
+
+# ------------------------- F-019: outcomes that the stage movement alone cannot catch
+#
+# `reports/review/2026-09-04-review.md:89` (F-019). In both cases below the
+# movement is legal on the ladder, so only the outcome check stands between the
+# caller and a signed record that says the opposite of what happened to the
+# money. Disabling either check left the whole suite green. Owner ruling:
+# `docs/OwnerDecisions.md` Part 21.
+
+
+def test_a_retirement_that_lands_on_a_capital_stage_is_refused():
+    """`Promotion Review -> Micro Capital` is a legal climb. Recorded as `Retire`,
+    it would be a signed record of a retirement that funds the strategy."""
+    with pytest.raises(ValueError, match="a retirement ends at"):
+        a_review(
+            outcome=ReviewOutcome.RETIRE,
+            stage_at_review=StrategyLifecycle.PROMOTION_REVIEW,
+            resulting_stage=StrategyLifecycle.MICRO_CAPITAL,
+        )
+
+
+def test_a_promotion_that_descends_the_ladder_is_refused():
+    """`Production -> Paper Trading` is a legal demotion. Recorded as `Promote`,
+    it would be a signed record of a promotion that took capital away."""
+    with pytest.raises(ValueError, match="a promotion climbs the ladder"):
+        a_review(
+            outcome=ReviewOutcome.PROMOTE,
+            stage_at_review=StrategyLifecycle.PRODUCTION,
+            resulting_stage=StrategyLifecycle.PAPER_TRADING,
+        )
