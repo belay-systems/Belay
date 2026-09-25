@@ -934,7 +934,7 @@ the code in front of it.
 data source has code that turns those bytes into prices", the claim that a stored
 fingerprint "makes" `RPT-0001` a migration, and which method a parser change hurts.
 They stand here as they were put; the corrections are in `docs/OwnerDecisions.md`
-Part 40 and the open question above.
+Part 40 and the Done entry above (kept).
 
 ## Done — 2026-09-25: what should ADR-017 promise? (option A)
 
@@ -958,7 +958,7 @@ help; the answer given, no for this problem, is recorded in Part 37.
 **Answered. Owner said "yes to fingerprint"** — recorded as
 `docs/OwnerDecisions.md` **Part 38**, with two things the owner was told wrong and
 one cost not stated, all recorded there: the fingerprint is not the only method
-(the open question above), the ADR-014 cost to the saved record `RPT-0001` was not
+(the Done entries above), the ADR-014 cost to the saved record `RPT-0001` was not
 stated, and re-fetching would not give `RPT-0001` a fingerprint.
 
 ## Done — 2026-09-25: each result names its fetch record (follow-up 2)
