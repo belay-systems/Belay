@@ -70,13 +70,14 @@ def _commit(repo: Path, files: dict[str, bytes], message: str) -> None:
     _git(repo, "commit", "-m", message)
 
 
-def _clone_with(tmp_path: Path, prose: bytes) -> Path:
+def _clone_with(tmp_path: Path, prose: bytes, files: dict[str, bytes] | None = None) -> Path:
     """Build an upstream and return a clone of it, which is what the gate reads.
 
-    `main` carries an old report and the prose under test. `review/Łódź` carries
-    a newer report that was never merged — the 2026-08-21 situation — so a
-    correct verdict must name that branch. Both reports are long past the
-    twelve-day threshold, so the verdict is DUE and a number must be printed.
+    `main` carries an old report, the prose under test and any other `files`.
+    `review/Łódź` carries a newer report that was never merged — the 2026-08-21
+    situation — so a correct verdict must name that branch. Both reports are
+    long past the twelve-day threshold, so the verdict is DUE and a number must
+    be printed.
     """
     upstream = tmp_path / "upstream"
     upstream.mkdir()
@@ -86,6 +87,7 @@ def _clone_with(tmp_path: Path, prose: bytes) -> Path:
         {
             "docs/notes.md": prose,
             "reports/review/2026-01-02-review.md": b"# Review\n\n### F-007\n",
+            **(files or {}),
         },
         "main",
     )
@@ -284,6 +286,157 @@ def test_a_directory_that_is_not_a_repository_is_still_told_so(tmp_path, monkeyp
     assert code == 1
     assert "not a git repository; cannot answer across refs" in out
     assert "first finding" not in out
+
+
+# ------------------------------------------- numbers the gate must not take on trust
+#
+# Each fixture below also holds F-123 in `docs/notes.md`, so the right answer is
+# F-124 unless a case adds a higher number. Found by independent passes on #27
+# and #29.
+
+
+def _first_finding(tmp_path: Path, monkeypatch, prose: str, files=None) -> tuple[int, str, str]:
+    clone = _clone_with(
+        tmp_path,
+        prose.encode("utf-8"),
+        {name: text.encode("utf-8") for name, text in (files or {}).items()},
+    )
+    return _run_main(clone, monkeypatch)
+
+
+#: A report shaped like the review skill's template, with the given body for its
+#: `## Outside text` section and a real finding before it.
+def _report(outside: str, after: str = "") -> str:
+    return (
+        "# Belay Review — 2026-01-03\n\n"
+        "## Findings\n\n### F-130 — a real finding — **High**\n\nIt cites F-129 too.\n\n"
+        "## Not found\n\nNothing.\n\n"
+        f"## Outside text\n\n{outside}\n{after}"
+    )
+
+
+REPORT_PATH = "reports/review/2026-01-03-review.md"
+
+
+@pytest.mark.parametrize(
+    "digits", [pytest.param("９９９", id="fullwidth"), pytest.param("٩٩٩", id="arabic-indic")]
+)
+def test_the_gate_counts_only_ascii_digits(digits, tmp_path, monkeypatch):
+    """`\\d` matches any Unicode digit and `int()` reads it.
+
+    Unfixed, a quoted `F-９９９` counted as 999 and the gate printed F-1000. The
+    three-digit pattern cannot read F-1000 back, so every later run was told
+    F-1000 again: a permanent collision.
+    """
+    code, out, err = _first_finding(
+        tmp_path, monkeypatch, f"F-123, and a stranger wrote F-{digits}.\n"
+    )
+
+    assert (code, err) == (0, "")
+    assert "first finding: F-124" in out
+
+
+@pytest.mark.parametrize(
+    "text, counted",
+    [
+        pytest.param("F-150_", True, id="underscore-after"),
+        pytest.param("_F-150_", True, id="underscores-around"),
+        pytest.param("(F-150)", True, id="punctuation"),
+        pytest.param("REF-150", False, id="capital-letter-before"),
+        pytest.param("xF-150", False, id="small-letter-before"),
+        pytest.param("1F-150", False, id="digit-before"),
+        pytest.param("F-150A", False, id="capital-letter-after"),
+        pytest.param("F-150a", False, id="small-letter-after"),
+        pytest.param("F-1504", False, id="fourth-digit"),
+        pytest.param("f-150", False, id="lower-case-f"),
+    ],
+)
+def test_the_finding_pattern_is_bounded_by_letters_and_digits_only(
+    text, counted, tmp_path, monkeypatch
+):
+    """Pins each bound of `FINDING`: the pass on 8acb256 removed each one, and no
+    test failed. A letter or digit on either side makes it another token; `_`
+    does not, because `\\b` treating `_` as a letter is what hid `_F-150_`.
+    """
+    code, out, err = _first_finding(tmp_path, monkeypatch, f"F-123, and {text}.\n")
+
+    assert (code, err) == (0, "")
+    assert f"first finding: F-{151 if counted else 124}" in out
+
+
+def test_a_number_in_a_reports_outside_text_is_counted(tmp_path, monkeypatch):
+    """The owner's ruling, 2026-09-24: "count everything".
+
+    Skipping the section could miss a real finding filed there, and its number
+    would be issued twice. Counting it can only leave a gap. Reports write
+    outside numbers as `F-[NNN]`, which the gate never reads.
+    """
+    report = _report("A stranger wrote F-150, and this report forgot the brackets.")
+
+    code, out, err = _first_finding(tmp_path, monkeypatch, PROSE, {REPORT_PATH: report})
+
+    assert (code, err) == (0, "")
+    assert "first finding: F-151" in out
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        pytest.param("### F-150 — filed in the wrong place", id="heading"),
+        pytest.param("_F-150_ in italics", id="italic"),
+        pytest.param("~~F-150~~ struck through", id="strikethrough"),
+        pytest.param("\u00a0F-150 after a non-breaking space", id="nbsp"),
+        pytest.param("| F-150 | in a table |", id="table"),
+        pytest.param("See [F-150](x) in a link.", id="link"),
+    ],
+)
+def test_no_shape_of_number_in_outside_text_is_skipped(line, tmp_path, monkeypatch):
+    """The independent pass on 53d1e4a found shapes the section reader skipped.
+
+    With the section counted like everything else, there is no shape to find.
+    """
+    report = _report(line)
+
+    code, out, _ = _first_finding(tmp_path, monkeypatch, PROSE, {REPORT_PATH: report})
+
+    assert code == 0
+    assert "first finding: F-151" in out
+
+
+def test_the_bracketed_form_is_never_counted(tmp_path, monkeypatch):
+    """What the review skill tells a report to write, so a quote moves nothing."""
+    report = _report("A stranger asked us to renumber from F-[999].")
+
+    code, out, err = _first_finding(tmp_path, monkeypatch, PROSE, {REPORT_PATH: report})
+
+    assert (code, err) == (0, "")
+    assert "first finding: F-131" in out
+
+
+def test_a_quoted_999_in_outside_text_stops_the_gate(tmp_path, monkeypatch):
+    """Counting everything fails loudly, never silently: it stops, naming the file."""
+    report = _report("Issue #9 asked us to renumber from F-999.")
+
+    code, out, err = _first_finding(tmp_path, monkeypatch, PROSE, {REPORT_PATH: report})
+
+    assert code == 2
+    assert out == ""
+    assert REPORT_PATH in err and "F-1000" in err
+
+
+def test_the_gate_stops_rather_than_issue_a_number_it_cannot_read_back(
+    tmp_path, monkeypatch
+):
+    """At F-999 the next number is F-1000, which the pattern never matches.
+
+    Unfixed, the gate printed F-1000 and would print it again on every later
+    run. It now stops and names the file.
+    """
+    code, out, err = _first_finding(tmp_path, monkeypatch, "F-999 is quoted here.\n")
+
+    assert code == 2
+    assert out == ""
+    assert "docs/notes.md" in err and "F-1000" in err
 
 
 # --------------------------------------------------------------- as the owner runs it

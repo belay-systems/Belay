@@ -71,8 +71,8 @@ def test_replace_does_not_resign_an_artifact():
 # --------------------------------------- F-019: the stage checks, each on its own
 #
 # `reports/review/2026-09-04-review.md:89` (F-019). Disabling either check below
-# left the whole suite green, because every STRATEGY and REPORT the suite builds
-# goes through `ArtifactFactory`, which refuses the same mistakes first. These
+# left the whole suite green, because no test built a STRATEGY without a stage or
+# a REPORT with one; `ArtifactFactory` refuses neither, so this is the only check. These
 # build the artifact directly and sign it, so the validator is the only thing
 # that can refuse it. Owner ruling: `docs/OwnerDecisions.md` Part 21.
 
