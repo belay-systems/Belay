@@ -3514,8 +3514,9 @@ welcome but never waited for (Part 30b)."
 
 ### What it settles
 
-- **32a. A stage read judges every past step by today's bar.** 25g's "It
-  does not re-judge past steps" is overruled. A raised bar lowers the stage
+- **32a. A stage read judges every past step by today's bar.** 25g's first
+  two sentences, "A raised bar applies from each strategy's next step. It does
+  not re-judge past steps.", are overruled. A raised bar lowers the stage
   read of any strategy whose steps no longer meet it, at once, not from its
   next step. 25g's other words stand: "No strategy holds capital today."
 - **32b. 25h and 26b amend 18e.** The count of variants tried still corrects
@@ -3604,8 +3605,8 @@ typo), but never before the day the demotion was recorded in Belay."
 - **33b.** 25b's significance report is a backtest report on the Paper
   Trading rung and on every capital rung, kept apart from the seven records of
   18a and 25a. Paper and live lengths stay with 18d and 25e.
-- **33c.** A repair review may set aside only a version that has no valid
-  base, or whose own chain fails the checks. A genuine demotion or retirement
+- **33c.** A repair review may set aside only a file that doesn't hold up:
+  one with no valid base, or whose own chain fails the checks. A genuine demotion or retirement
   is lifted only as 28a says.
 - **33d.** A correction under 28c may move a demotion's date later, never
   earlier than the day the demotion was recorded in Belay.
@@ -3620,3 +3621,53 @@ typo), but never before the day the demotion was recorded in Belay."
 
 It does not ratify either ADR. Under 32c, a fresh pass on the text as
 ratified still comes right before ratification.
+
+# Part 34 — Ruled 2026-09-25: fix the author's errors, then stop the text rounds
+
+**Question put.** A sixth fresh-session pass attacked the edits this session
+made for Parts 32 and 33. It found 5 blocking findings and 15 others. Several
+were the author's own errors: a misquotation of 25g (F6-1), a rule that left
+out supersessions needing no yes (F6-2), and "version" written in Part 33c's
+record where the owner's chosen answer said "file" (F6-15). Others came from
+rulings interacting, and raised five new owner questions. The session said
+that six rounds in a row had each grown new edge cases, the author's
+included, and that no capital rung can open today. It asked: "The text keeps
+growing new holes with every fix. How do we stop the loop?" The answer
+chosen read: "1) Fix only my mistakes: the misquote, the 'version'/'file'
+wording in your record, the missing no-yes supersessions, the one-clause
+demotion guard, and the nits. 2) Record every sixth-pass finding and its five
+questions as open items and step-2 tests, with no more rule rewrites. 3) Push,
+marked plainly as not re-checked. The next attacks happen on the code (step 2)
+and on the final text before you ratify (32c)."
+
+**Owner chose: "Fix my errors, then stop (Recommended)".**
+
+### What it settles
+
+- **34a. The text rounds on ADR-015 and ADR-016 end here.** The author's
+  errors found by the sixth pass are fixed. Every other finding, and the five
+  questions it raised, are open items and step-2 tests. The next attacks are
+  on the code (28e step 2) and on the text as ratified (32c).
+- **34b. These last fixes are pushed without another pass, and say so.**
+
+### Corrections made in this pull request, before merge
+
+- **32a** named only "It does not re-judge past steps" as overruled. The
+  answer the owner chose ("raising the bar immediately drops any strategy")
+  also overrules 25g's first sentence. 32a's "What it settles" now names both
+  sentences (sixth-pass finding F6-14).
+- **33c** said "version" where the owner's chosen answer said "file". It now
+  says "file" (F6-15). Whether "file" also covers a stored `Demote` or
+  `Retire` review is the first of the five open questions.
+
+### Session readings, not the owner's words
+
+- **33d's chosen answer gave a backwards example.** It said a correction "can
+  move the date later (for example, fixing a future-dated typo)". Fixing a
+  future-dated typo moves the date earlier. The operative words, "never before
+  the day the demotion was recorded in Belay", are what ADR-015 implements.
+
+### What it does not settle
+
+The five questions (ADR-016's Required Follow-Up, item 19). They are put when
+step 2 starts. It does not ratify either ADR.
