@@ -5430,9 +5430,9 @@ Negative:
 - `tests/artifacts/test_review_decision.py` gains evidence at every construction,
   `Remain Current Stage` included (18c), and `review_artifact()`'s signature grows
   by four parameters here (`evidence`, required; `subject_integrity_hash`;
-  `subject_ladder_length`; `evidence_summary`) and by ADR-016's five content keys
+  `subject_ladder_length`; `evidence_summary`) and by ADR-016's six content keys
   (rule 5). *(Corrected 2026-09-24, finding B7: this said `Promote`, `Demote` and
-  `Retire` only.)*
+  `Retire` only. Five became six on 2026-09-25, finding 2N5.)*
 - **building a strategy for a test stops being a one-liner.** Reaching
   `MICRO_CAPITAL` legitimately takes five strategy versions and five evidenced
   reviews. A shared climbing fixture is not optional
